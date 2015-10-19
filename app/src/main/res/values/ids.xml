@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="id_launchview_neutralzone"></item>
+    <array name="laneIds">
+        <item type="id" name="id_launchview_lane1"></item>
+        <item type="id" name="id_launchview_lane2"></item>
+        <item type="id" name="id_launchview_lane3"></item>
+        <item type="id" name="id_launchview_lane4"></item>
+        <item type="id" name="id_launchview_lane5"></item>
+        <item type="id" name="id_launchview_lane6"></item>
+        <item type="id" name="id_launchview_lane7"></item>
+        <item type="id" name="id_launchview_lane8"></item>
+    </array>
+</resources>
