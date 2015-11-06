@@ -1,6 +1,5 @@
-package de.devmil.paperlaunch.storage;
+package de.devmil.paperlaunch.utils;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
@@ -10,22 +9,13 @@ import android.util.Log;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-public abstract class DBUtils {
-    private static Intent getIntentFromString(String string) {
-        //TODO: serializableIntent
-        return null;
-    }
+public abstract class BitmapUtils {
 
-    private static String getStringFromIntent(Intent intent) {
-        //TODO: serializableIntent
-        return null;
-    }
-
-    private static Drawable getIcon(byte[] rawData) {
+    public static Drawable getIcon(byte[] rawData) {
         return Drawable.createFromStream(new ByteArrayInputStream(rawData), null);
     }
 
-    private static byte[] getBytes(Drawable drawable) {
+    public static byte[] getBytes(Drawable drawable) {
         Bitmap bmp = drawableToBitmap(drawable);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);

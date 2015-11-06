@@ -22,7 +22,7 @@ import java.util.List;
  * Created by michaellamers on 29.05.15.
  */
 public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
-    private List<LaunchEntry> mEntries;
+    private List<Launch> mEntries;
     private float mImageWidthDip = 40;
     private float mLowerElevationDip = 2;
     private float mHighElevationDip = 6;
@@ -34,7 +34,7 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private float mNeutralZoneWidthDip = 40;
     private float mImageOffsetDip = 5;
 
-    public List<LaunchEntry> getEntries()
+    public List<Launch> getEntries()
     {
         return new ArrayList<>(mEntries);
     }
@@ -43,7 +43,7 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     {
     }
 
-    public void setEntries(List<LaunchEntry> entries)
+    public void setEntries(List<Launch> entries)
     {
         mEntries = new ArrayList<>(entries);
     }

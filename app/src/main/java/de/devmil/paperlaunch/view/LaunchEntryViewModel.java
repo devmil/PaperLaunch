@@ -15,10 +15,11 @@
  */
 package de.devmil.paperlaunch.view;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import de.devmil.paperlaunch.model.ILaunchEntryConfig;
-import de.devmil.paperlaunch.model.LaunchEntry;
+import de.devmil.paperlaunch.model.Launch;
 
 /**
  * Created by michaellamers on 29.05.15.
@@ -136,7 +137,7 @@ public class LaunchEntryViewModel {
         return mConfig.getEntryAlphaAnimationDuration();
     }
 
-    public static LaunchEntryViewModel createFrom(LaunchEntry entry, ILaunchEntryConfig config) {
-        return new LaunchEntryViewModel(entry.getAppName(), entry.getAppIcon(), config);
+    public static LaunchEntryViewModel createFrom(Context context, Launch launch, ILaunchEntryConfig config) {
+        return new LaunchEntryViewModel(launch.getName(context), launch.getIcon(context), config);
     }
 }

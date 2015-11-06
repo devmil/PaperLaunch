@@ -17,6 +17,7 @@ public class EntriesAccess {
                 EntriesSQLiteOpenHelper.COLUMN_ENTRIES_PARENTFOLDERID,
                 EntriesSQLiteOpenHelper.COLUMN_ENTRIES_ORDERINDEX
             };
+
     private static final int INDEX_COLUMN_ID = 0;
     private static final int INDEX_COLUMN_FOLDERID = 1;
     private static final int INDEX_COLUMN_LAUNCHID = 2;
@@ -65,6 +66,40 @@ public class EntriesAccess {
                 EntriesSQLiteOpenHelper.TABLE_ENTRIES,
                 entriesColumns,
                 EntriesSQLiteOpenHelper.COLUMN_ID + " = " + entryId,
+                null,
+                null,
+                null,
+                null
+        );
+
+        if(c.moveToFirst()) {
+            return cursorToEntry(c);
+        }
+        return null;
+    }
+
+    public EntryDTO queryEntryForFolder(long folderId) {
+        Cursor c = mDatabase.query(
+                EntriesSQLiteOpenHelper.TABLE_ENTRIES,
+                entriesColumns,
+                EntriesSQLiteOpenHelper.COLUMN_ENTRIES_FOLDERID + " = " + folderId,
+                null,
+                null,
+                null,
+                null
+        );
+
+        if(c.moveToFirst()) {
+            return cursorToEntry(c);
+        }
+        return null;
+    }
+
+    public EntryDTO queryEntryForLaunch(long launchId) {
+        Cursor c = mDatabase.query(
+                EntriesSQLiteOpenHelper.TABLE_ENTRIES,
+                entriesColumns,
+                EntriesSQLiteOpenHelper.COLUMN_ENTRIES_LAUNCHID + " = " + launchId,
                 null,
                 null,
                 null,

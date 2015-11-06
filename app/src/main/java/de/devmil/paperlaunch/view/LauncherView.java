@@ -16,7 +16,6 @@
 package de.devmil.paperlaunch.view;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.LinearLayout;
@@ -27,7 +26,7 @@ import java.util.List;
 
 import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.model.LaunchConfig;
-import de.devmil.paperlaunch.model.LaunchEntry;
+import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.utils.ViewUtils;
 
 /**
@@ -100,9 +99,9 @@ public class LauncherView extends RelativeLayout {
         //TODO: split into auto folders if there are too many of them
         List<LaunchLaneViewModel> laneModels = new ArrayList<>();
         List<LaunchEntryViewModel> entryModels = new ArrayList<>();
-        for(LaunchEntry e : mConfig.getEntries())
+        for(Launch e : mConfig.getEntries())
         {
-            entryModels.add(LaunchEntryViewModel.createFrom(e, mConfig));
+            entryModels.add(LaunchEntryViewModel.createFrom(getContext(), e, mConfig));
         }
         laneModels.add(new LaunchLaneViewModel(entryModels, mConfig));
 
