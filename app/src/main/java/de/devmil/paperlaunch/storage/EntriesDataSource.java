@@ -14,63 +14,128 @@ import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.devmil.paperlaunch.model.LaunchEntry;
 
 public class EntriesDataSource {
 
-    private SQLiteDatabase database;
-    private EntriesSQLiteOpenHelper dbHelper;
-
-    private String[] allColumns = {
-            EntriesSQLiteOpenHelper.COLUMN_ID,
-            EntriesSQLiteOpenHelper.COLUMN_ORDERINDEX,
-            EntriesSQLiteOpenHelper.COLUMN_NAME,
-            EntriesSQLiteOpenHelper.COLUMN_LAUNCHINTENT,
-            EntriesSQLiteOpenHelper.COLUMN_ICON,
-            EntriesSQLiteOpenHelper.COLUMN_ISFOLDER,
-            EntriesSQLiteOpenHelper.COLUMN_FOLDERID
-    };
-
-    private static final int COLUMN_ID_INDEX = 0;
-    private static final int COLUMN_ORDERINDEX_INDEX = 1;
-    private static final int COLUMN_LAUNCHINTENT_INDEX = 2;
-    private static final int COLUMN_NAME_INDEX = 3;
-    private static final int COLUMN_ICON_INDEX = 4;
-    private static final int COLUMN_ISFOLDER_INDEX = 5;
-    private static final int COLUMN_FOLDERID_INDEX = 6;
+    private EntriesSQLiteOpenHelper mHelper;
+    private SQLiteDatabase mDatabase;
+    private EntriesAccess mEntriesAccess;
 
     public EntriesDataSource(Context context) {
-        dbHelper = new EntriesSQLiteOpenHelper(context);
+        mHelper = new EntriesSQLiteOpenHelper(context);
     }
 
     public void open() throws SQLiteException {
-        database = dbHelper.getWritableDatabase();
+        mDatabase = mHelper.getWritableDatabase();
+        mEntriesAccess = new EntriesAccess(mDatabase);
     }
 
     public void close() {
-        dbHelper.close();
+        rollbackTransaction();
+        mDatabase = null;
+        mEntriesAccess = null;
+        mHelper.close();
     }
 
-    public LaunchEntry createEntry(boolean isFolder) {
-        ContentValues values = new ContentValues();
+    public void startTransaction() {
+        mDatabase.beginTransaction();
+    }
 
-        values.put(EntriesSQLiteOpenHelper.COLUMN_ISFOLDER, isFolder ? 1 : 0);
+    public void commitTransaction() {
+        if(mDatabase != null && mDatabase.inTransaction()) {
+            mDatabase.setTransactionSuccessful();
+            mDatabase.endTransaction();
+        }
+    }
 
-        long id = database.insert(EntriesSQLiteOpenHelper.TABLE_ENTRIES, null, values);
+    public void rollbackTransaction() {
+        if(mDatabase != null && mDatabase.inTransaction()) {
+            mDatabase.endTransaction();
+        }
+    }
 
-        Cursor cursor = database.query(
-                EntriesSQLiteOpenHelper.TABLE_ENTRIES,
-                allColumns,
-                EntriesSQLiteOpenHelper.COLUMN_ID + " = " + id,
-                null,
-                null,
-                null,
-                null);
-        cursor.moveToFirst();
-        LaunchEntry result = cursorToEntry(cursor);
-        cursor.close();
-        return result;
+    public LaunchEntry createLaunch(long parentFolderId) {
+        //create Entry
+        EntryDTO entry = mEntriesAccess.createNew();
+        entry.setParentFolderId(parentFolderId);
+        //create Launch
+        LaunchDTO launch = mLaunchesAccess.createNew();
+        //relate them
+        entry.setLaunchId(launch.getId());
+
+        mEntriesAccess.update(entry);
+
+        return loadLaunch(launch.getId());
+    }
+
+    public FolderEntry createFolder(long parentFolderId) {
+        //create Entry
+        EntryDTO entry = mEntriesAccess.createNew();
+        entry.setParentFolderId(parentFolderId);
+        //create folder
+        FolderDTO folder = mFoldersAccess.createNew();
+        //relate them
+        entry.setFolderId(folder.getId());
+
+        mEntriesAccess.update(entry);
+
+        return loadFolder(folder.getId());
+    }
+
+    public LaunchEntry loadLaunch(long launchId) {
+        LaunchDTO launch = mLaunchesAccess.queryLaunch(launchId);
+
+        return createLaunchFromDTO(launch);
+    }
+
+    public FolderEntry loadFolder(long folderId) {
+        FolderDTO folder = mFoldersAccess.queryFolder(folderId);
+
+        List<EntryDTO> subEntryDTOs = mEntriesAccess.queryAllEntries(folder.getId());
+
+        return createFolderFromDTO(folder, subEntryDTOs);
+    }
+
+    public void updateLaunchData(LaunchEntry launchEntry) {
+        LaunchDTO launch = getDTOFromLaunch(launchEntry);
+
+        mLaunchesAccess.update(launch);
+    }
+
+    public void updateFolderData(FolderEntry folderEntry) {
+        FolderDTO folder = getDTOFromFolder(folderEntry);
+
+        mFoldersAccess.update(folder);
+    }
+
+    public void updateOrders(FolderEntry folder) {
+        int orderIndex = 0;
+        for(IEntry subEntry : folder.getEntries()) {
+            if(subEntry.isFolder()) {
+                updateOrderForFolder(subEntry.getId(), orderIndex);
+            } else {
+                updateOrderForLaunch(subEntry.getId(), orderIndex);
+            }
+            orderIndex++;
+        }
+    }
+
+    public void updateOrderForFolder(long folderId, long orderIndex) {
+        EntryDTO entry = mEntriesAccess.queryEntryForFolder(folderId);
+        entry.setOrderIndex(orderIndex);
+
+        mEntriesAccess.update(entry);
+    }
+
+    public void updateOrderForLaunch(long launchId, long orderIndex) {
+        EntryDTO entry = mEntriesAccess.queryEntryForLaunch(launchId);
+        entry.setOrderIndex(orderIndex);
+
+        mEntriesAccess.update(entry);
     }
 
     public void deleteEntry(LaunchEntry entry) {
