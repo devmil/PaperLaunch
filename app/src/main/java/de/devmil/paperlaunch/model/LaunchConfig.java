@@ -18,9 +18,6 @@ package de.devmil.paperlaunch.model;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by michaellamers on 29.05.15.
- */
 public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private List<Launch> mEntries;
     private float mImageWidthDip = 40;

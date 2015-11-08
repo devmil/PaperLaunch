@@ -15,9 +15,6 @@
  */
 package de.devmil.paperlaunch.model;
 
-/**
- * Created by michaellamers on 29.05.15.
- */
 public interface ILaunchEntryConfig {
     int getEntryMoveAnimationDuration();
     int getEntryAlphaAnimationDuration();

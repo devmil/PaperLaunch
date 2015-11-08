@@ -16,9 +16,6 @@
 package de.devmil.paperlaunch.view;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Rect;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,9 +28,6 @@ import java.util.List;
 
 import de.devmil.paperlaunch.utils.ViewUtils;
 
-/**
- * Created by michaellamers on 29.05.15.
- */
 public class LaunchLaneView extends RelativeLayout {
     private LaunchLaneViewModel mViewModel;
 

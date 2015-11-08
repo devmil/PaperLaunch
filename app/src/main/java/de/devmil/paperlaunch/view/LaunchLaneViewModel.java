@@ -20,9 +20,6 @@ import java.util.List;
 
 import de.devmil.paperlaunch.model.ILaunchLaneConfig;
 
-/**
- * Created by michaellamers on 29.05.15.
- */
 public class LaunchLaneViewModel {
     private List<LaunchEntryViewModel> mEntryModels;
     private ILaunchLaneConfig mConfig;

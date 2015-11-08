@@ -20,12 +20,8 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.utils.ViewUtils;
 
-/**
- * Created by michaellamers on 29.05.15.
- */
 public class LaunchEntryView extends LinearLayout {
     private LaunchEntryViewModel mViewModel;
 

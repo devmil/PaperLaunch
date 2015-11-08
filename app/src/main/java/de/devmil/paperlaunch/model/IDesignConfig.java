@@ -15,9 +15,6 @@
  */
 package de.devmil.paperlaunch.model;
 
-/**
- * Created by michaellamers on 31.05.15.
- */
 public interface IDesignConfig {
     int getFrameDefaultColor();
     int getUnknownAppImageId();

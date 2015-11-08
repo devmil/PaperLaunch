@@ -29,9 +29,6 @@ import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.utils.ViewUtils;
 
-/**
- * Created by michaellamers on 29.05.15.
- */
 public class LauncherView extends RelativeLayout {
     private LaunchConfig mConfig;
 

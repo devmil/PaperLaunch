@@ -1,6 +1,5 @@
 package de.devmil.paperlaunch.storage;
 
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 
 public class FolderDTO {

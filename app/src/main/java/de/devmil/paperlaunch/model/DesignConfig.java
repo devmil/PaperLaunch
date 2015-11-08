@@ -19,9 +19,6 @@ import android.graphics.Color;
 
 import de.devmil.paperlaunch.R;
 
-/**
- * Created by michaellamers on 31.05.15.
- */
 public class DesignConfig implements IDesignConfig {
 
     private int mFrameDefaultColor = Color.WHITE;
