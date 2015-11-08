@@ -29,10 +29,8 @@ public class TestDrive extends Activity {
 
         List<Launch> entries = new ArrayList<>();
         entries.add(Launch.create(this, cfg.getDesignConfig(), "com.agilebits.onepassword"));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "au.com.shiftyjelly.pocketcasts"));
         entries.add(Launch.create(this, cfg.getDesignConfig(), "org.kman.AquaMail"));
         entries.add(Launch.create(this, cfg.getDesignConfig(), "com.microsoft.office.onenote"));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "pl.solidexplorer"));
         entries.add(Launch.create(this, cfg.getDesignConfig(), "com.spotify.music"));
 
         cfg.setEntries(entries);
