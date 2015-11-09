@@ -28,10 +28,10 @@ public class TestDrive extends Activity {
         LaunchConfig cfg = new LaunchConfig();
 
         List<Launch> entries = new ArrayList<>();
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.agilebits.onepassword"));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "org.kman.AquaMail"));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.microsoft.office.onenote"));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.spotify.music"));
+        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.agilebits.onepassword", "com.agilebits.onepassword.activity.LoginActivity", 1));
+        entries.add(Launch.create(this, cfg.getDesignConfig(), "org.kman.AquaMail", "org.kman.AquaMail.ui.AccountListActivity", 2));
+        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.microsoft.office.onenote", "com.microsoft.office.onenote.ui.ONMSplashActivity", 3));
+        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.spotify.music", "com.spotify.music.MainActivity", 4));
 
         cfg.setEntries(entries);
 

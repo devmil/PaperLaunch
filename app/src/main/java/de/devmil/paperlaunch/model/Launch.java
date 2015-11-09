@@ -84,11 +84,11 @@ public class Launch implements IEntry {
         return mDto;
     }
 
-    public static Launch create(Context context, IDesignConfig designConfig, String packageName) {
+    public static Launch create(Context context, IDesignConfig designConfig, String packageName, String className, long id) {
         Intent launchIntent = new Intent();
-        launchIntent.setComponent(new ComponentName(packageName, "SomeDummyClass"));
+        launchIntent.setComponent(new ComponentName(packageName, className));
 
-        LaunchDTO dto = new LaunchDTO(0, null, launchIntent, null);
+        LaunchDTO dto = new LaunchDTO(id, null, launchIntent, null);
         return new Launch(dto);
     }
 }

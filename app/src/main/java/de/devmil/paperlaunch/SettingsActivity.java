@@ -1,16 +1,13 @@
 package de.devmil.paperlaunch;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -40,15 +37,15 @@ public class SettingsActivity extends Activity {
         mButtonTest = (Button)findViewById(R.id.activity_settings_buttontest);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayout.VERTICAL, false));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setItemAnimator(new EntriesItemAnimator());
 
         LaunchConfig cfg = new LaunchConfig();
 
         List<IEntry> entries = new ArrayList<>();
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.agilebits.onepassword"));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "org.kman.AquaMail"));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.microsoft.office.onenote"));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.spotify.music"));
+        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.agilebits.onepassword", "com.agilebits.onepassword.activity.LoginActivity", 1));
+        entries.add(Launch.create(this, cfg.getDesignConfig(), "org.kman.AquaMail", "org.kman.AquaMail.ui.AccountListActivity", 2));
+        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.microsoft.office.onenote", "com.microsoft.office.onenote.ui.ONMSplashActivity", 3));
+        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.spotify.music", "com.spotify.music.MainActivity", 4));
 
         mRecyclerView.setAdapter(new EntriesAdapter(mRecyclerView, entries));
 
@@ -59,6 +56,29 @@ public class SettingsActivity extends Activity {
                 startActivity(launchIntent);
             }
         });
+    }
+
+    private class EntriesItemAnimator extends DefaultItemAnimator
+    {
+        @Override
+        public long getAddDuration() {
+            return 60;
+        }
+
+        @Override
+        public long getChangeDuration() {
+            return 120;
+        }
+
+        @Override
+        public long getMoveDuration() {
+            return 120;
+        }
+
+        @Override
+        public long getRemoveDuration() {
+            return 60;
+        }
     }
 
     private class EntriesAdapter extends DragSortAdapter<EntriesAdapter.ViewHolder>
@@ -105,10 +125,10 @@ public class SettingsActivity extends Activity {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             IEntry entry = mEntries.get(position);
+
+            holder.container.setVisibility(getDraggingId() == entry.getId() ? View.INVISIBLE : View.VISIBLE);
             holder.imageView.setImageDrawable(entry.getIcon(holder.imageView.getContext()));
             holder.textView.setText(entry.getName(holder.textView.getContext()));
-
-            //FIXME: holder.container.setVisibility(getDraggingId() == itemId ? View.INVISIBLE : View.VISIBLE);
         }
 
         @Override
@@ -118,15 +138,19 @@ public class SettingsActivity extends Activity {
 
         class ViewHolder extends DragSortAdapter.ViewHolder implements View.OnLongClickListener
         {
+            public LinearLayout container;
             public ImageView imageView;
             public TextView textView;
+            private ImageView handle;
 
             public ViewHolder(DragSortAdapter<?> dragSortAdapter, View itemView) {
                 super(dragSortAdapter, itemView);
+                container = (LinearLayout)itemView.findViewById(R.id.activity_settings_entries_container);
                 imageView = (ImageView)itemView.findViewById(R.id.activity_settings_entries_image);
                 textView = (TextView)itemView.findViewById(R.id.activity_settings_entries_text);
+                handle = (ImageView)itemView.findViewById(R.id.activity_settings_entries_handle);
 
-                imageView.setOnLongClickListener(this);
+                handle.setOnLongClickListener(this);
             }
 
             @Override
