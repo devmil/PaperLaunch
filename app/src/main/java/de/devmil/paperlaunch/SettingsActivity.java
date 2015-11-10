@@ -56,6 +56,8 @@ public class SettingsActivity extends Activity {
                 startActivity(launchIntent);
             }
         });
+
+        //TODO: get the FAB and attach a sub menu for choosing between adding a Launch or a Folder
     }
 
     private class EntriesItemAnimator extends DefaultItemAnimator
@@ -150,7 +152,10 @@ public class SettingsActivity extends Activity {
                 textView = (TextView)itemView.findViewById(R.id.activity_settings_entries_text);
                 handle = (ImageView)itemView.findViewById(R.id.activity_settings_entries_handle);
 
+                //TODO: check if a long click or a tap event fits better
                 handle.setOnLongClickListener(this);
+
+                //TODO: attach tap event for opening the details activity / fragment (tablets?)
             }
 
             @Override
