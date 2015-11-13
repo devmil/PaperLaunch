@@ -102,6 +102,15 @@ public class SettingsActivity extends Activity {
             return -1;
         }
 
+        private IEntry getEntryById(long id) {
+            for(IEntry entry : mEntries) {
+                if(entry.getId() == id) {
+                    return entry;
+                }
+            }
+            return null;
+        }
+
         @Override
         public long getItemId(int position) {
             return mEntries.get(position).getId();
@@ -138,8 +147,7 @@ public class SettingsActivity extends Activity {
             return mEntries.size();
         }
 
-        class ViewHolder extends DragSortAdapter.ViewHolder implements View.OnLongClickListener
-        {
+        class ViewHolder extends DragSortAdapter.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
             public LinearLayout container;
             public ImageView imageView;
             public TextView textView;
@@ -156,12 +164,22 @@ public class SettingsActivity extends Activity {
                 handle.setOnLongClickListener(this);
 
                 //TODO: attach tap event for opening the details activity / fragment (tablets?)
+                container.setOnClickListener(this);
             }
 
             @Override
             public boolean onLongClick(View view) {
                 startDrag();
                 return true;
+            }
+
+            @Override
+            public void onClick(View v) {
+                IEntry entry = getEntryById(getItemId());
+                Intent editIntent = entry.getEditIntent(v.getContext());
+                if(editIntent != null) {
+                    startActivity(editIntent);
+                }
             }
         }
     }

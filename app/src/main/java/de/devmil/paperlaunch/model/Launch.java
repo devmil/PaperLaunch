@@ -22,6 +22,7 @@ import android.graphics.drawable.Drawable;
 
 import de.devmil.paperlaunch.storage.LaunchDTO;
 import de.devmil.paperlaunch.utils.AppMetadataUtils;
+import de.devmil.paperlaunch.view.activities.EditLaunchActivity;
 
 public class Launch implements IEntry {
     private LaunchDTO mDto;
@@ -61,18 +62,27 @@ public class Launch implements IEntry {
             return mDto.getIcon();
         }
         if(mDefaultAppIcon == null) {
-            if(getLaunchIntent() == null) {
-                return null;
-            }
-            ComponentName componentName = getLaunchIntent().getComponent();
-            mDefaultAppIcon = AppMetadataUtils.getAppIcon(context, componentName);
+            mDefaultAppIcon = getAppIcon(context);
         }
         return mDefaultAppIcon;
+    }
+
+    public Drawable getAppIcon(Context context) {
+        if(getLaunchIntent() == null) {
+            return null;
+        }
+        ComponentName componentName = getLaunchIntent().getComponent();
+        return AppMetadataUtils.getAppIcon(context, componentName);
     }
 
     @Override
     public boolean isFolder() {
         return false;
+    }
+
+    @Override
+    public Intent getEditIntent(Context context) {
+        return EditLaunchActivity.createLaunchIntent(context, getDto());
     }
 
     public Intent getLaunchIntent()

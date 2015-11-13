@@ -1,6 +1,7 @@
 package de.devmil.paperlaunch.model;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 
 import java.util.List;
@@ -35,6 +36,12 @@ public class Folder implements IEntry {
     public Drawable getIcon(Context context) {
         return mDto.getIcon();
     }
+
+    @Override
+    public Intent getEditIntent(Context context) {
+        return null;
+    }
+
     public List<IEntry> getSubEntries() {
         return mSubEntries;
     }

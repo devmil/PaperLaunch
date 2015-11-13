@@ -1,6 +1,7 @@
 package de.devmil.paperlaunch.model;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 
 public interface IEntry {
@@ -9,4 +10,6 @@ public interface IEntry {
     String getName(Context context);
     Drawable getIcon(Context context);
     boolean isFolder();
+
+    Intent getEditIntent(Context context);
 }
