@@ -9,12 +9,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="15dp">
+        android:layout_margin="10dp"
+        android:padding="5dp"
+        android:elevation="2dp"
+        android:background="@android:color/background_light">
 
         <TextView
             android:id="@+id/fragment_edit_launch_txtHeadName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:text="Name"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -36,12 +40,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="15dp">
+        android:layout_margin="10dp"
+        android:padding="5dp"
+        android:elevation="2dp"
+        android:background="@android:color/background_light">
 
         <TextView
             android:id="@+id/fragment_edit_launch_txtHeadIcon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:text="Icon"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -65,13 +73,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="15dp">
+        android:layout_margin="10dp"
+        android:padding="5dp"
+        android:elevation="2dp"
+        android:background="@android:color/background_light">
 
         <TextView
             android:id="@+id/fragment_edit_launch_txtHeadApp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="App"
+            android:layout_margin="5dp"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <LinearLayout
