@@ -22,6 +22,11 @@
         </activity>
         <activity android:name=".view.activities.EditLaunchActivity" >
         </activity>
+        <activity
+            android:name="de.devmil.paperlaunch.view.utils.IntentSelector"
+            android:label="Select an Intent" >
+        </activity>
+
     </application>
 
 </manifest>

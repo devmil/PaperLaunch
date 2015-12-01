@@ -33,6 +33,15 @@
                 android:layout_height="wrap_content"
                 android:text="Name"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <ImageButton
+                android:id="@+id/fragment_edit_launch_btnEditName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_mode_edit_black_24dp"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -60,11 +69,21 @@
             android:gravity="center_vertical">
             <ImageView
                 android:id="@+id/fragment_edit_launch_imgIcon"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:scaleType="centerInside"
                 android:src="@mipmap/ic_launcher"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <ImageButton
+                android:id="@+id/fragment_edit_launch_btnEditIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_mode_edit_black_24dp"/>
+
         </LinearLayout>
 
     </LinearLayout>
@@ -101,10 +120,16 @@
                 android:textAppearance="?android:attr/textAppearanceLarge" />
             <TextView
                 android:id="@+id/fragment_edit_launch_txtLaunch"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="App name"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
+            <ImageButton
+                android:id="@+id/fragment_edit_launch_btnEditApp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_mode_edit_black_24dp"/>
         </LinearLayout>
 
     </LinearLayout>

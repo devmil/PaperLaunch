@@ -1,19 +1,20 @@
 package de.devmil.paperlaunch.view.fragments;
 
-import android.app.Activity;
-import android.content.Context;
-import android.net.Uri;
-import android.os.Bundle;
 import android.app.Fragment;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.storage.LaunchDTO;
+import de.devmil.paperlaunch.view.utils.IntentSelector;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +26,7 @@ import de.devmil.paperlaunch.storage.LaunchDTO;
  */
 public class EditLaunchFragment extends Fragment {
     private static final String ARG_LAUNCH = "paramLaunch";
+    private static final int CODE_SELECT_INTENT = 1000;
 
     private Launch mLaunch;
 
@@ -33,6 +35,7 @@ public class EditLaunchFragment extends Fragment {
     private ImageView mImgIcon;
     private ImageView mImgApp;
     private TextView mTxtLaunch;
+    private ImageButton btnEditApp;
 
     /**
      * Use this factory method to create a new instance of
@@ -84,6 +87,19 @@ public class EditLaunchFragment extends Fragment {
         mImgIcon = (ImageView)view.findViewById(R.id.fragment_edit_launch_imgIcon);
         mImgApp = (ImageView)view.findViewById(R.id.fragment_edit_launch_imgApp);
         mTxtLaunch = (TextView)view.findViewById(R.id.fragment_edit_launch_txtLaunch);
+        btnEditApp = (ImageButton)view.findViewById(R.id.fragment_edit_launch_btnEditApp);
+
+        btnEditApp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(v.getContext(), IntentSelector.class);
+                intent.putExtra(IntentSelector.EXTRA_STRING_ACTIVITIES, "--Activities--");
+                intent.putExtra(IntentSelector.EXTRA_STRING_SHORTCUTS, "--Shortcuts--");
+
+                startActivityForResult(intent, CODE_SELECT_INTENT);
+            }
+        });
 
         updateView();
 

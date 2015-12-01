@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/common__intentSelector_llWait"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#96000000"
+        android:gravity="center" >
+
+        <ProgressBar
+            android:id="@+id/common__intentSelector_progressWait"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </ProgressBar>
+    </LinearLayout>
+
+    <TabHost
+        android:id="@android:id/tabhost"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:id="@+id/common__intentSelector_linearLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            </TabWidget>
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <LinearLayout
+                    android:id="@+id/common__intentSelector_tabActivities"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <LinearLayout
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:orientation="vertical">
+                        <CheckBox
+                            android:id="@+id/common__intentSelector_chkShowAllActivities"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Show all" />
+
+                        <ExpandableListView
+                            android:id="@+id/common__intentSelector_lvActivities"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" >
+                        </ExpandableListView>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/common__intentSelector_tabShortcuts"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
+
+                    <ExpandableListView
+                        android:id="@+id/common__intentSelector_lvShortcuts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
+                    </ExpandableListView>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/common__intentSelector_tabTextShortcuts"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
+
+                    <TextView
+                        android:id="@+id/common__intentSelector_txtShortcuts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
+                    </TextView>
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+
+</RelativeLayout>
