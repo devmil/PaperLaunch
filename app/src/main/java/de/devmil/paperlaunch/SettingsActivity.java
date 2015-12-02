@@ -3,6 +3,7 @@ package de.devmil.paperlaunch;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,12 +22,17 @@ import java.util.List;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.model.LaunchConfig;
+import de.devmil.paperlaunch.storage.LaunchDTO;
+import de.devmil.paperlaunch.view.utils.IntentSelector;
 
 public class SettingsActivity extends Activity {
+
+    private static final int CODE_ADD_APP_RESULT = 1000;
 
     private EntriesAdapter mAdapter;
     private RecyclerView mRecyclerView;
     private Button mButtonTest;
+    private FloatingActionButton mAddButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +41,7 @@ public class SettingsActivity extends Activity {
 
         mRecyclerView = (RecyclerView)findViewById(R.id.activity_settings_entrieslist);
         mButtonTest = (Button)findViewById(R.id.activity_settings_buttontest);
+        mAddButton = (FloatingActionButton)findViewById(R.id.activity_settings_fab);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayout.VERTICAL, false));
         mRecyclerView.setItemAnimator(new EntriesItemAnimator());
@@ -47,7 +54,7 @@ public class SettingsActivity extends Activity {
         entries.add(Launch.create(this, cfg.getDesignConfig(), "com.microsoft.office.onenote", "com.microsoft.office.onenote.ui.ONMSplashActivity", 3));
         entries.add(Launch.create(this, cfg.getDesignConfig(), "com.spotify.music", "com.spotify.music.MainActivity", 4));
 
-        mRecyclerView.setAdapter(new EntriesAdapter(mRecyclerView, entries));
+        mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, entries));
 
         mButtonTest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +64,38 @@ public class SettingsActivity extends Activity {
             }
         });
 
-        //TODO: get the FAB and attach a sub menu for choosing between adding a Launch or a Folder
+        //TODO: attach a sub menu for choosing between adding a Launch or a Folder
+        mAddButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(v.getContext(), IntentSelector.class);
+                intent.putExtra(IntentSelector.EXTRA_STRING_ACTIVITIES, "--Activities--");
+                intent.putExtra(IntentSelector.EXTRA_STRING_SHORTCUTS, "--Shortcuts--");
+
+                startActivityForResult(intent, CODE_ADD_APP_RESULT);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode != RESULT_OK) {
+            return;
+        }
+        if(CODE_ADD_APP_RESULT == requestCode) {
+            addLaunch(data);
+        }
+    }
+
+    private void addLaunch(Intent launchIntent) {
+
+        long id = mAdapter.getNextId();
+        LaunchDTO launchDTO = new LaunchDTO(id, null, launchIntent, null);
+        Launch l = new Launch(launchDTO);
+
+        mAdapter.addEntry(l);
     }
 
     private class EntriesItemAnimator extends DefaultItemAnimator
@@ -90,6 +128,21 @@ public class SettingsActivity extends Activity {
         public EntriesAdapter(RecyclerView recyclerView, List<IEntry> entries) {
             super(recyclerView);
             mEntries = entries;
+        }
+
+        public long getNextId() {
+            long max = 0;
+            for(IEntry e : mEntries) {
+                if(max < e.getId()) {
+                    max = e.getId();
+                }
+            }
+            return max + 1;
+        }
+
+        public void addEntry(IEntry entry) {
+            mEntries.add(entry);
+            notifyDataSetChanged();
         }
 
         @Override

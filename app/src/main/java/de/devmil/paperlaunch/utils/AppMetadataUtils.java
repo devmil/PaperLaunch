@@ -53,7 +53,7 @@ public abstract class AppMetadataUtils {
         ApplicationInfo appInfo = null;
         try {
             appInfo = pm.getApplicationInfo(componentName.getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (Exception e) {
             appInfo = null;
         }
         if(appInfo == null) {
