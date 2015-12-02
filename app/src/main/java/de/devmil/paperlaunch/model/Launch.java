@@ -18,8 +18,6 @@ package de.devmil.paperlaunch.model;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 
 import de.devmil.paperlaunch.storage.LaunchDTO;
@@ -52,12 +50,7 @@ public class Launch implements IEntry {
                 return null;
             }
 
-            if(launchIntent.hasExtra(Intent.EXTRA_SHORTCUT_NAME)) {
-                mDefaultAppName = launchIntent.getStringExtra(Intent.EXTRA_SHORTCUT_NAME);
-            } else {
-                ComponentName componentName = getLaunchIntent().getComponent();
-                mDefaultAppName = AppMetadataUtils.getAppName(context, componentName);
-            }
+            mDefaultAppName = AppMetadataUtils.getAppName(context, launchIntent);
         }
         return mDefaultAppName;
     }
@@ -71,35 +64,10 @@ public class Launch implements IEntry {
         if(mDefaultAppIcon == null) {
             Intent launchIntent = getLaunchIntent();
             if(launchIntent != null) {
-                if(launchIntent.hasExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE)) {
-                    try {
-                        Intent.ShortcutIconResource iconRes = launchIntent.getParcelableExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE);
-                        Resources appRes = context.getPackageManager().getResourcesForApplication(iconRes.packageName);
-                        int resId = appRes.getIdentifier(iconRes.resourceName, null, null);
-                        mDefaultAppIcon = appRes.getDrawable(resId);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            if(mDefaultAppIcon == null) {
-                mDefaultAppIcon = getAppIcon(context);
+                mDefaultAppIcon = AppMetadataUtils.getAppIcon(context, launchIntent);
             }
         }
         return mDefaultAppIcon;
-    }
-
-    public Drawable getAppIcon(Context context) {
-        Intent launchIntent = getLaunchIntent();
-        if(launchIntent == null) {
-            return null;
-        }
-        Intent intentToUse = launchIntent;
-        if(launchIntent.hasExtra(Intent.EXTRA_SHORTCUT_INTENT)) {
-            intentToUse = launchIntent.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
-        }
-        ComponentName componentName = intentToUse.getComponent();
-        return AppMetadataUtils.getAppIcon(context, componentName);
     }
 
     @Override
