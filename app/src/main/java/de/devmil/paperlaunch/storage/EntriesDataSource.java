@@ -44,16 +44,22 @@ public class EntriesDataSource {
     }
 
     public void commitTransaction() {
-        if(mDatabase != null && mDatabase.inTransaction()) {
+        if (mDatabase != null && mDatabase.inTransaction()) {
             mDatabase.setTransactionSuccessful();
             mDatabase.endTransaction();
         }
     }
 
     public void rollbackTransaction() {
-        if(mDatabase != null && mDatabase.inTransaction()) {
+        if (mDatabase != null && mDatabase.inTransaction()) {
             mDatabase.endTransaction();
         }
+    }
+
+    public void clear() {
+        startTransaction();
+        mHelper.clear(mDatabase);
+        commitTransaction();
     }
 
     public Launch createLaunch(long parentFolderId) {
@@ -90,6 +96,17 @@ public class EntriesDataSource {
         return createLaunchFromDTO(launch);
     }
 
+    public List<IEntry> loadRootContent() {
+        List<EntryDTO> entryDTOs =  mEntriesAccess.queryAllEntries(-1);
+
+        List<IEntry> entries = new ArrayList<>();
+        for(EntryDTO entryDto : entryDTOs) {
+            entries.add(loadEntry(entryDto));
+        }
+
+        return entries;
+    }
+
     private Launch createLaunchFromDTO(LaunchDTO dto) {
         return new Launch(dto);
     }
@@ -105,14 +122,19 @@ public class EntriesDataSource {
     private Folder createFolderFromDTO(FolderDTO dto, List<EntryDTO> subEntryDTOs) {
         List<IEntry> subEntries = new ArrayList<>();
         for(EntryDTO entryDto : subEntryDTOs) {
-            if(entryDto.getFolderId() > 0) {
-                subEntries.add(loadFolder(entryDto.getFolderId()));
-            } else if(entryDto.getLaunchId() > 0) {
-                subEntries.add(loadLaunch(entryDto.getLaunchId()));
-            }
+            subEntries.add(loadEntry(entryDto));
         }
 
         return new Folder(dto, subEntries);
+    }
+
+    private IEntry loadEntry(EntryDTO entryDto) {
+        if(entryDto.getFolderId() > 0) {
+            return loadFolder(entryDto.getFolderId());
+        } else if(entryDto.getLaunchId() > 0) {
+            return loadLaunch(entryDto.getLaunchId());
+        }
+        return null;
     }
 
     public void updateLaunchData(Launch launch) {

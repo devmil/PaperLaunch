@@ -113,10 +113,12 @@ public class EntriesAccess {
     }
 
     public EntryDTO createNew() {
+        ContentValues values = new ContentValues();
+        values.put(EntriesSQLiteOpenHelper.COLUMN_ENTRIES_ORDERINDEX, -1);
         long id = mDatabase.insert(
                 EntriesSQLiteOpenHelper.TABLE_ENTRIES,
                 null,
-                null);
+                values);
 
         return queryEntry(id);
     }

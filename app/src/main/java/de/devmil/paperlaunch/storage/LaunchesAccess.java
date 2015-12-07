@@ -44,10 +44,13 @@ public class LaunchesAccess {
     }
 
     public LaunchDTO createNew() {
+        ContentValues values = new ContentValues();
+        values.put(EntriesSQLiteOpenHelper.COLUMN_LAUNCHES_NAME, (String)null);
+
         long id = mDatabase.insert(
                 EntriesSQLiteOpenHelper.TABLE_LAUNCHES,
                 null,
-                null);
+                values);
 
         return queryLaunch(id);
     }

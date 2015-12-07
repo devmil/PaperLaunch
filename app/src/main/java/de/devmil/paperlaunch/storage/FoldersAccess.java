@@ -41,10 +41,13 @@ public class FoldersAccess {
     }
 
     public FolderDTO createNew() {
+        ContentValues values = new ContentValues();
+        values.put(EntriesSQLiteOpenHelper.COLUMN_FOLDERS_NAME, (String)null);
+
         long id = mDatabase.insert(
                 EntriesSQLiteOpenHelper.TABLE_FOLDERS,
                 null,
-                null);
+                values);
 
         return queryFolder(id);
     }

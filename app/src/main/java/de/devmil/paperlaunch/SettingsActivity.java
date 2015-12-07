@@ -1,6 +1,7 @@
 package de.devmil.paperlaunch;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -22,6 +23,7 @@ import java.util.List;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.model.LaunchConfig;
+import de.devmil.paperlaunch.storage.EntriesDataSource;
 import de.devmil.paperlaunch.storage.LaunchDTO;
 import de.devmil.paperlaunch.view.utils.IntentSelector;
 
@@ -46,15 +48,7 @@ public class SettingsActivity extends Activity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayout.VERTICAL, false));
         mRecyclerView.setItemAnimator(new EntriesItemAnimator());
 
-        LaunchConfig cfg = new LaunchConfig();
-
-        List<IEntry> entries = new ArrayList<>();
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.agilebits.onepassword", "com.agilebits.onepassword.activity.LoginActivity", 1));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "org.kman.AquaMail", "org.kman.AquaMail.ui.AccountListActivity", 2));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.microsoft.office.onenote", "com.microsoft.office.onenote.ui.ONMSplashActivity", 3));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.spotify.music", "com.spotify.music.MainActivity", 4));
-
-        mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, entries));
+        mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, loadEntries()));
 
         mButtonTest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,6 +90,42 @@ public class SettingsActivity extends Activity {
         Launch l = new Launch(launchDTO);
 
         mAdapter.addEntry(l);
+    }
+
+    private List<IEntry> loadEntries() {
+        EntriesDataSource ds = new EntriesDataSource(this);
+
+        ds.open();
+
+        //resetData(ds);
+
+        List<IEntry> result = ds.loadRootContent();
+
+        ds.close();
+
+        return result;
+    }
+
+    private void resetData(EntriesDataSource ds) {
+        ds.clear();
+
+        createLaunch(ds, "com.agilebits.onepassword", "com.agilebits.onepassword.activity.LoginActivity");
+        createLaunch(ds, "org.kman.AquaMail", "org.kman.AquaMail.ui.AccountListActivity");
+        createLaunch(ds, "com.microsoft.office.onenote", "com.microsoft.office.onenote.ui.ONMSplashActivity");
+        createLaunch(ds, "com.spotify.music", "com.spotify.music.MainActivity");
+    }
+
+    private Launch createLaunch(EntriesDataSource ds, String packageName, String className) {
+        Launch l = ds.createLaunch(-1);
+
+        Intent launchIntent = new Intent();
+        launchIntent.setComponent(new ComponentName(packageName, className));
+
+        l.getDto().setLaunchIntent(launchIntent);
+
+        ds.updateLaunchData(l);
+
+        return l;
     }
 
     private class EntriesItemAnimator extends DefaultItemAnimator

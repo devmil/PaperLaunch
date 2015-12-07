@@ -12,10 +12,16 @@ import java.io.ByteArrayOutputStream;
 public abstract class BitmapUtils {
 
     public static Drawable getIcon(byte[] rawData) {
+        if(rawData == null) {
+            return null;
+        }
         return Drawable.createFromStream(new ByteArrayInputStream(rawData), null);
     }
 
     public static byte[] getBytes(Drawable drawable) {
+        if(drawable == null) {
+            return null;
+        }
         Bitmap bmp = drawableToBitmap(drawable);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
@@ -27,6 +33,9 @@ public abstract class BitmapUtils {
     }
 
     private static Bitmap drawableToBitmap(Drawable drawable) {
+        if(drawable == null) {
+            return null;
+        }
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable) drawable).getBitmap();
         }

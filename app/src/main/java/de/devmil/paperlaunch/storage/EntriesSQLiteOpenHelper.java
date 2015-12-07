@@ -30,7 +30,7 @@ public class EntriesSQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "entries.db";
     private static final int DATABASE_VERSION = 1;
 
-    private static final String DATABASE_CREATE = "create table "
+    private static final String TABLE_ENTRIES_CREATE = "create table "
             + TABLE_ENTRIES
             + " ( "
             + COLUMN_ID                     + " integer primary key autoincrement, "
@@ -38,16 +38,16 @@ public class EntriesSQLiteOpenHelper extends SQLiteOpenHelper {
             + COLUMN_ENTRIES_LAUNCHID       + " integer, "
             + COLUMN_ENTRIES_FOLDERID       + " integer, "
             + COLUMN_ENTRIES_PARENTFOLDERID + " integer "
-            + " ); "
-            + "create table "
+            + " ); ";
+    private static final String TABLE_LAUNCHES_CREATE =  "create table "
             + TABLE_LAUNCHES
             + " ( "
             + COLUMN_ID                     + " integer primary key autoincrement, "
             + COLUMN_LAUNCHES_NAME          + " text, "
             + COLUMN_LAUNCHES_LAUNCHINTENT  + " text, "
             + COLUMN_LAUNCHES_ICON          + " blob "
-            + " ); "
-            + " create table "
+            + " ); ";
+    private static final String TABLE_FOLDERS_CREATE =  " create table "
             + TABLE_FOLDERS
             + " ( "
             + COLUMN_ID                     + " integer primary key autoincrement, "
@@ -62,13 +62,28 @@ public class EntriesSQLiteOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(DATABASE_CREATE);
+        db.execSQL(TABLE_ENTRIES_CREATE);
+        db.execSQL(TABLE_LAUNCHES_CREATE);
+        db.execSQL(TABLE_FOLDERS_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.i(TAG, "Upgrading database. Old version = " + oldVersion + " ==> new version = " + newVersion);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ENTRIES);
-        db.execSQL(DATABASE_CREATE);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LAUNCHES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOLDERS);
+        db.execSQL(TABLE_ENTRIES_CREATE);
+        db.execSQL(TABLE_LAUNCHES_CREATE);
+        db.execSQL(TABLE_FOLDERS_CREATE);
+    }
+
+    public void clear(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ENTRIES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LAUNCHES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOLDERS);
+        db.execSQL(TABLE_ENTRIES_CREATE);
+        db.execSQL(TABLE_LAUNCHES_CREATE);
+        db.execSQL(TABLE_FOLDERS_CREATE);
     }
 }
