@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.devmil.paperlaunch.R;
+import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.utils.ViewUtils;
@@ -96,7 +97,7 @@ public class LauncherView extends RelativeLayout {
         //TODO: split into auto folders if there are too many of them
         List<LaunchLaneViewModel> laneModels = new ArrayList<>();
         List<LaunchEntryViewModel> entryModels = new ArrayList<>();
-        for(Launch e : mConfig.getEntries())
+        for(IEntry e : mConfig.getEntries())
         {
             entryModels.add(LaunchEntryViewModel.createFrom(getContext(), e, mConfig));
         }

@@ -18,6 +18,7 @@ package de.devmil.paperlaunch.view;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 
+import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.ILaunchEntryConfig;
 import de.devmil.paperlaunch.model.Launch;
 
@@ -137,7 +138,7 @@ public class LaunchEntryViewModel {
         return mConfig.getEntryAlphaAnimationDuration();
     }
 
-    public static LaunchEntryViewModel createFrom(Context context, Launch launch, ILaunchEntryConfig config) {
-        return new LaunchEntryViewModel(launch.getName(context), launch.getIcon(context), config);
+    public static LaunchEntryViewModel createFrom(Context context, IEntry entry, ILaunchEntryConfig config) {
+        return new LaunchEntryViewModel(entry.getName(context), entry.getIcon(context), config);
     }
 }

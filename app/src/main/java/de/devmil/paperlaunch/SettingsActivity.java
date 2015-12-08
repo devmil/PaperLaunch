@@ -20,11 +20,10 @@ import com.makeramen.dragsortadapter.DragSortAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.devmil.paperlaunch.model.Folder;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.Launch;
-import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
-import de.devmil.paperlaunch.storage.LaunchDTO;
 import de.devmil.paperlaunch.view.utils.IntentSelector;
 
 public class SettingsActivity extends Activity {
@@ -35,11 +34,15 @@ public class SettingsActivity extends Activity {
     private RecyclerView mRecyclerView;
     private Button mButtonTest;
     private FloatingActionButton mAddButton;
+    private int mParentFolderId = -1;
+    private EntriesDataSource mDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        mDataSource = new EntriesDataSource(this);
 
         mRecyclerView = (RecyclerView)findViewById(R.id.activity_settings_entrieslist);
         mButtonTest = (Button)findViewById(R.id.activity_settings_buttontest);
@@ -48,7 +51,7 @@ public class SettingsActivity extends Activity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayout.VERTICAL, false));
         mRecyclerView.setItemAnimator(new EntriesItemAnimator());
 
-        mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, loadEntries()));
+        mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, loadEntries(), mDataSource));
 
         mButtonTest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,48 +87,76 @@ public class SettingsActivity extends Activity {
     }
 
     private void addLaunch(Intent launchIntent) {
+        mDataSource.open();
 
-        long id = mAdapter.getNextId();
-        LaunchDTO launchDTO = new LaunchDTO(id, null, launchIntent, null);
-        Launch l = new Launch(launchDTO);
+        Launch l = mDataSource.createLaunch(mParentFolderId);
+        l.getDto().setLaunchIntent(launchIntent);
+        mDataSource.updateLaunchData(l);
+        mDataSource.close();
 
         mAdapter.addEntry(l);
     }
 
     private List<IEntry> loadEntries() {
-        EntriesDataSource ds = new EntriesDataSource(this);
+        mDataSource.open();
 
-        ds.open();
+        //resetData();
 
-        //resetData(ds);
+        List<IEntry> result = mDataSource.loadRootContent();
 
-        List<IEntry> result = ds.loadRootContent();
-
-        ds.close();
+        mDataSource.close();
 
         return result;
     }
 
-    private void resetData(EntriesDataSource ds) {
-        ds.clear();
+    private void resetData() {
+        mDataSource.clear();
 
-        createLaunch(ds, "com.agilebits.onepassword", "com.agilebits.onepassword.activity.LoginActivity");
-        createLaunch(ds, "org.kman.AquaMail", "org.kman.AquaMail.ui.AccountListActivity");
-        createLaunch(ds, "com.microsoft.office.onenote", "com.microsoft.office.onenote.ui.ONMSplashActivity");
-        createLaunch(ds, "com.spotify.music", "com.spotify.music.MainActivity");
+        createLaunch("com.agilebits.onepassword", "com.agilebits.onepassword.activity.LoginActivity", 1);
+        createLaunch("org.kman.AquaMail", "org.kman.AquaMail.ui.AccountListActivity", 2);
+        createLaunch("com.microsoft.office.onenote", "com.microsoft.office.onenote.ui.ONMSplashActivity", 3);
+        createLaunch("com.spotify.music", "com.spotify.music.MainActivity", 5);
+
+        List<ComponentName> folderLaunchComponents = new ArrayList<>();
+        folderLaunchComponents.add(new ComponentName("mobi.koni.appstofiretv", "mobi.koni.appstofiretv.MainActivity"));
+        folderLaunchComponents.add(new ComponentName("org.dmfs.tasks", "org.dmfs.tasks.TaskListActivity"));
+
+        createFolder("Test Folder", folderLaunchComponents, 4);
     }
 
-    private Launch createLaunch(EntriesDataSource ds, String packageName, String className) {
-        Launch l = ds.createLaunch(-1);
+    private Launch createLaunch(String packageName, String className, int orderIndex) {
+        return createLaunch(-1, packageName, className, orderIndex);
+    }
+
+
+    private Launch createLaunch(long parentFolderId, String packageName, String className, int orderIndex) {
+        Launch l = mDataSource.createLaunch(parentFolderId, orderIndex);
 
         Intent launchIntent = new Intent();
         launchIntent.setComponent(new ComponentName(packageName, className));
 
         l.getDto().setLaunchIntent(launchIntent);
 
-        ds.updateLaunchData(l);
+        mDataSource.updateLaunchData(l);
 
         return l;
+    }
+
+    private Folder createFolder(String folderName, List<ComponentName> launchComponentNames, int orderIndex)
+    {
+        Folder f = mDataSource.createFolder(-1, orderIndex);
+        f.getDto().setName(folderName);
+
+        mDataSource.updateFolderData(f);
+
+        int launchOrderIndex = 1;
+
+        for(ComponentName cn : launchComponentNames) {
+            createLaunch(f.getId(), cn.getPackageName(), cn.getClassName(), launchOrderIndex);
+            launchOrderIndex++;
+        }
+
+        return mDataSource.loadFolder(f.getId());
     }
 
     private class EntriesItemAnimator extends DefaultItemAnimator
@@ -154,24 +185,17 @@ public class SettingsActivity extends Activity {
     private class EntriesAdapter extends DragSortAdapter<EntriesAdapter.ViewHolder>
     {
         private List<IEntry> mEntries;
+        private EntriesDataSource mDataSource;
 
-        public EntriesAdapter(RecyclerView recyclerView, List<IEntry> entries) {
+        public EntriesAdapter(RecyclerView recyclerView, List<IEntry> entries, EntriesDataSource dataSource) {
             super(recyclerView);
             mEntries = entries;
-        }
-
-        public long getNextId() {
-            long max = 0;
-            for(IEntry e : mEntries) {
-                if(max < e.getId()) {
-                    max = e.getId();
-                }
-            }
-            return max + 1;
+            mDataSource = dataSource;
         }
 
         public void addEntry(IEntry entry) {
             mEntries.add(entry);
+            saveOrder();
             notifyDataSetChanged();
         }
 
@@ -206,6 +230,7 @@ public class SettingsActivity extends Activity {
                 return false;
             }
             mEntries.add(toPosition, mEntries.remove(fromPosition));
+            saveOrder();
             return true;
         }
 
@@ -228,6 +253,14 @@ public class SettingsActivity extends Activity {
         @Override
         public int getItemCount() {
             return mEntries.size();
+        }
+
+        private void saveOrder() {
+            mDataSource.open();
+
+            mDataSource.updateOrders(mEntries);
+
+            mDataSource.close();
         }
 
         class ViewHolder extends DragSortAdapter.ViewHolder implements View.OnLongClickListener, View.OnClickListener {

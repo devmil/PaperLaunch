@@ -7,6 +7,8 @@ import android.graphics.drawable.Drawable;
 public interface IEntry {
 
     long getId();
+    long getEntryId();
+    long getOrderIndex();
     String getName(Context context);
     Drawable getIcon(Context context);
     boolean isFolder();

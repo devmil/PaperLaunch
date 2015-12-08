@@ -63,8 +63,12 @@ public class EntriesDataSource {
     }
 
     public Launch createLaunch(long parentFolderId) {
+        return createLaunch(parentFolderId, -1);
+    }
+
+    public Launch createLaunch(long parentFolderId, int orderIndex) {
         //create Entry
-        EntryDTO entry = mEntriesAccess.createNew();
+        EntryDTO entry = mEntriesAccess.createNew(orderIndex);
         entry.setParentFolderId(parentFolderId);
         //create Launch
         LaunchDTO launch = mLaunchesAccess.createNew();
@@ -77,8 +81,12 @@ public class EntriesDataSource {
     }
 
     public Folder createFolder(long parentFolderId) {
+        return createFolder(parentFolderId, -1);
+    }
+
+    public Folder createFolder(long parentFolderId, int orderIndex) {
         //create Entry
-        EntryDTO entry = mEntriesAccess.createNew();
+        EntryDTO entry = mEntriesAccess.createNew(orderIndex);
         entry.setParentFolderId(parentFolderId);
         //create folder
         FolderDTO folder = mFoldersAccess.createNew();
@@ -92,8 +100,9 @@ public class EntriesDataSource {
 
     public Launch loadLaunch(long launchId) {
         LaunchDTO launch = mLaunchesAccess.queryLaunch(launchId);
+        EntryDTO entry = mEntriesAccess.queryEntryForLaunch(launchId);
 
-        return createLaunchFromDTO(launch);
+        return createLaunchFromDTO(launch, entry);
     }
 
     public List<IEntry> loadRootContent() {
@@ -107,25 +116,26 @@ public class EntriesDataSource {
         return entries;
     }
 
-    private Launch createLaunchFromDTO(LaunchDTO dto) {
-        return new Launch(dto);
+    private Launch createLaunchFromDTO(LaunchDTO dto, EntryDTO entryDto) {
+        return new Launch(dto, entryDto);
     }
 
     public Folder loadFolder(long folderId) {
         FolderDTO folder = mFoldersAccess.queryFolder(folderId);
+        EntryDTO entry = mEntriesAccess.queryEntryForFolder(folderId);
 
         List<EntryDTO> subEntryDTOs = mEntriesAccess.queryAllEntries(folder.getId());
 
-        return createFolderFromDTO(folder, subEntryDTOs);
+        return createFolderFromDTO(folder, entry, subEntryDTOs);
     }
 
-    private Folder createFolderFromDTO(FolderDTO dto, List<EntryDTO> subEntryDTOs) {
+    private Folder createFolderFromDTO(FolderDTO dto, EntryDTO entryDto, List<EntryDTO> subEntryDTOs) {
         List<IEntry> subEntries = new ArrayList<>();
-        for(EntryDTO entryDto : subEntryDTOs) {
-            subEntries.add(loadEntry(entryDto));
+        for(EntryDTO subEntryDto : subEntryDTOs) {
+            subEntries.add(loadEntry(subEntryDto));
         }
 
-        return new Folder(dto, subEntries);
+        return new Folder(dto, entryDto, subEntries);
     }
 
     private IEntry loadEntry(EntryDTO entryDto) {
@@ -150,28 +160,19 @@ public class EntriesDataSource {
     }
 
     public void updateOrders(Folder folder) {
-        int orderIndex = 0;
-        for(IEntry subEntry : folder.getSubEntries()) {
-            if(subEntry.isFolder()) {
-                updateOrderForFolder(subEntry.getId(), orderIndex);
-            } else {
-                updateOrderForLaunch(subEntry.getId(), orderIndex);
-            }
-            orderIndex++;
+        updateOrders(folder.getSubEntries());
+    }
+
+    public void updateOrders(List<IEntry> entries) {
+        for(int i=0; i<entries.size(); i++) {
+            updateOrder(entries.get(i), i);
         }
     }
 
-    public void updateOrderForFolder(long folderId, long orderIndex) {
-        EntryDTO entry = mEntriesAccess.queryEntryForFolder(folderId);
-        entry.setOrderIndex(orderIndex);
+    public void updateOrder(IEntry entry, int orderIndex) {
+        EntryDTO entryDTO = mEntriesAccess.queryEntry(entry.getEntryId());
+        entryDTO.setOrderIndex(orderIndex);
 
-        mEntriesAccess.update(entry);
-    }
-
-    public void updateOrderForLaunch(long launchId, long orderIndex) {
-        EntryDTO entry = mEntriesAccess.queryEntryForLaunch(launchId);
-        entry.setOrderIndex(orderIndex);
-
-        mEntriesAccess.update(entry);
+        mEntriesAccess.update(entryDTO);
     }
 }

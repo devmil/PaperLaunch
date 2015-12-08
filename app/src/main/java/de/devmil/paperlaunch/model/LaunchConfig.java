@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
-    private List<Launch> mEntries;
+    private List<IEntry> mEntries;
     private float mImageWidthDip = 40;
     private float mLowerElevationDip = 2;
     private float mHighElevationDip = 6;
@@ -31,7 +31,7 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private float mNeutralZoneWidthDip = 40;
     private float mImageOffsetDip = 5;
 
-    public List<Launch> getEntries()
+    public List<IEntry> getEntries()
     {
         return new ArrayList<>(mEntries);
     }
@@ -40,7 +40,7 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     {
     }
 
-    public void setEntries(List<Launch> entries)
+    public void setEntries(List<IEntry> entries)
     {
         mEntries = new ArrayList<>(entries);
     }

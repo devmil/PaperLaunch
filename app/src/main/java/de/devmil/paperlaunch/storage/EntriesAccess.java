@@ -31,10 +31,7 @@ public class EntriesAccess {
     }
 
     public List<EntryDTO> queryAllEntries(long parentFolderId) {
-        String selection = null;
-        if(parentFolderId >= 0) {
-            selection = EntriesSQLiteOpenHelper.COLUMN_ENTRIES_PARENTFOLDERID + " = " + parentFolderId;
-        }
+        String selection = EntriesSQLiteOpenHelper.COLUMN_ENTRIES_PARENTFOLDERID + " = " + parentFolderId;
 
         Cursor c = mDatabase.query(
                 EntriesSQLiteOpenHelper.TABLE_ENTRIES,
@@ -112,9 +109,9 @@ public class EntriesAccess {
         return null;
     }
 
-    public EntryDTO createNew() {
+    public EntryDTO createNew(int orderIndex) {
         ContentValues values = new ContentValues();
-        values.put(EntriesSQLiteOpenHelper.COLUMN_ENTRIES_ORDERINDEX, -1);
+        values.put(EntriesSQLiteOpenHelper.COLUMN_ENTRIES_ORDERINDEX, orderIndex);
         long id = mDatabase.insert(
                 EntriesSQLiteOpenHelper.TABLE_ENTRIES,
                 null,

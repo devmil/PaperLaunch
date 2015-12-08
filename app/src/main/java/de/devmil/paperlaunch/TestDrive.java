@@ -9,29 +9,33 @@ import android.view.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.model.Launch;
+import de.devmil.paperlaunch.storage.EntriesDataSource;
 import de.devmil.paperlaunch.view.LauncherView;
 
 
 public class TestDrive extends Activity {
 
     private LauncherView mLauncherView;
+    private EntriesDataSource mDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_drive);
 
+        mDataSource = new EntriesDataSource(this);
+        mDataSource.open();
+
         mLauncherView = (LauncherView)findViewById(R.id.tstLauncherView);
 
         LaunchConfig cfg = new LaunchConfig();
 
-        List<Launch> entries = new ArrayList<>();
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.agilebits.onepassword", "com.agilebits.onepassword.activity.LoginActivity", 1));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "org.kman.AquaMail", "org.kman.AquaMail.ui.AccountListActivity", 2));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.microsoft.office.onenote", "com.microsoft.office.onenote.ui.ONMSplashActivity", 3));
-        entries.add(Launch.create(this, cfg.getDesignConfig(), "com.spotify.music", "com.spotify.music.MainActivity", 4));
+        List<IEntry> entries = mDataSource.loadRootContent();
+
+        mDataSource.close();
 
         cfg.setEntries(entries);
 

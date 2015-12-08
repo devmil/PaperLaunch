@@ -20,23 +20,36 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 
+import de.devmil.paperlaunch.storage.EntryDTO;
 import de.devmil.paperlaunch.storage.LaunchDTO;
 import de.devmil.paperlaunch.utils.AppMetadataUtils;
 
 public class Launch implements IEntry {
     private LaunchDTO mDto;
+    private EntryDTO mEntryDto;
 
     private String mDefaultAppName = null;
     private Drawable mDefaultAppIcon = null;
 
-    public Launch(LaunchDTO launchDTO)
+    public Launch(LaunchDTO launchDTO, EntryDTO entryDTO)
     {
         mDto = launchDTO;
+        mEntryDto = entryDTO;
     }
 
     @Override
     public long getId() {
         return mDto.getId();
+    }
+
+    @Override
+    public long getEntryId() {
+        return mEntryDto.getId();
+    }
+
+    @Override
+    public long getOrderIndex() {
+        return mEntryDto.getOrderIndex();
     }
 
     @Override
@@ -94,13 +107,5 @@ public class Launch implements IEntry {
 
     public LaunchDTO getDto() {
         return mDto;
-    }
-
-    public static Launch create(Context context, IDesignConfig designConfig, String packageName, String className, long id) {
-        Intent launchIntent = new Intent();
-        launchIntent.setComponent(new ComponentName(packageName, className));
-
-        LaunchDTO dto = new LaunchDTO(id, null, launchIntent, null);
-        return new Launch(dto);
     }
 }
