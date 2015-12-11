@@ -66,9 +66,13 @@ public class FoldersAccess {
     }
 
     public void delete(FolderDTO folder) {
+        delete(folder.getId());
+    }
+
+    public void delete(long folderId) {
         mDatabase.delete(
                 EntriesSQLiteOpenHelper.TABLE_FOLDERS,
-                EntriesSQLiteOpenHelper.COLUMN_ID + " = " + folder.getId(),
+                EntriesSQLiteOpenHelper.COLUMN_ID + " = " + folderId,
                 null
         );
     }

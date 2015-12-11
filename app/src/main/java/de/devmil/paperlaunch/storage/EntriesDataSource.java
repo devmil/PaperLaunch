@@ -129,6 +129,19 @@ public class EntriesDataSource {
         return createFolderFromDTO(folder, entry, subEntryDTOs);
     }
 
+    public void deleteEntry(long entryId) {
+        EntryDTO entryDto = mEntriesAccess.queryEntry(entryId);
+        if(entryDto != null) {
+            if(entryDto.getFolderId() > 0) {
+                mFoldersAccess.delete(entryDto.getFolderId());
+            }
+            else if(entryDto.getLaunchId() > 0) {
+                mLaunchesAccess.delete(entryDto.getLaunchId());
+            }
+            mEntriesAccess.delete(entryDto);
+        }
+    }
+
     private Folder createFolderFromDTO(FolderDTO dto, EntryDTO entryDto, List<EntryDTO> subEntryDTOs) {
         List<IEntry> subEntries = new ArrayList<>();
         for(EntryDTO subEntryDto : subEntryDTOs) {

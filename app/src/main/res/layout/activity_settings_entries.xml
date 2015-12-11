@@ -30,6 +30,17 @@
         android:id="@+id/activity_settings_entries_text"
         android:clickable="false"
         android:layout_margin="10dp"
-        android:layout_width="wrap_content"
+        android:layout_weight="1"
+        android:layout_width="0dp"
         android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/activity_settings_entries_delete"
+        android:clickable="true"
+        android:layout_margin="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:alpha="0.8"
+        android:src="@mipmap/ic_delete_grey600_36dp"/>
+
 </LinearLayout>

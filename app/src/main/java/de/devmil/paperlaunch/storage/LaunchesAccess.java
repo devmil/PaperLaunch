@@ -69,9 +69,13 @@ public class LaunchesAccess {
     }
 
     public void delete(LaunchDTO launch) {
+        delete(launch.getId());
+    }
+
+    public void delete(long launchId) {
         mDatabase.delete(
                 EntriesSQLiteOpenHelper.TABLE_LAUNCHES,
-                EntriesSQLiteOpenHelper.COLUMN_ID + " = " + launch.getId(),
+                EntriesSQLiteOpenHelper.COLUMN_ID + " = " + launchId,
                 null
         );
     }

@@ -268,6 +268,7 @@ public class SettingsActivity extends Activity {
             public ImageView imageView;
             public TextView textView;
             private ImageView handle;
+            private ImageView deleteImg;
 
             public ViewHolder(DragSortAdapter<?> dragSortAdapter, View itemView) {
                 super(dragSortAdapter, itemView);
@@ -275,12 +276,15 @@ public class SettingsActivity extends Activity {
                 imageView = (ImageView)itemView.findViewById(R.id.activity_settings_entries_image);
                 textView = (TextView)itemView.findViewById(R.id.activity_settings_entries_text);
                 handle = (ImageView)itemView.findViewById(R.id.activity_settings_entries_handle);
+                deleteImg = (ImageView)itemView.findViewById(R.id.activity_settings_entries_delete);
 
                 //TODO: check if a long click or a tap event fits better
                 handle.setOnLongClickListener(this);
 
                 //TODO: attach tap event for opening the details activity / fragment (tablets?)
                 container.setOnClickListener(this);
+
+                deleteImg.setOnClickListener(this);
             }
 
             @Override
@@ -292,9 +296,19 @@ public class SettingsActivity extends Activity {
             @Override
             public void onClick(View v) {
                 IEntry entry = getEntryById(getItemId());
-                Intent editIntent = entry.getEditIntent(v.getContext());
-                if(editIntent != null) {
-                    startActivity(editIntent);
+                if(v == container) {
+                    Intent editIntent = entry.getEditIntent(v.getContext());
+                    if (editIntent != null) {
+                        startActivity(editIntent);
+                    }
+                }
+                else if(v == deleteImg) {
+                    mDataSource.open();
+                    mDataSource.deleteEntry(entry.getEntryId());
+                    mDataSource.close();
+                    int pos = getPositionForId(getItemId());
+                    mEntries.remove(pos);
+                    notifyItemRemoved(pos);
                 }
             }
         }
