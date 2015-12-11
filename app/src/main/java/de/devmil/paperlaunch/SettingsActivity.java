@@ -2,6 +2,7 @@ package de.devmil.paperlaunch;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.cocosw.bottomsheet.BottomSheet;
 import com.makeramen.dragsortadapter.DragSortAdapter;
 
 import java.util.ArrayList;
@@ -65,12 +67,30 @@ public class SettingsActivity extends Activity {
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setClass(v.getContext(), IntentSelector.class);
-                intent.putExtra(IntentSelector.EXTRA_STRING_ACTIVITIES, "--Activities--");
-                intent.putExtra(IntentSelector.EXTRA_STRING_SHORTCUTS, "--Shortcuts--");
 
-                startActivityForResult(intent, CODE_ADD_APP_RESULT);
+                new BottomSheet.Builder(SettingsActivity.this)
+                        .title(R.string.folder_settings_add_title)
+                        .grid()
+                        .sheet(2001, R.mipmap.ic_link_black_48dp, R.string.folder_settings_add_app)
+                        .sheet(2002, R.mipmap.ic_folder_black_48dp, R.string.folder_settings_add_folder)
+                        .listener(new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch(which) {
+                                    case 2001:
+                                        Intent intent = new Intent();
+                                        intent.setClass(SettingsActivity.this, IntentSelector.class);
+                                        intent.putExtra(IntentSelector.EXTRA_STRING_ACTIVITIES, getResources().getString(R.string.folder_settings_add_app_activities));
+                                        intent.putExtra(IntentSelector.EXTRA_STRING_SHORTCUTS, getResources().getString(R.string.folder_settings_add_app_shortcuts));
+
+                                        startActivityForResult(intent, CODE_ADD_APP_RESULT);
+                                        break;
+                                    case 2002:
+                                        break;
+                                }
+                            }
+                        }).show();
+
             }
         });
     }
@@ -248,6 +268,11 @@ public class SettingsActivity extends Activity {
             holder.container.setVisibility(getDraggingId() == entry.getId() ? View.INVISIBLE : View.VISIBLE);
             holder.imageView.setImageDrawable(entry.getIcon(holder.imageView.getContext()));
             holder.textView.setText(entry.getName(holder.textView.getContext()));
+
+            int editVisibility = entry.isFolder() ? View.VISIBLE : View.GONE;
+            if(holder.editImg.getVisibility() != editVisibility) {
+                holder.editImg.setVisibility(editVisibility);
+            }
         }
 
         @Override
@@ -268,6 +293,7 @@ public class SettingsActivity extends Activity {
             public ImageView imageView;
             public TextView textView;
             private ImageView handle;
+            private ImageView editImg;
             private ImageView deleteImg;
 
             public ViewHolder(DragSortAdapter<?> dragSortAdapter, View itemView) {
@@ -276,6 +302,7 @@ public class SettingsActivity extends Activity {
                 imageView = (ImageView)itemView.findViewById(R.id.activity_settings_entries_image);
                 textView = (TextView)itemView.findViewById(R.id.activity_settings_entries_text);
                 handle = (ImageView)itemView.findViewById(R.id.activity_settings_entries_handle);
+                editImg = (ImageView)itemView.findViewById(R.id.activity_settings_entries_edit);
                 deleteImg = (ImageView)itemView.findViewById(R.id.activity_settings_entries_delete);
 
                 //TODO: check if a long click or a tap event fits better
@@ -283,6 +310,8 @@ public class SettingsActivity extends Activity {
 
                 //TODO: attach tap event for opening the details activity / fragment (tablets?)
                 container.setOnClickListener(this);
+
+                editImg.setOnClickListener(this);
 
                 deleteImg.setOnClickListener(this);
             }
@@ -301,6 +330,9 @@ public class SettingsActivity extends Activity {
                     if (editIntent != null) {
                         startActivity(editIntent);
                     }
+                }
+                else if(v == editImg) {
+                    //TODO: launch edit folder
                 }
                 else if(v == deleteImg) {
                     mDataSource.open();
