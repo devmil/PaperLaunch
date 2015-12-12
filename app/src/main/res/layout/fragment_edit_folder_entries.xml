@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/activity_settings_entries_container"
+    android:id="@+id/fragment_edit_folder_entries_container"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,11 +9,14 @@
     android:clickable="true"
     android:focusable="true"
     android:elevation="2dp"
-    android:layout_margin="2dp"
-    android:background="@drawable/activity_settings_entries_background">
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
+    android:layout_marginStart="@dimen/activity_horizontal_margin"
+    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+    android:background="@drawable/fragment_edit_folder_entries_background">
 
     <ImageView
-        android:id="@+id/activity_settings_entries_handle"
+        android:id="@+id/fragment_edit_folder_entries_handle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -21,13 +24,13 @@
         android:src="@mipmap/ic_reorder_black_48dp" />
 
     <ImageView
-        android:id="@+id/activity_settings_entries_image"
+        android:id="@+id/fragment_edit_folder_entries_image"
         android:clickable="false"
         android:layout_margin="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
-        android:id="@+id/activity_settings_entries_text"
+        android:id="@+id/fragment_edit_folder_entries_text"
         android:clickable="false"
         android:layout_margin="10dp"
         android:layout_weight="1"
@@ -35,7 +38,7 @@
         android:layout_height="wrap_content" />
 
     <ImageView
-        android:id="@+id/activity_settings_entries_edit"
+        android:id="@+id/fragment_edit_folder_entries_edit"
         android:clickable="true"
         android:layout_margin="10dp"
         android:layout_width="wrap_content"
@@ -44,7 +47,7 @@
         android:src="@mipmap/ic_mode_edit_grey600_36dp" />
 
     <ImageView
-        android:id="@+id/activity_settings_entries_delete"
+        android:id="@+id/fragment_edit_folder_entries_delete"
         android:clickable="true"
         android:layout_margin="10dp"
         android:layout_width="wrap_content"

@@ -6,10 +6,7 @@
     android:id="@+id/activity_settings_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="de.devmil.paperlaunch.SettingsActivity">
 
     <Button
@@ -17,24 +14,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Test"/>
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/activity_settings_entrieslist"
+
+    <fragment
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/activity_settings_buttontest"
-        android:clipToPadding="false"
-        android:scrollbarStyle="outsideOverlay"
-        android:scrollbars="vertical"
-        />
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/activity_settings_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:src="@mipmap/ic_add_black_24dp"
-        android:layout_margin="6dp"
-        app:elevation="4dp">
+        android:name="de.devmil.paperlaunch.view.fragments.EditFolderFragment"
+        android:id="@+id/fragment"
+        android:layout_below="@+id/activity_settings_buttontest"
+        android:layout_alignParentStart="true"
+        tools:layout="@layout/fragment_edit_folder" />
 
-    </android.support.design.widget.FloatingActionButton>
 </RelativeLayout>
