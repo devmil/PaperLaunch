@@ -14,10 +14,13 @@ import java.util.List;
 import de.devmil.paperlaunch.model.Folder;
 import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
+import de.devmil.paperlaunch.view.fragments.EditFolderFragment;
 
 public class SettingsActivity extends FragmentActivity {
 
     private Button mButtonTest;
+    private Button mButtonReset;
+    private EditFolderFragment mFragment;
     private EntriesDataSource mDataSource;
 
     @Override
@@ -28,6 +31,8 @@ public class SettingsActivity extends FragmentActivity {
         mDataSource = new EntriesDataSource(this);
 
         mButtonTest = (Button)findViewById(R.id.activity_settings_buttontest);
+        mButtonReset = (Button)findViewById(R.id.activity_settings_buttonreset);
+        mFragment = (EditFolderFragment)getSupportFragmentManager().findFragmentById(R.id.activity_settings_editfolder_fragment);
 
         mButtonTest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -37,13 +42,17 @@ public class SettingsActivity extends FragmentActivity {
             }
         });
 
-
+        mButtonReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetData();
+                mFragment.invalidate();
+            }
+        });
     }
 
-
-
-
     private void resetData() {
+        mDataSource.open();
         mDataSource.clear();
 
         createLaunch("com.agilebits.onepassword", "com.agilebits.onepassword.activity.LoginActivity", 1);
@@ -56,6 +65,8 @@ public class SettingsActivity extends FragmentActivity {
         folderLaunchComponents.add(new ComponentName("org.dmfs.tasks", "org.dmfs.tasks.TaskListActivity"));
 
         createFolder("Test Folder", folderLaunchComponents, 4);
+
+        mDataSource.close();
     }
 
     private Launch createLaunch(String packageName, String className, int orderIndex) {

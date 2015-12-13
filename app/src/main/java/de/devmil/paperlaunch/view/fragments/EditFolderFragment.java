@@ -88,7 +88,7 @@ public class EditFolderFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayout.VERTICAL, false));
         mRecyclerView.setItemAnimator(new EntriesItemAnimator());
 
-        mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, loadEntries(), mDataSource));
+        loadData();
 
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,6 +118,14 @@ public class EditFolderFragment extends Fragment {
             }
         });
         return result;
+    }
+
+    public void invalidate() {
+        loadData();
+    }
+
+    private void loadData() {
+        mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, loadEntries(), mDataSource));
     }
 
     private List<IEntry> loadEntries() {
@@ -212,18 +220,18 @@ public class EditFolderFragment extends Fragment {
         }
 
         @Override
-        public int getPositionForId(long id) {
+        public int getPositionForId(long entryId) {
             for(int i=0; i<mEntries.size(); i++) {
-                if(mEntries.get(i).getId() == id) {
+                if(mEntries.get(i).getEntryId() == entryId) {
                     return i;
                 }
             }
             return -1;
         }
 
-        private IEntry getEntryById(long id) {
+        private IEntry getEntryById(long entryId) {
             for(IEntry entry : mEntries) {
-                if(entry.getId() == id) {
+                if(entry.getEntryId() == entryId) {
                     return entry;
                 }
             }
@@ -232,7 +240,7 @@ public class EditFolderFragment extends Fragment {
 
         @Override
         public long getItemId(int position) {
-            return mEntries.get(position).getId();
+            return mEntries.get(position).getEntryId();
         }
 
         @Override
