@@ -88,18 +88,6 @@ public class Launch implements IEntry {
         return false;
     }
 
-    @Override
-    public Intent getEditIntent(Context context) {
-        //FIXME: temporary test
-        Intent launchIntent = getLaunchIntent();
-        if(launchIntent != null) {
-            if(launchIntent.hasExtra(Intent.EXTRA_SHORTCUT_INTENT)) {
-                launchIntent = launchIntent.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
-            }
-        }
-        return launchIntent;
-    }
-
     public Intent getLaunchIntent()
     {
         return mDto.getLaunchIntent();

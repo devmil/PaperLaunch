@@ -10,9 +10,12 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,6 +25,7 @@ import com.makeramen.dragsortadapter.DragSortAdapter;
 
 import java.util.List;
 
+import de.devmil.paperlaunch.EditFolderActivity;
 import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.model.Folder;
 import de.devmil.paperlaunch.model.IEntry;
@@ -36,13 +40,15 @@ import de.devmil.paperlaunch.view.utils.IntentSelector;
  */
 public class EditFolderFragment extends Fragment {
     private static final String ARG_PARAM_FOLDERID = "paramFolderId";
-    private static final int CODE_ADD_APP_RESULT = 1000;
+    private static final int REQUEST_ADD_APP = 1000;
+    private static final int REQUEST_EDIT_FOLDER = 1010;
 
     private EntriesAdapter mAdapter;
     private EntriesDataSource mDataSource;
     private RecyclerView mRecyclerView;
     private FloatingActionButton mAddButton;
     private LinearLayout mEditNameLayout;
+    private EditText mFolderNameEditText;
     private long mFolderId = -1;
     private Folder mFolder = null;
 
@@ -82,6 +88,7 @@ public class EditFolderFragment extends Fragment {
         mRecyclerView = (RecyclerView)result.findViewById(R.id.fragment_edit_folder_entrieslist);
         mAddButton = (FloatingActionButton)result.findViewById(R.id.fragment_edit_folder_fab);
         mEditNameLayout = (LinearLayout)result.findViewById(R.id.fragment_edit_folder_editname_layout);
+        mFolderNameEditText = (EditText)result.findViewById(R.id.fragment_edit_folder_editname_text);
 
         mEditNameLayout.setVisibility(mFolderId >= 0 ? View.VISIBLE : View.GONE);
 
@@ -89,6 +96,24 @@ public class EditFolderFragment extends Fragment {
         mRecyclerView.setItemAnimator(new EntriesItemAnimator());
 
         loadData();
+
+        mFolderNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mFolder.getDto().setName(mFolderNameEditText.getText().toString());
+                mDataSource.open();
+                mDataSource.updateFolderData(mFolder);
+                mDataSource.close();
+            }
+        });
 
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,6 +151,9 @@ public class EditFolderFragment extends Fragment {
 
     private void loadData() {
         mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, loadEntries(), mDataSource));
+        if(mFolder != null) {
+            mFolderNameEditText.setText(mFolder.getDto().getName());
+        }
     }
 
     private List<IEntry> loadEntries() {
@@ -145,7 +173,10 @@ public class EditFolderFragment extends Fragment {
     }
 
     private void initiateCreateFolder() {
+        long folderId = addFolder("New Folder");
 
+        Intent editFolderIntent = EditFolderActivity.createLaunchIntent(getContext(), folderId);
+        startActivityForResult(editFolderIntent, REQUEST_EDIT_FOLDER);
     }
 
     private void initiateCreateLaunch() {
@@ -154,17 +185,20 @@ public class EditFolderFragment extends Fragment {
         intent.putExtra(IntentSelector.EXTRA_STRING_ACTIVITIES, getResources().getString(R.string.folder_settings_add_app_activities));
         intent.putExtra(IntentSelector.EXTRA_STRING_SHORTCUTS, getResources().getString(R.string.folder_settings_add_app_shortcuts));
 
-        startActivityForResult(intent, CODE_ADD_APP_RESULT);
+        startActivityForResult(intent, REQUEST_ADD_APP);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode != Activity.RESULT_OK) {
-            return;
-        }
-        if(CODE_ADD_APP_RESULT == requestCode) {
+        if(REQUEST_ADD_APP == requestCode) {
+            if(resultCode != Activity.RESULT_OK) {
+                return;
+            }
             addLaunch(data);
+        }
+        else if(REQUEST_EDIT_FOLDER == requestCode) {
+            invalidate();
         }
     }
 
@@ -177,6 +211,18 @@ public class EditFolderFragment extends Fragment {
         mDataSource.close();
 
         mAdapter.addEntry(l);
+    }
+
+    private long addFolder(String initialName) {
+        mDataSource.open();
+        Folder folder = mDataSource.createFolder(mFolderId);
+        folder.getDto().setName(initialName);
+        mDataSource.updateFolderData(folder);
+        mDataSource.close();
+
+        mAdapter.addEntry(folder);
+
+        return folder.getId();
     }
 
     private class EntriesItemAnimator extends DefaultItemAnimator
@@ -326,13 +372,12 @@ public class EditFolderFragment extends Fragment {
             public void onClick(View v) {
                 IEntry entry = getEntryById(getItemId());
                 if(v == container) {
-                    Intent editIntent = entry.getEditIntent(v.getContext());
-                    if (editIntent != null) {
-                        startActivity(editIntent);
-                    }
                 }
                 else if(v == editImg) {
-                    //TODO: launch edit folder
+                    if(entry.isFolder()) {
+                        Intent editFolderIntent = EditFolderActivity.createLaunchIntent(getContext(), entry.getId());
+                        startActivityForResult(editFolderIntent, REQUEST_EDIT_FOLDER);
+                    }
                 }
                 else if(v == deleteImg) {
                     mDataSource.open();

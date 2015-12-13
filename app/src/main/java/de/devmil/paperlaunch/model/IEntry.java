@@ -12,6 +12,4 @@ public interface IEntry {
     String getName(Context context);
     Drawable getIcon(Context context);
     boolean isFolder();
-
-    Intent getEditIntent(Context context);
 }

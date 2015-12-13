@@ -13,4 +13,5 @@
     <string name="folder_settings_add_app_activities">Activities</string>
     <string name="folder_settings_add_app_shortcuts">Shortcuts</string>
     <string name="folder_settings_add_folder">Folder</string>
+    <string name="title_activity_edit_folder">EditFolderActivity</string>
 </resources>

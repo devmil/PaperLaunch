@@ -50,11 +50,6 @@ public class Folder implements IEntry {
         return mDto.getIcon();
     }
 
-    @Override
-    public Intent getEditIntent(Context context) {
-        return null;
-    }
-
     public List<IEntry> getSubEntries() {
         return mSubEntries;
     }

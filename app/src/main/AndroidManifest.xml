@@ -1,32 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.devmil.paperlaunch" >
+    package="de.devmil.paperlaunch">
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.PaperLaunch" >
+        android:theme="@style/Theme.PaperLaunch">
         <activity
             android:name=".TestDrive"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name"></activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activities.EditLaunchActivity" >
-        </activity>
+        <activity android:name=".view.activities.EditLaunchActivity"></activity>
         <activity
-            android:name="de.devmil.paperlaunch.view.utils.IntentSelector"
-            android:label="Select an Intent" >
-        </activity>
-
+            android:name=".view.utils.IntentSelector"
+            android:label="Select an Intent"></activity>
+        <activity
+            android:name=".EditFolderActivity"
+            android:label="@string/title_activity_edit_folder"></activity>
     </application>
 
 </manifest>
