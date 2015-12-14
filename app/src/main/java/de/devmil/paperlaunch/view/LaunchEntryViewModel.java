@@ -26,26 +26,30 @@ import de.devmil.paperlaunch.model.Launch;
  * Created by michaellamers on 29.05.15.
  */
 public class LaunchEntryViewModel {
-    private String mAppName;
-    private Drawable mAppIcon;
+    private Context mContext;
+    private IEntry mEntry;
     private State mState = State.Inactive;
     private ILaunchEntryConfig mConfig;
 
-    public LaunchEntryViewModel(String appName, Drawable appIcon, ILaunchEntryConfig config)
+    public LaunchEntryViewModel(Context context, IEntry entry, ILaunchEntryConfig config)
     {
-        mAppName = appName;
-        mAppIcon = appIcon;
+        mContext = context;
+        mEntry = entry;
         mConfig = config;
+    }
+
+    public IEntry getEntry() {
+        return mEntry;
     }
 
     public String getAppName()
     {
-        return mAppName;
+        return mEntry.getName(mContext);
     }
 
     public Drawable getAppIcon()
     {
-        return mAppIcon;
+        return mEntry.getIcon(mContext);
     }
 
     public float getImageWidthDip()
@@ -139,6 +143,6 @@ public class LaunchEntryViewModel {
     }
 
     public static LaunchEntryViewModel createFrom(Context context, IEntry entry, ILaunchEntryConfig config) {
-        return new LaunchEntryViewModel(entry.getName(context), entry.getIcon(context), config);
+        return new LaunchEntryViewModel(context, entry, config);
     }
 }

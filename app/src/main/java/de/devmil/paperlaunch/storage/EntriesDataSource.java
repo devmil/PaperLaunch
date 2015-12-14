@@ -133,12 +133,20 @@ public class EntriesDataSource {
         EntryDTO entryDto = mEntriesAccess.queryEntry(entryId);
         if(entryDto != null) {
             if(entryDto.getFolderId() > 0) {
+                deleteFolderContent(entryDto.getFolderId());
                 mFoldersAccess.delete(entryDto.getFolderId());
             }
             else if(entryDto.getLaunchId() > 0) {
                 mLaunchesAccess.delete(entryDto.getLaunchId());
             }
             mEntriesAccess.delete(entryDto);
+        }
+    }
+
+    private void deleteFolderContent(long folderId) {
+        Folder folder = loadFolder(folderId);
+        for(IEntry entry : folder.getSubEntries()) {
+            deleteEntry(entry.getEntryId());
         }
     }
 

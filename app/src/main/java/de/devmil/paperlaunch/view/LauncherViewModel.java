@@ -22,15 +22,7 @@ import java.util.List;
  * Created by michaellamers on 29.05.15.
  */
 public class LauncherViewModel {
-    private List<LaunchLaneViewModel> mLaneViewModels;
-
-    public LauncherViewModel(List<LaunchLaneViewModel> laneViewModels)
+    public LauncherViewModel()
     {
-        mLaneViewModels = new ArrayList<>(laneViewModels);
-    }
-
-    public List<LaunchLaneViewModel> getLaneViewModels()
-    {
-        return mLaneViewModels;
     }
 }

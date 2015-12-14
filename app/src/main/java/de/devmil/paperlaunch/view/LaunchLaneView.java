@@ -16,6 +16,7 @@
 package de.devmil.paperlaunch.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,10 +27,17 @@ import android.widget.RelativeLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.utils.ViewUtils;
 
 public class LaunchLaneView extends RelativeLayout {
+    interface ILaneListener {
+        void onItemSelected(IEntry selectedItem);
+        void onStateChanged(LaunchLaneViewModel.State oldState, LaunchLaneViewModel.State newState);
+    }
+
     private LaunchLaneViewModel mViewModel;
+    private ILaneListener mLaneListener;
 
     //view components
     private LinearLayout mSelectIndicatorContainer;
@@ -68,9 +76,17 @@ public class LaunchLaneView extends RelativeLayout {
         adaptModelState();
     }
 
+    public void setLaneListener(ILaneListener listener) {
+        mLaneListener = listener;
+    }
+
     public void start()
     {
         gotoState(LaunchLaneViewModel.State.Focusing);
+    }
+
+    public void stop() {
+        removeAllViews();
     }
 
     public void gotoState(LaunchLaneViewModel.State state)
@@ -81,6 +97,9 @@ public class LaunchLaneView extends RelativeLayout {
     public void doHandleTouch(int action, int x, int y)
     {
         int focusSelectionBorder = getWidth();
+        if(mViewModel == null) {
+            return;
+        }
         if(mViewModel.getState() == LaunchLaneViewModel.State.Focusing)
         {
             if(action == MotionEvent.ACTION_UP) {
@@ -89,14 +108,27 @@ public class LaunchLaneView extends RelativeLayout {
             }
             else {
                 ensureFocusedEntryAt(y);
-                if (x < focusSelectionBorder)
-                    transitToState(LaunchLaneViewModel.State.Selected);
+                if(mFocusedEntryView != null) {
+                    if (mViewModel.isOnRightSide()) {
+                        if (x < focusSelectionBorder) {
+                            transitToState(LaunchLaneViewModel.State.Selected);
+                        }
+                    } else {
+                        if (x > focusSelectionBorder)
+                            transitToState(LaunchLaneViewModel.State.Selected);
+                    }
+                }
             }
         }
         else if(mViewModel.getState() == LaunchLaneViewModel.State.Selected)
         {
-            if(x > focusSelectionBorder)
-                transitToState(LaunchLaneViewModel.State.Focusing);
+            if(mViewModel.isOnRightSide()) {
+                if (x > focusSelectionBorder)
+                    transitToState(LaunchLaneViewModel.State.Focusing);
+            } else {
+                if (x < focusSelectionBorder)
+                    transitToState(LaunchLaneViewModel.State.Focusing);
+            }
         }
     }
 
@@ -197,10 +229,28 @@ public class LaunchLaneView extends RelativeLayout {
                 break;
             case Selected:
                 showSelectionIndicator();
-                //TODO: keep selected state and move all others to inactive
+                sendAllEntriesToState(LaunchEntryViewModel.State.Inactive, true, mFocusedEntryView);
+                fireSelectedEvent();
                 break;
         }
-        mViewModel.setState(state);
+        if(mViewModel != null) {
+            LaunchLaneViewModel.State oldState = mViewModel.getState();
+            LaunchLaneViewModel.State newState = state;
+            mViewModel.setState(newState);
+            fireStateChangedEvent(oldState, newState);
+        }
+    }
+
+    private void fireStateChangedEvent(LaunchLaneViewModel.State oldState, LaunchLaneViewModel.State newState) {
+        if(mLaneListener != null) {
+            mLaneListener.onStateChanged(oldState, newState);
+        }
+    }
+
+    private void fireSelectedEvent() {
+        if(mLaneListener != null) {
+            mLaneListener.onItemSelected(mFocusedEntryView.getEntry());
+        }
     }
 
     private void adaptModelState() {
@@ -218,6 +268,11 @@ public class LaunchLaneView extends RelativeLayout {
 
     private void sendAllEntriesToState(final LaunchEntryViewModel.State state, boolean topDown)
     {
+        sendAllEntriesToState(state, topDown, null);
+    }
+
+    private void sendAllEntriesToState(final LaunchEntryViewModel.State state, boolean topDown, LaunchEntryView except)
+    {
         int delay = 0;
         int start = 0;
         int end = mEntryViews.size();
@@ -230,7 +285,9 @@ public class LaunchLaneView extends RelativeLayout {
         }
         for(int i=start; i<end; i+=diff)
         {
-            mEntryViews.get(i).gotoState(state, delay += mViewModel.getEntryMoveDiffMS());
+            if(mEntryViews.get(i) != except) {
+                mEntryViews.get(i).gotoState(state, delay += mViewModel.getEntryMoveDiffMS());
+            }
         }
     }
 
@@ -247,7 +304,9 @@ public class LaunchLaneView extends RelativeLayout {
 
     private void hideSelectionIndicator()
     {
-        mSelectIndicator.setVisibility(View.INVISIBLE);
+        if(mSelectIndicator != null) {
+            mSelectIndicator.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void ensureFocusedEntryAt(int y)

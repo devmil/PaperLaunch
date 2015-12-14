@@ -20,6 +20,7 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.utils.ViewUtils;
 
 public class LaunchEntryView extends LinearLayout {
@@ -55,6 +56,10 @@ public class LaunchEntryView extends LinearLayout {
         mImgFrame.setBackgroundColor(mViewModel.getFrameDefaultColor());
 
         adaptModelState();
+    }
+
+    public IEntry getEntry() {
+        return mViewModel.getEntry();
     }
 
     public void setState(LaunchEntryViewModel.State state)

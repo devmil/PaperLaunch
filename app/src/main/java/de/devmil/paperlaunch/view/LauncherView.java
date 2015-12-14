@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.devmil.paperlaunch.R;
+import de.devmil.paperlaunch.model.Folder;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.model.Launch;
@@ -94,16 +95,20 @@ public class LauncherView extends RelativeLayout {
 
     private void buildViewModel()
     {
-        //TODO: split into auto folders if there are too many of them
-        List<LaunchLaneViewModel> laneModels = new ArrayList<>();
-        List<LaunchEntryViewModel> entryModels = new ArrayList<>();
-        for(IEntry e : mConfig.getEntries())
-        {
-            entryModels.add(LaunchEntryViewModel.createFrom(getContext(), e, mConfig));
-        }
-        laneModels.add(new LaunchLaneViewModel(entryModels, mConfig));
+        mViewModel = new LauncherViewModel();
+    }
 
-        mViewModel = new LauncherViewModel(laneModels);
+    private int[] getLaneIds() {
+        return new int[] {
+                R.id.id_launchview_lane1,
+                R.id.id_launchview_lane2,
+                R.id.id_launchview_lane3,
+                R.id.id_launchview_lane4,
+                R.id.id_launchview_lane5,
+                R.id.id_launchview_lane6,
+                R.id.id_launchview_lane7,
+                R.id.id_launchview_lane8
+        };
     }
 
     private void buildViews()
@@ -112,27 +117,69 @@ public class LauncherView extends RelativeLayout {
         mLaneViews.clear();
         addNeutralZone();
         int currentAnchor = mNeutralZone.getId();
-        int[] laneIds = getResources().getIntArray(R.array.laneIds);
-        int currentIdx = 0;
-        for(LaunchLaneViewModel lm : mViewModel.getLaneViewModels())
+        int[] laneIds = getLaneIds();
+
+        for(int i=0; i<laneIds.length; i++)
         {
-            LaunchLaneView llv = new LaunchLaneView(getContext());
-            llv.setId(laneIds[currentIdx++]);
-
-            LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-            if(mConfig.isOnRightSide())
-                params.addRule(RelativeLayout.LEFT_OF, currentAnchor);
-            else
-                params.addRule(RelativeLayout.RIGHT_OF, currentAnchor);
-
-            addView(llv, params);
-            mLaneViews.add(llv);
-            llv.doInitializeData(lm);
-
-            currentAnchor = llv.getId();
+            currentAnchor = addLaneView(i, currentAnchor).getId();
         }
+
+        setEntriesToLane(mLaneViews.get(0), mConfig.getEntries());
+    }
+
+    private LaunchLaneView addLaneView(final int laneIndex, int anchorId) {
+        final int[] laneIds = getLaneIds();
+        int id = laneIds[laneIndex];
+
+        LaunchLaneView llv = new LaunchLaneView(getContext());
+        llv.setId(id);
+
+        LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        if(mConfig.isOnRightSide())
+            params.addRule(RelativeLayout.LEFT_OF, anchorId);
+        else
+            params.addRule(RelativeLayout.RIGHT_OF, anchorId);
+
+        addView(llv, params);
+        mLaneViews.add(llv);
+
+        llv.setLaneListener(new LaunchLaneView.ILaneListener() {
+            @Override
+            public void onItemSelected(IEntry selectedItem) {
+                if (selectedItem.isFolder()) {
+                    Folder f = (Folder) selectedItem;
+                    LaunchLaneView nextLaneView = mLaneViews.get(laneIndex + 1);
+                    setEntriesToLane(nextLaneView, f.getSubEntries());
+                    nextLaneView.start();
+                }
+            }
+
+            @Override
+            public void onStateChanged(LaunchLaneViewModel.State oldState, LaunchLaneViewModel.State newState) {
+                if(newState == LaunchLaneViewModel.State.Focusing) {
+                    for(int idx = laneIndex + 1; idx < mLaneViews.size(); idx++) {
+                        mLaneViews.get(idx).stop();
+                    }
+                }
+            }
+        });
+
+        return llv;
+    }
+
+    private void setEntriesToLane(LaunchLaneView laneView, List<IEntry> entries) {
+        //TODO: handle folder icon
+        //TODO: split into auto folders if there are too many of them
+        List<LaunchEntryViewModel> entryModels = new ArrayList<>();
+        for(IEntry e : entries)
+        {
+            entryModels.add(LaunchEntryViewModel.createFrom(getContext(), e, mConfig));
+        }
+
+        LaunchLaneViewModel vm = new LaunchLaneViewModel(entryModels, mConfig);
+        laneView.doInitializeData(vm);
     }
 
     private void addNeutralZone()

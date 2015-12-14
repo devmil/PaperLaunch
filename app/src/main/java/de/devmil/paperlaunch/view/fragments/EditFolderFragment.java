@@ -108,6 +108,9 @@ public class EditFolderFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
+                if(mFolder == null) {
+                    return;
+                }
                 mFolder.getDto().setName(mFolderNameEditText.getText().toString());
                 mDataSource.open();
                 mDataSource.updateFolderData(mFolder);
