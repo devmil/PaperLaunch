@@ -15,8 +15,11 @@
  */
 package de.devmil.paperlaunch.view;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.devmil.paperlaunch.model.IEntry;
+import de.devmil.paperlaunch.utils.PositionAndSizeEvaluator;
 import de.devmil.paperlaunch.utils.ViewUtils;
 
 public class LaunchLaneView extends RelativeLayout {
@@ -111,11 +115,11 @@ public class LaunchLaneView extends RelativeLayout {
                 if(mFocusedEntryView != null) {
                     if (mViewModel.isOnRightSide()) {
                         if (x < focusSelectionBorder) {
-                            transitToState(LaunchLaneViewModel.State.Selected);
+                            transitToState(LaunchLaneViewModel.State.Selecting);
                         }
                     } else {
                         if (x > focusSelectionBorder)
-                            transitToState(LaunchLaneViewModel.State.Selected);
+                            transitToState(LaunchLaneViewModel.State.Selecting);
                     }
                 }
             }
@@ -150,6 +154,7 @@ public class LaunchLaneView extends RelativeLayout {
 
     private void createViews()
     {
+        removeAllViews();
         mEntriesContainer = new LinearLayout(getContext());
         mEntriesContainer.setOrientation(LinearLayout.VERTICAL);
         RelativeLayout.LayoutParams entriesContainerParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -186,7 +191,9 @@ public class LaunchLaneView extends RelativeLayout {
         mSelectIndicator.setElevation(ViewUtils.getPxFromDip(getContext(), mViewModel.getSelectedImageElevationDip()));
         mSelectIndicator.setVisibility(View.INVISIBLE);
 
-        LinearLayout.LayoutParams selectIndicatorParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams selectIndicatorParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
 
         mSelectIndicatorContainer.addView(mSelectIndicator, selectIndicatorParams);
         ViewUtils.disableClipping(mSelectIndicator);
@@ -227,9 +234,11 @@ public class LaunchLaneView extends RelativeLayout {
                 hideSelectionIndicator();
                 sendAllEntriesToState(LaunchEntryViewModel.State.Active, true);
                 break;
-            case Selected:
+            case Selecting:
                 showSelectionIndicator();
                 sendAllEntriesToState(LaunchEntryViewModel.State.Inactive, true, mFocusedEntryView);
+                break;
+            case Selected:
                 fireSelectedEvent();
                 break;
         }
@@ -293,12 +302,51 @@ public class LaunchLaneView extends RelativeLayout {
 
     private void applySizeParameters()
     {
-        mSelectedIcon.setMaxHeight((int)ViewUtils.getPxFromDip(getContext(), mViewModel.getImageWidthDip()));
+        mSelectedIcon.setMaxHeight((int) ViewUtils.getPxFromDip(getContext(), mViewModel.getImageWidthDip()));
         mSelectedIcon.setMaxWidth((int) ViewUtils.getPxFromDip(getContext(), mViewModel.getImageWidthDip()));
     }
 
     private void showSelectionIndicator()
     {
+        if(mFocusedEntryView == null) {
+            return;
+        }
+        Rect fromRect = new Rect();
+        mFocusedEntryView.getHitRect(fromRect);
+        Rect toRect = new Rect();
+        mSelectIndicatorContainer.getHitRect(toRect);
+
+        mSelectedIcon.setImageDrawable(mFocusedEntryView.getEntry().getIcon(getContext()));
+
+        try {
+            ObjectAnimator anim = ObjectAnimator.ofObject(
+                    mSelectIndicator,
+                    "margins",
+                    new PositionAndSizeEvaluator(mSelectIndicator),
+                    fromRect,
+                    toRect);
+            anim.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    transitToState(LaunchLaneViewModel.State.Selected);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                }
+            });
+            anim.setDuration(mViewModel.getSelectingAnimationDurationMS());
+            anim.start();
+        } catch(Exception e) {
+        }
         mSelectIndicator.setVisibility(View.VISIBLE);
     }
 

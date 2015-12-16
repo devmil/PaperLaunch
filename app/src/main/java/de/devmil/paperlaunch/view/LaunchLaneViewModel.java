@@ -46,6 +46,10 @@ public class LaunchLaneViewModel {
         return mConfig.getImageWidthDip();
     }
 
+    public float getHighElevationDip() {
+        return mConfig.getHighElevationDip();
+    }
+
     public boolean isOnRightSide()
     {
         return mConfig.isOnRightSide();
@@ -72,10 +76,16 @@ public class LaunchLaneViewModel {
         return mConfig.getHighElevationDip();
     }
 
+    public int getSelectingAnimationDurationMS()
+    {
+        return mConfig.getSelectingAnimationDurationMS();
+    }
+
     public enum State
     {
         Init,
         Focusing,
+        Selecting,
         Selected
     }
 }

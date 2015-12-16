@@ -22,4 +22,5 @@ public interface ILaunchLaneConfig {
     float getLowElevationDip();
     float getHighElevationDip();
     IDesignConfig getDesignConfig();
+    int getSelectingAnimationDurationMS();
 }

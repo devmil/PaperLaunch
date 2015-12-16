@@ -125,6 +125,10 @@ public class LauncherView extends RelativeLayout {
         }
 
         setEntriesToLane(mLaneViews.get(0), mConfig.getEntries());
+
+        for(int i=mLaneViews.size() - 1; i>=0; i--) {
+            mLaneViews.get(i).bringToFront();
+        }
     }
 
     private LaunchLaneView addLaneView(final int laneIndex, int anchorId) {
