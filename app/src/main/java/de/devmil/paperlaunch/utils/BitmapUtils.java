@@ -35,7 +35,7 @@ public abstract class BitmapUtils {
         return byteArray;
     }
 
-    private static Bitmap drawableToBitmap(Drawable drawable) {
+    public static Bitmap drawableToBitmap(Drawable drawable) {
         if(drawable == null) {
             return null;
         }

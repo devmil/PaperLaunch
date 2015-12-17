@@ -20,7 +20,10 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.devmil.paperlaunch.model.IEntry;
+import de.devmil.paperlaunch.utils.BitmapUtils;
 import de.devmil.paperlaunch.utils.PositionAndSizeEvaluator;
 import de.devmil.paperlaunch.utils.ViewUtils;
 
@@ -190,6 +194,7 @@ public class LaunchLaneView extends RelativeLayout {
         mSelectIndicator.setBackgroundColor(mViewModel.getFrameDefaultColor());
         mSelectIndicator.setElevation(ViewUtils.getPxFromDip(getContext(), mViewModel.getSelectedImageElevationDip()));
         mSelectIndicator.setVisibility(View.INVISIBLE);
+        mSelectIndicator.setGravity(Gravity.CENTER_HORIZONTAL);
 
         LinearLayout.LayoutParams selectIndicatorParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -316,7 +321,12 @@ public class LaunchLaneView extends RelativeLayout {
         Rect toRect = new Rect();
         mSelectIndicatorContainer.getHitRect(toRect);
 
-        mSelectedIcon.setImageDrawable(mFocusedEntryView.getEntry().getIcon(getContext()));
+        Drawable drawable = mFocusedEntryView.getEntry().getIcon(getContext());
+        mSelectedIcon.setImageDrawable(drawable);
+
+        Palette p = Palette.from(BitmapUtils.drawableToBitmap(drawable)).generate();
+
+        mSelectIndicator.setBackgroundColor(p.getLightMutedColor(mViewModel.getFrameDefaultColor()));
 
         try {
             ObjectAnimator anim = ObjectAnimator.ofObject(
