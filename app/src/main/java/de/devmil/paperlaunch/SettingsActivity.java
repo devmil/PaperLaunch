@@ -52,21 +52,23 @@ public class SettingsActivity extends FragmentActivity {
     }
 
     private void resetData() {
-        mDataSource.open();
-        mDataSource.clear();
+        mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+            @Override
+            public void execute() {
+                mDataSource.clear();
 
-        createLaunch("com.agilebits.onepassword", "com.agilebits.onepassword.activity.LoginActivity", 1);
-        createLaunch("org.kman.AquaMail", "org.kman.AquaMail.ui.AccountListActivity", 2);
-        createLaunch("com.microsoft.office.onenote", "com.microsoft.office.onenote.ui.ONMSplashActivity", 3);
-        createLaunch("com.spotify.music", "com.spotify.music.MainActivity", 5);
+                createLaunch("com.agilebits.onepassword", "com.agilebits.onepassword.activity.LoginActivity", 1);
+                createLaunch("org.kman.AquaMail", "org.kman.AquaMail.ui.AccountListActivity", 2);
+                createLaunch("com.microsoft.office.onenote", "com.microsoft.office.onenote.ui.ONMSplashActivity", 3);
+                createLaunch("com.spotify.music", "com.spotify.music.MainActivity", 5);
 
-        List<ComponentName> folderLaunchComponents = new ArrayList<>();
-        folderLaunchComponents.add(new ComponentName("mobi.koni.appstofiretv", "mobi.koni.appstofiretv.MainActivity"));
-        folderLaunchComponents.add(new ComponentName("org.dmfs.tasks", "org.dmfs.tasks.TaskListActivity"));
+                List<ComponentName> folderLaunchComponents = new ArrayList<>();
+                folderLaunchComponents.add(new ComponentName("mobi.koni.appstofiretv", "mobi.koni.appstofiretv.MainActivity"));
+                folderLaunchComponents.add(new ComponentName("org.dmfs.tasks", "org.dmfs.tasks.TaskListActivity"));
 
-        createFolder("Test Folder", folderLaunchComponents, 4);
-
-        mDataSource.close();
+                createFolder("Test Folder", folderLaunchComponents, 4);
+            }
+        });
     }
 
     private Launch createLaunch(String packageName, String className, int orderIndex) {

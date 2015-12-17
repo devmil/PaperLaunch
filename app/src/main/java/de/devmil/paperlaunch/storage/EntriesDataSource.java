@@ -13,6 +13,7 @@ import de.devmil.paperlaunch.model.Launch;
 
 public class EntriesDataSource {
 
+    private Context mContext;
     private EntriesSQLiteOpenHelper mHelper;
     private SQLiteDatabase mDatabase;
     private EntriesAccess mEntriesAccess;
@@ -20,14 +21,30 @@ public class EntriesDataSource {
     private LaunchesAccess mLaunchesAccess;
 
     public EntriesDataSource(Context context) {
+        mContext = context;
         mHelper = new EntriesSQLiteOpenHelper(context);
+    }
+
+    public interface IAction {
+        void execute();
+    }
+
+    public void executeWithOpenDataSource(IAction action) {
+        boolean opened = mDatabase == null;
+        if(opened) {
+            open();
+        }
+        action.execute();
+        if(opened) {
+            close();
+        }
     }
 
     public void open() throws SQLiteException {
         mDatabase = mHelper.getWritableDatabase();
         mEntriesAccess = new EntriesAccess(mDatabase);
-        mFoldersAccess = new FoldersAccess(mDatabase);
-        mLaunchesAccess = new LaunchesAccess(mDatabase);
+        mFoldersAccess = new FoldersAccess(mContext, mDatabase);
+        mLaunchesAccess = new LaunchesAccess(mContext, mDatabase);
     }
 
     public void close() {
@@ -175,8 +192,10 @@ public class EntriesDataSource {
     }
 
     public void updateFolderData(Folder folder) {
-        FolderDTO folderDto = folder.getDto();
+        updateFolderData(folder.getDto());
+    }
 
+    public void updateFolderData(FolderDTO folderDto) {
         mFoldersAccess.update(folderDto);
     }
 

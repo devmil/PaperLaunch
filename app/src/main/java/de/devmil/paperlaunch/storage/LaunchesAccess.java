@@ -1,6 +1,7 @@
 package de.devmil.paperlaunch.storage;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -21,8 +22,10 @@ public class LaunchesAccess {
     private static final int INDEX_COLUMN_ICON = 3;
 
     private SQLiteDatabase mDatabase;
+    private Context mContext;
 
-    public LaunchesAccess(SQLiteDatabase database) {
+    public LaunchesAccess(Context context, SQLiteDatabase database) {
+        mContext = context;
         mDatabase = database;
     }
 
@@ -85,7 +88,7 @@ public class LaunchesAccess {
                 cursor.getInt(INDEX_COLUMN_ID),
                 cursor.getString(INDEX_COLUMN_NAME),
                 IntentSerializer.deserialize(cursor.getString(INDEX_COLUMN_LAUNCHINTENT)),
-                BitmapUtils.getIcon(cursor.getBlob(INDEX_COLUMN_ICON))
+                BitmapUtils.getIcon(mContext, cursor.getBlob(INDEX_COLUMN_ICON))
         );
     }
 

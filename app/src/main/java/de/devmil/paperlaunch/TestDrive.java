@@ -26,18 +26,20 @@ public class TestDrive extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_drive);
 
-        mDataSource = new EntriesDataSource(this);
-        mDataSource.open();
-
-        mLauncherView = (LauncherView)findViewById(R.id.tstLauncherView);
-
         LaunchConfig cfg = new LaunchConfig();
+        final List<IEntry>[] entries = new List[] { null };
 
-        List<IEntry> entries = mDataSource.loadRootContent();
+        mDataSource = new EntriesDataSource(this);
+        mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+            @Override
+            public void execute() {
+                mLauncherView = (LauncherView) findViewById(R.id.tstLauncherView);
 
-        mDataSource.close();
+                entries[0] = mDataSource.loadRootContent();
+            }
+        });
 
-        cfg.setEntries(entries);
+        cfg.setEntries(entries[0]);
 
         mLauncherView.doInitialize(cfg);
 

@@ -2,8 +2,12 @@ package de.devmil.paperlaunch.view.fragments;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -30,7 +34,10 @@ import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.model.Folder;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.Launch;
+import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
+import de.devmil.paperlaunch.storage.FolderDTO;
+import de.devmil.paperlaunch.utils.FolderImageHelper;
 import de.devmil.paperlaunch.view.utils.IntentSelector;
 
 /**
@@ -51,8 +58,10 @@ public class EditFolderFragment extends Fragment {
     private EditText mFolderNameEditText;
     private long mFolderId = -1;
     private Folder mFolder = null;
+    LaunchConfig mConfig;
 
     public EditFolderFragment() {
+        mConfig = new LaunchConfig();
     }
 
     /**
@@ -112,9 +121,12 @@ public class EditFolderFragment extends Fragment {
                     return;
                 }
                 mFolder.getDto().setName(mFolderNameEditText.getText().toString());
-                mDataSource.open();
-                mDataSource.updateFolderData(mFolder);
-                mDataSource.close();
+                mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+                    @Override
+                    public void execute() {
+                        mDataSource.updateFolderData(mFolder);
+                    }
+                });
             }
         });
 
@@ -160,19 +172,25 @@ public class EditFolderFragment extends Fragment {
     }
 
     private List<IEntry> loadEntries() {
-        mDataSource.open();
 
-        List<IEntry> result = null;
-        if(mFolderId == -1) {
-            result = mDataSource.loadRootContent();
-        } else {
-            mFolder = mDataSource.loadFolder(mFolderId);
-            result = mFolder.getSubEntries();
+        class Local {
+            List<IEntry> result;
         }
 
-        mDataSource.close();
+        final Local local = new Local();
+        mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+            @Override
+            public void execute() {
+                if (mFolderId == -1) {
+                    local.result = mDataSource.loadRootContent();
+                } else {
+                    mFolder = mDataSource.loadFolder(mFolderId);
+                    local.result = mFolder.getSubEntries();
+                }
+            }
+        });
 
-        return result;
+        return local.result;
     }
 
     private void initiateCreateFolder() {
@@ -202,30 +220,61 @@ public class EditFolderFragment extends Fragment {
         }
         else if(REQUEST_EDIT_FOLDER == requestCode) {
             invalidate();
+            if(mFolder != null) {
+                mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+                    @Override
+                    public void execute() {
+                        updateFolderImage(mFolder);
+                    }
+                });
+            }
         }
     }
 
-    private void addLaunch(Intent launchIntent) {
-        mDataSource.open();
+    private void addLaunch(final Intent launchIntent) {
+        mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+            @Override
+            public void execute() {
+                Launch l = mDataSource.createLaunch(mFolderId);
+                l.getDto().setLaunchIntent(launchIntent);
+                mDataSource.updateLaunchData(l);
 
-        Launch l = mDataSource.createLaunch(mFolderId);
-        l.getDto().setLaunchIntent(launchIntent);
-        mDataSource.updateLaunchData(l);
-        mDataSource.close();
+                mAdapter.addEntry(l);
 
-        mAdapter.addEntry(l);
+                if (mFolder != null) {
+                    updateFolderImage(mFolder.getDto(), mAdapter.getEntries());
+                }
+            }
+        });
     }
 
-    private long addFolder(String initialName) {
-        mDataSource.open();
-        Folder folder = mDataSource.createFolder(mFolderId);
-        folder.getDto().setName(initialName);
-        mDataSource.updateFolderData(folder);
-        mDataSource.close();
+    private void updateFolderImage(Folder folder) {
+        updateFolderImage(folder.getDto(), folder.getSubEntries());
+    }
 
-        mAdapter.addEntry(folder);
+    private void updateFolderImage(FolderDTO folderDto, List<IEntry> entries) {
+        float imgWidth = mConfig.getImageWidthDip();
+        Bitmap bmp = FolderImageHelper.createImageFromEntries(getContext(), entries, imgWidth);
+        Drawable newIcon = new BitmapDrawable(getResources(), bmp);
+        folderDto.setIcon(newIcon);
 
-        return folder.getId();
+        mDataSource.updateFolderData(folderDto);
+    }
+
+    private long addFolder(final String initialName) {
+        final Folder[] folder = new Folder[]{null};
+        mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+            @Override
+            public void execute() {
+                folder[0] = mDataSource.createFolder(mFolderId);
+                folder[0].getDto().setName(initialName);
+                mDataSource.updateFolderData(folder[0]);
+            }
+        });
+
+        mAdapter.addEntry(folder[0]);
+
+        return folder[0].getId();
     }
 
     private class EntriesItemAnimator extends DefaultItemAnimator
@@ -260,6 +309,10 @@ public class EditFolderFragment extends Fragment {
             super(recyclerView);
             mEntries = entries;
             mDataSource = dataSource;
+        }
+
+        public List<IEntry> getEntries() {
+            return mEntries;
         }
 
         public void addEntry(IEntry entry) {
@@ -330,11 +383,12 @@ public class EditFolderFragment extends Fragment {
         }
 
         private void saveOrder() {
-            mDataSource.open();
-
-            mDataSource.updateOrders(mEntries);
-
-            mDataSource.close();
+            mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+                @Override
+                public void execute() {
+                    mDataSource.updateOrders(mEntries);
+                }
+            });
         }
 
         class ViewHolder extends DragSortAdapter.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
@@ -373,7 +427,7 @@ public class EditFolderFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                IEntry entry = getEntryById(getItemId());
+                final IEntry entry = getEntryById(getItemId());
                 if(v == container) {
                 }
                 else if(v == editImg) {
@@ -383,12 +437,19 @@ public class EditFolderFragment extends Fragment {
                     }
                 }
                 else if(v == deleteImg) {
-                    mDataSource.open();
-                    mDataSource.deleteEntry(entry.getEntryId());
-                    mDataSource.close();
-                    int pos = getPositionForId(getItemId());
-                    mEntries.remove(pos);
-                    notifyItemRemoved(pos);
+                    mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+                        @Override
+                        public void execute() {
+                            mDataSource.deleteEntry(entry.getEntryId());
+
+                            int pos = getPositionForId(getItemId());
+                            mEntries.remove(pos);
+                            if (mFolder != null) {
+                                updateFolderImage(mFolder.getDto(), mEntries);
+                            }
+                            notifyItemRemoved(pos);
+                        }
+                    });
                 }
             }
         }

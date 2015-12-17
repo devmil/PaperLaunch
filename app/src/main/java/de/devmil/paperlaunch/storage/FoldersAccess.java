@@ -1,6 +1,7 @@
 package de.devmil.paperlaunch.storage;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -18,8 +19,10 @@ public class FoldersAccess {
     private static final int INDEX_COLUMN_ICON = 2;
 
     private SQLiteDatabase mDatabase;
+    private Context mContext;
 
-    public FoldersAccess(SQLiteDatabase database) {
+    public FoldersAccess(Context context, SQLiteDatabase database) {
+        mContext = context;
         mDatabase = database;
     }
 
@@ -81,7 +84,7 @@ public class FoldersAccess {
         return new FolderDTO(
                 cursor.getInt(INDEX_COLUMN_ID),
                 cursor.getString(INDEX_COLUMN_NAME),
-                BitmapUtils.getIcon(cursor.getBlob(INDEX_COLUMN_ICON))
+                BitmapUtils.getIcon(mContext, cursor.getBlob(INDEX_COLUMN_ICON))
         );
     }
 

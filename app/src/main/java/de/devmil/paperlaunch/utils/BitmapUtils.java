@@ -1,6 +1,8 @@
 package de.devmil.paperlaunch.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -11,11 +13,12 @@ import java.io.ByteArrayOutputStream;
 
 public abstract class BitmapUtils {
 
-    public static Drawable getIcon(byte[] rawData) {
+    public static Drawable getIcon(Context context, byte[] rawData) {
         if(rawData == null) {
             return null;
         }
-        return Drawable.createFromStream(new ByteArrayInputStream(rawData), null);
+        Bitmap bmp = BitmapFactory.decodeByteArray(rawData, 0, rawData.length);
+        return new BitmapDrawable(context.getResources(), bmp);
     }
 
     public static byte[] getBytes(Drawable drawable) {
