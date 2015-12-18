@@ -18,11 +18,45 @@ package de.devmil.paperlaunch.view;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by michaellamers on 29.05.15.
- */
+import de.devmil.paperlaunch.model.IDesignConfig;
+import de.devmil.paperlaunch.model.IEntry;
+import de.devmil.paperlaunch.model.ILaunchEntryConfig;
+import de.devmil.paperlaunch.model.ILaunchLaneConfig;
+import de.devmil.paperlaunch.model.LaunchConfig;
+
 public class LauncherViewModel {
-    public LauncherViewModel()
+    private LaunchConfig mConfig;
+
+    public LauncherViewModel(LaunchConfig config)
     {
+        mConfig = config;
+    }
+
+    public List<IEntry> getEntries() {
+        return mConfig.getEntries();
+    }
+
+    public boolean isOnRightSide() {
+        return mConfig.isOnRightSide();
+    }
+
+    public ILaunchEntryConfig getEntryConfig() {
+        return mConfig;
+    }
+
+    public ILaunchLaneConfig getLaneConfig() {
+        return mConfig;
+    }
+
+    public IDesignConfig getDesignConfig() {
+        return mConfig.getDesignConfig();
+    }
+
+    public float getHighElevationDip() {
+        return mConfig.getHighElevationDip();
+    }
+
+    public float getNeutralZoneWidthDip() {
+        return mConfig.getNeutralZoneWidthDip();
     }
 }

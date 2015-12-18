@@ -222,7 +222,7 @@ public class LaunchLaneView extends RelativeLayout {
 
         mSelectedItemTextView = new VerticalTextView(getContext());
         mSelectedItemTextView.setVisibility(View.GONE);
-        mSelectedItemTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        mSelectedItemTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mViewModel.getItemNameTextSizeSP());
 
         LinearLayout.LayoutParams selectedItemTextViewParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -239,7 +239,9 @@ public class LaunchLaneView extends RelativeLayout {
         {
             LaunchEntryView ev = new LaunchEntryView(getContext());
             mEntryViews.add(ev);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
             mEntriesContainer.addView(ev, params);
 
             ev.doInitialize(e);
@@ -347,7 +349,7 @@ public class LaunchLaneView extends RelativeLayout {
 
         Palette p = Palette.from(BitmapUtils.drawableToBitmap(drawable)).generate();
 
-        mSelectIndicator.setBackgroundColor(p.getLightMutedColor(mViewModel.getFrameDefaultColor()));
+        mSelectIndicator.setBackgroundColor(getColorFromPalette(p, mViewModel.getFrameDefaultColor()));
 
         try {
             ObjectAnimator anim = ObjectAnimator.ofObject(
@@ -392,11 +394,26 @@ public class LaunchLaneView extends RelativeLayout {
                     }
                 }
             }).start();
-
-            //mSelectIndicator
         } catch(Exception e) {
         }
         mSelectIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private int getColorFromPalette(Palette palette, int defaultColor) {
+        int result = palette.getLightMutedColor(Color.BLACK);
+        if(result == Color.BLACK) {
+            result = palette.getLightVibrantColor(Color.BLACK);
+        }
+        if(result == Color.BLACK) {
+            result = palette.getMutedColor(Color.BLACK);
+        }
+        if(result == Color.BLACK) {
+            result = palette.getVibrantColor(Color.BLACK);
+        }
+        if(result == Color.BLACK) {
+            result = defaultColor;
+        }
+        return result;
     }
 
     private void hideSelectionIndicator()

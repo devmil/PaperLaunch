@@ -20,7 +20,7 @@ import java.util.List;
 
 public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private List<IEntry> mEntries;
-    private float mImageWidthDip = 40;
+    private float mImageWidthDip = 50;
     private float mLowerElevationDip = 2;
     private float mHighElevationDip = 6;
     private int mEntryMoveAnimationDuration = 100;
@@ -28,8 +28,9 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private int mEntryAlphaAnimationDuration = 100;
     private boolean mIsOnRightSide = true;
     private int mSelectingAnimationDurationMS = 200;
+    private float mItemNameTextSizeSP = 30;
     private IDesignConfig mDesignConfig = new DesignConfig();
-    private float mNeutralZoneWidthDip = 40;
+    private float mNeutralZoneWidthDip = 50;
     private float mImageOffsetDip = 5;
 
     public List<IEntry> getEntries()
@@ -68,6 +69,10 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
 
     public int getSelectingAnimationDurationMS() {
         return mSelectingAnimationDurationMS;
+    }
+
+    public float getItemNameTextSizeSP() {
+        return mItemNameTextSizeSP;
     }
 
     public int getEntryMoveAnimationDuration()

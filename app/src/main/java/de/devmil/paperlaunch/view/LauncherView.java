@@ -32,8 +32,6 @@ import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.utils.ViewUtils;
 
 public class LauncherView extends RelativeLayout {
-    private LaunchConfig mConfig;
-
     private LauncherViewModel mViewModel;
     private List<LaunchLaneView> mLaneViews = new ArrayList<>();
     private LinearLayout mNeutralZone;
@@ -60,9 +58,7 @@ public class LauncherView extends RelativeLayout {
 
     public void doInitialize(LaunchConfig config)
     {
-        mConfig = config;
-
-        buildViewModel();
+        buildViewModel(config);
 
         buildViews();
     }
@@ -93,9 +89,9 @@ public class LauncherView extends RelativeLayout {
         ViewUtils.disableClipping(this);
     }
 
-    private void buildViewModel()
+    private void buildViewModel(LaunchConfig config)
     {
-        mViewModel = new LauncherViewModel();
+        mViewModel = new LauncherViewModel(config);
     }
 
     private int[] getLaneIds() {
@@ -124,7 +120,7 @@ public class LauncherView extends RelativeLayout {
             currentAnchor = addLaneView(i, currentAnchor).getId();
         }
 
-        setEntriesToLane(mLaneViews.get(0), mConfig.getEntries());
+        setEntriesToLane(mLaneViews.get(0), mViewModel.getEntries());
 
         for(int i=mLaneViews.size() - 1; i>=0; i--) {
             mLaneViews.get(i).bringToFront();
@@ -141,7 +137,7 @@ public class LauncherView extends RelativeLayout {
         LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        if(mConfig.isOnRightSide())
+        if(mViewModel.isOnRightSide())
             params.addRule(RelativeLayout.LEFT_OF, anchorId);
         else
             params.addRule(RelativeLayout.RIGHT_OF, anchorId);
@@ -179,10 +175,10 @@ public class LauncherView extends RelativeLayout {
         List<LaunchEntryViewModel> entryModels = new ArrayList<>();
         for(IEntry e : entries)
         {
-            entryModels.add(LaunchEntryViewModel.createFrom(getContext(), e, mConfig));
+            entryModels.add(LaunchEntryViewModel.createFrom(getContext(), e, mViewModel.getEntryConfig()));
         }
 
-        LaunchLaneViewModel vm = new LaunchLaneViewModel(entryModels, mConfig);
+        LaunchLaneViewModel vm = new LaunchLaneViewModel(entryModels, mViewModel.getLaneConfig());
         laneView.doInitializeData(vm);
     }
 
@@ -190,15 +186,15 @@ public class LauncherView extends RelativeLayout {
     {
         mNeutralZone = new LinearLayout(getContext());
         mNeutralZone.setId(R.id.id_launchview_neutralzone);
-        mNeutralZone.setBackgroundColor(mConfig.getDesignConfig().getFrameDefaultColor());
-        mNeutralZone.setElevation(ViewUtils.getPxFromDip(getContext(), mConfig.getHighElevationDip()));
-        mNeutralZone.setMinimumWidth((int)ViewUtils.getPxFromDip(getContext(), mConfig.getNeutralZoneWidthDip()));
+        mNeutralZone.setBackgroundColor(mViewModel.getDesignConfig().getFrameDefaultColor());
+        mNeutralZone.setElevation(ViewUtils.getPxFromDip(getContext(), mViewModel.getHighElevationDip()));
+        mNeutralZone.setMinimumWidth((int)ViewUtils.getPxFromDip(getContext(), mViewModel.getNeutralZoneWidthDip()));
         mNeutralZone.setClickable(false);
 
         LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        if(mConfig.isOnRightSide())
+        if(mViewModel.isOnRightSide())
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         else
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);

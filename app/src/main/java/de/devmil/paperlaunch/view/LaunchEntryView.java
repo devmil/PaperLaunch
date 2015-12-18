@@ -92,40 +92,33 @@ public class LaunchEntryView extends LinearLayout {
 
         addView(mImgFrame, imgFrameParams);
         ViewUtils.disableClipping(mImgFrame);
-
-        mAppIcon = new ImageView(getContext());
-        mAppIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        LayoutParams imgParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        int marginsImgPx = (int)ViewUtils.getPxFromDip(getContext(), 1);
-        imgParams.setMargins(marginsImgPx, marginsImgPx, marginsImgPx, marginsImgPx);
-
-        mImgFrame.addView(mAppIcon, imgParams);
-        ViewUtils.disableClipping(mAppIcon);
     }
 
     private void adaptModelState()
     {
         applyParameters();
-        applyImage();
 
         setImageParameters(mViewModel.getState(), false, 0);
     }
 
     private void applyParameters()
     {
-        int width = (int)ViewUtils.getPxFromDip(getContext(), mViewModel.getImageWidthDip());
-        mAppIcon.setMaxWidth(width);
-        mAppIcon.setMinimumWidth(width);
-        int height = (int) ViewUtils.getPxFromDip(getContext(), mViewModel.getImageWidthDip());
-        mAppIcon.setMaxHeight(height);
-        mAppIcon.setMinimumHeight(height);
+        mImgFrame.removeAllViews();
+        mAppIcon = new ImageView(getContext());
+        mAppIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        int imgWidth = (int)ViewUtils.getPxFromDip(getContext(), mViewModel.getImageWidthDip());
+        int imgHeight = (int) ViewUtils.getPxFromDip(getContext(), mViewModel.getImageWidthDip());
+
+        LayoutParams imgParams = new LayoutParams(imgWidth, imgHeight);
+        int marginsImgPx = (int)ViewUtils.getPxFromDip(getContext(), 1);
+        imgParams.setMargins(marginsImgPx, marginsImgPx, marginsImgPx, marginsImgPx);
+
+        mImgFrame.addView(mAppIcon, imgParams);
+        ViewUtils.disableClipping(mAppIcon);
+
+        mAppIcon.setImageDrawable(mViewModel.getAppIcon());
 
         mImgFrame.setElevation(ViewUtils.getPxFromDip(getContext(), mViewModel.getImageElevationDip()));
-    }
-
-    private void applyImage()
-    {
-        mAppIcon.setImageDrawable(mViewModel.getAppIcon());
     }
 
     private float getTranslateXToApply(LaunchEntryViewModel.State state)

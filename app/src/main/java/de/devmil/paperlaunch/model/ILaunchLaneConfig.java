@@ -23,4 +23,5 @@ public interface ILaunchLaneConfig {
     float getHighElevationDip();
     IDesignConfig getDesignConfig();
     int getSelectingAnimationDurationMS();
+    float getItemNameTextSizeSP();
 }

@@ -81,6 +81,10 @@ public class LaunchLaneViewModel {
         return mConfig.getSelectingAnimationDurationMS();
     }
 
+    public float getItemNameTextSizeSP() {
+        return mConfig.getItemNameTextSizeSP();
+    }
+
     public enum State
     {
         Init,
