@@ -23,6 +23,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,11 +33,14 @@ import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.utils.BitmapUtils;
 import de.devmil.paperlaunch.utils.PositionAndSizeEvaluator;
 import de.devmil.paperlaunch.utils.ViewUtils;
+import de.devmil.paperlaunch.view.widgets.VerticalTextView;
 
 public class LaunchLaneView extends RelativeLayout {
     interface ILaneListener {
@@ -52,6 +56,7 @@ public class LaunchLaneView extends RelativeLayout {
     private LinearLayout mSelectIndicator;
     private LinearLayout mEntriesContainer;
     private ImageView mSelectedIcon;
+    private VerticalTextView mSelectedItemTextView;
     private List<LaunchEntryView> mEntryViews = new ArrayList<>();
     private LaunchEntryView mFocusedEntryView;
 
@@ -195,6 +200,7 @@ public class LaunchLaneView extends RelativeLayout {
         mSelectIndicator.setElevation(ViewUtils.getPxFromDip(getContext(), mViewModel.getSelectedImageElevationDip()));
         mSelectIndicator.setVisibility(View.INVISIBLE);
         mSelectIndicator.setGravity(Gravity.CENTER_HORIZONTAL);
+        mSelectIndicator.setOrientation(LinearLayout.VERTICAL);
 
         LinearLayout.LayoutParams selectIndicatorParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -207,9 +213,22 @@ public class LaunchLaneView extends RelativeLayout {
         mSelectedIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         mSelectedIcon.setImageResource(mViewModel.getUnknownAppImageId());
 
-        LinearLayout.LayoutParams selectIconParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams selectIconParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        selectIconParams.setMargins(0, (int)ViewUtils.getPxFromDip(getContext(), 5), 0, 0);
 
         mSelectIndicator.addView(mSelectedIcon, selectIconParams);
+
+        mSelectedItemTextView = new VerticalTextView(getContext());
+        mSelectedItemTextView.setVisibility(View.GONE);
+        mSelectedItemTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+
+        LinearLayout.LayoutParams selectedItemTextViewParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        selectedItemTextViewParams.setMargins(0, (int)ViewUtils.getPxFromDip(getContext(), 20), 0, 0);
+        mSelectIndicator.addView(mSelectedItemTextView, selectedItemTextViewParams);
     }
 
     private void createEntryViews() {
@@ -324,6 +343,8 @@ public class LaunchLaneView extends RelativeLayout {
         Drawable drawable = mFocusedEntryView.getEntry().getIcon(getContext());
         mSelectedIcon.setImageDrawable(drawable);
 
+        mSelectedItemTextView.setText(mFocusedEntryView.getEntry().getName(getContext()));
+
         Palette p = Palette.from(BitmapUtils.drawableToBitmap(drawable)).generate();
 
         mSelectIndicator.setBackgroundColor(p.getLightMutedColor(mViewModel.getFrameDefaultColor()));
@@ -355,6 +376,24 @@ public class LaunchLaneView extends RelativeLayout {
             });
             anim.setDuration(mViewModel.getSelectingAnimationDurationMS());
             anim.start();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(mViewModel.getSelectingAnimationDurationMS() / 2);
+                        mSelectedItemTextView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mSelectedItemTextView.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }).start();
+
+            //mSelectIndicator
         } catch(Exception e) {
         }
         mSelectIndicator.setVisibility(View.VISIBLE);
@@ -364,6 +403,9 @@ public class LaunchLaneView extends RelativeLayout {
     {
         if(mSelectIndicator != null) {
             mSelectIndicator.setVisibility(View.INVISIBLE);
+        }
+        if(mSelectedItemTextView != null) {
+            mSelectedItemTextView.setVisibility(View.GONE);
         }
     }
 
