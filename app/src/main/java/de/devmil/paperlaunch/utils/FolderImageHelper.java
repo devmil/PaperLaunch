@@ -31,7 +31,7 @@ public class FolderImageHelper {
                 continue;
             }
 
-            Drawable img = entry.getIcon(context);
+            Drawable img = entry.getFolderSummaryIcon(context);
             ImageView entryImageView = new ImageView(context);
             entryImageView.setImageDrawable(img);
             entryImageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);

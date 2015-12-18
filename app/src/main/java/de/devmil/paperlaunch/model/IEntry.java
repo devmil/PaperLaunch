@@ -11,5 +11,6 @@ public interface IEntry {
     long getOrderIndex();
     String getName(Context context);
     Drawable getIcon(Context context);
+    Drawable getFolderSummaryIcon(Context context);
     boolean isFolder();
 }

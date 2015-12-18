@@ -27,7 +27,7 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private int mEntryMoveDiffMS = 50;
     private int mEntryAlphaAnimationDuration = 100;
     private boolean mIsOnRightSide = true;
-    private int mSelectingAnimationDurationMS = 300;
+    private int mSelectingAnimationDurationMS = 200;
     private IDesignConfig mDesignConfig = new DesignConfig();
     private float mNeutralZoneWidthDip = 40;
     private float mImageOffsetDip = 5;

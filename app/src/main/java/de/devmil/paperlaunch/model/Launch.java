@@ -84,6 +84,11 @@ public class Launch implements IEntry {
     }
 
     @Override
+    public Drawable getFolderSummaryIcon(Context context) {
+        return getIcon(context);
+    }
+
+    @Override
     public boolean isFolder() {
         return false;
     }

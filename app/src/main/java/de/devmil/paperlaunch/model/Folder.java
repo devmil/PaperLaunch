@@ -1,10 +1,12 @@
 package de.devmil.paperlaunch.model;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 
 import java.util.List;
 
+import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.storage.EntryDTO;
 import de.devmil.paperlaunch.storage.FolderDTO;
 
@@ -37,6 +39,11 @@ public class Folder implements IEntry {
     @Override
     public String getName(Context context) {
         return mDto.getName();
+    }
+
+    @Override
+    public Drawable getFolderSummaryIcon(Context context) {
+        return context.getResources().getDrawable(R.mipmap.ic_folder_grey600_48dp, context.getTheme());
     }
 
     @Override

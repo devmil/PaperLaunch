@@ -220,14 +220,6 @@ public class EditFolderFragment extends Fragment {
         }
         else if(REQUEST_EDIT_FOLDER == requestCode) {
             invalidate();
-            if(mFolder != null) {
-                mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
-                    @Override
-                    public void execute() {
-                        updateFolderImage(mFolder);
-                    }
-                });
-            }
         }
     }
 
@@ -353,6 +345,14 @@ public class EditFolderFragment extends Fragment {
             }
             mEntries.add(toPosition, mEntries.remove(fromPosition));
             saveOrder();
+            mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+                @Override
+                public void execute() {
+                    if (mFolder != null) {
+                        updateFolderImage(mFolder.getDto(), mEntries);
+                    }
+                }
+            });
             return true;
         }
 
@@ -370,11 +370,6 @@ public class EditFolderFragment extends Fragment {
             holder.container.setVisibility(getDraggingId() == entry.getId() ? View.INVISIBLE : View.VISIBLE);
             holder.imageView.setImageDrawable(entry.getIcon(holder.imageView.getContext()));
             holder.textView.setText(entry.getName(holder.textView.getContext()));
-
-            int editVisibility = entry.isFolder() ? View.VISIBLE : View.GONE;
-            if(holder.editImg.getVisibility() != editVisibility) {
-                holder.editImg.setVisibility(editVisibility);
-            }
         }
 
         @Override
@@ -396,7 +391,6 @@ public class EditFolderFragment extends Fragment {
             public ImageView imageView;
             public TextView textView;
             private ImageView handle;
-            private ImageView editImg;
             private ImageView deleteImg;
 
             public ViewHolder(DragSortAdapter<?> dragSortAdapter, View itemView) {
@@ -405,16 +399,12 @@ public class EditFolderFragment extends Fragment {
                 imageView = (ImageView)itemView.findViewById(R.id.fragment_edit_folder_entries_image);
                 textView = (TextView)itemView.findViewById(R.id.fragment_edit_folder_entries_text);
                 handle = (ImageView)itemView.findViewById(R.id.fragment_edit_folder_entries_handle);
-                editImg = (ImageView)itemView.findViewById(R.id.fragment_edit_folder_entries_edit);
                 deleteImg = (ImageView)itemView.findViewById(R.id.fragment_edit_folder_entries_delete);
 
                 //TODO: check if a long click or a tap event fits better
                 handle.setOnLongClickListener(this);
 
-                //TODO: attach tap event for opening the details activity / fragment (tablets?)
                 container.setOnClickListener(this);
-
-                editImg.setOnClickListener(this);
 
                 deleteImg.setOnClickListener(this);
             }
@@ -429,8 +419,6 @@ public class EditFolderFragment extends Fragment {
             public void onClick(View v) {
                 final IEntry entry = getEntryById(getItemId());
                 if(v == container) {
-                }
-                else if(v == editImg) {
                     if(entry.isFolder()) {
                         Intent editFolderIntent = EditFolderActivity.createLaunchIntent(getContext(), entry.getId());
                         startActivityForResult(editFolderIntent, REQUEST_EDIT_FOLDER);
