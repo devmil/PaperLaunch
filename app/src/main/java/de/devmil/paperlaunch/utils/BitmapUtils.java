@@ -25,22 +25,45 @@ public abstract class BitmapUtils {
         if(drawable == null) {
             return null;
         }
-        Bitmap bmp = drawableToBitmap(drawable);
+
+        BitmapResult bmpResult = drawableToBitmap(drawable);
+
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        bmpResult.getBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream);
 
         byte[] byteArray = stream.toByteArray();
 
-        bmp.recycle();
+        if(bmpResult.isNew()) {
+            bmpResult.getBitmap().recycle();
+        }
         return byteArray;
     }
 
-    public static Bitmap drawableToBitmap(Drawable drawable) {
+    public static class BitmapResult {
+        private Bitmap mBitmap;
+        private boolean mIsNew;
+
+        public BitmapResult(Bitmap bitmap, boolean isNew) {
+            mBitmap = bitmap;
+            mIsNew = isNew;
+        }
+
+        public Bitmap getBitmap() {
+            return mBitmap;
+        }
+
+        public boolean isNew() {
+            return mIsNew;
+        }
+
+    }
+
+    public static BitmapResult drawableToBitmap(Drawable drawable) {
         if(drawable == null) {
             return null;
         }
         if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable) drawable).getBitmap();
+            return new BitmapResult(((BitmapDrawable) drawable).getBitmap(), false);
         }
 
         final int width = !drawable.getBounds().isEmpty() ? drawable
@@ -57,6 +80,6 @@ public abstract class BitmapUtils {
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
 
-        return bitmap;
+        return new BitmapResult(bitmap, true);
     }
 }

@@ -347,9 +347,14 @@ public class LaunchLaneView extends RelativeLayout {
 
         mSelectedItemTextView.setText(mFocusedEntryView.getEntry().getName(getContext()));
 
-        Palette p = Palette.from(BitmapUtils.drawableToBitmap(drawable)).generate();
+        BitmapUtils.BitmapResult bmpResult = BitmapUtils.drawableToBitmap(drawable);
+        Palette p = Palette.from(bmpResult.getBitmap()).generate();
 
         mSelectIndicator.setBackgroundColor(getColorFromPalette(p, mViewModel.getFrameDefaultColor()));
+
+        if(bmpResult.isNew()) {
+            bmpResult.getBitmap().recycle();
+        }
 
         try {
             ObjectAnimator anim = ObjectAnimator.ofObject(
