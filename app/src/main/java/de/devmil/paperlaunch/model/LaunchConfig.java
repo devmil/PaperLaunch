@@ -20,7 +20,7 @@ import java.util.List;
 
 public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private List<IEntry> mEntries;
-    private float mImageWidthDip = 50;
+    private float mImageWidthDip = 48;
     private float mLowerElevationDip = 2;
     private float mHighElevationDip = 6;
     private int mEntryMoveAnimationDuration = 100;

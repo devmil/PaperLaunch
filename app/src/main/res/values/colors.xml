@@ -3,4 +3,6 @@
     <color name="theme_primary">#4CAF50</color>
     <color name="theme_primary_dark">#388E3C</color>
     <color name="theme_accent">#536DFE</color>
+
+    <color name="name_label">#353535</color>
 </resources>

@@ -1,5 +1,7 @@
 package de.devmil.paperlaunch.service;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -7,15 +9,18 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ActionMenuView;
 import android.widget.LinearLayout;
 
 import java.util.List;
 
+import de.devmil.paperlaunch.R;
+import de.devmil.paperlaunch.SettingsActivity;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
@@ -24,7 +29,9 @@ import de.devmil.paperlaunch.view.LauncherView;
 
 public class LauncherOverlayService extends Service {
     private static final String ACTION_LAUNCH = "ACTION_LAUNCH";
+    private static final int NOTIFICATION_ID = 2000;
 
+    private boolean mNotificationShown = false;
     private boolean mAlreadyRegistered = false;
     private EntriesDataSource mDataSource;
     private LauncherView mLauncherView;
@@ -42,6 +49,7 @@ public class LauncherOverlayService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent != null && ACTION_LAUNCH.equals(intent.getAction())) {
             ensureOverlayActive();
+            ensureNotification();
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -162,5 +170,34 @@ public class LauncherOverlayService extends Service {
         float newY = fromY + (fromLocation[1] - toLocation[1]);
 
         to.handleTouchEvent(event.getAction(), newX, newY);
+    }
+
+    private void ensureNotification() {
+        if(mNotificationShown) {
+            return;
+        }
+        PendingIntent settingsPendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                new Intent(this, SettingsActivity.class),
+                0
+        );
+        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setContentTitle("PaperLaunch")
+                .setContentText("PaperLaunch running")
+                .setOngoing(true)
+                .setLocalOnly(true)
+                .setSmallIcon(R.drawable.empty)
+                .setPriority(Notification.PRIORITY_MIN)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setContentIntent(settingsPendingIntent)
+        ;
+
+        Notification notification = builder.build();
+
+        nm.notify(NOTIFICATION_ID, notification);
+        mNotificationShown = true;
     }
 }

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.utils.BitmapUtils;
 import de.devmil.paperlaunch.utils.PositionAndSizeEvaluator;
@@ -224,6 +225,8 @@ public class LaunchLaneView extends RelativeLayout {
         mSelectedItemTextView = new VerticalTextView(getContext());
         mSelectedItemTextView.setVisibility(View.GONE);
         mSelectedItemTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mViewModel.getItemNameTextSizeSP());
+        //this is needed because the parts in the system run with another theme than the application parts
+        mSelectedItemTextView.setTextColor(getResources().getColor(R.color.name_label));
 
         LinearLayout.LayoutParams selectedItemTextViewParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -365,11 +368,15 @@ public class LaunchLaneView extends RelativeLayout {
         mSelectedItemTextView.setText(mFocusedEntryView.getEntry().getName(getContext()));
 
         BitmapUtils.BitmapResult bmpResult = BitmapUtils.drawableToBitmap(drawable);
-        Palette p = Palette.from(bmpResult.getBitmap()).generate();
+        if(bmpResult != null && bmpResult.getBitmap() != null) {
+            Palette p = Palette.from(bmpResult.getBitmap()).generate();
 
-        mSelectIndicator.setBackgroundColor(getColorFromPalette(p, mViewModel.getFrameDefaultColor()));
+            mSelectIndicator.setBackgroundColor(getColorFromPalette(p, mViewModel.getFrameDefaultColor()));
+        } else {
+            mSelectIndicator.setBackgroundColor(mViewModel.getFrameDefaultColor());
+        }
 
-        if(bmpResult.isNew()) {
+        if(bmpResult != null && bmpResult.isNew()) {
             bmpResult.getBitmap().recycle();
         }
 
