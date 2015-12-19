@@ -16,6 +16,7 @@
 package de.devmil.paperlaunch.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.LinearLayout;
@@ -35,6 +36,13 @@ public class LauncherView extends RelativeLayout {
     private LauncherViewModel mViewModel;
     private List<LaunchLaneView> mLaneViews = new ArrayList<>();
     private LinearLayout mNeutralZone;
+    private ILauncherViewListener mListener;
+
+    private IEntry mCurrentlySelectedItem;
+
+    public interface ILauncherViewListener {
+        void onFinished();
+    }
 
     public LauncherView(Context context) {
         super(context);
@@ -59,29 +67,38 @@ public class LauncherView extends RelativeLayout {
     public void doInitialize(LaunchConfig config)
     {
         buildViewModel(config);
-
-        buildViews();
     }
 
     public void start()
     {
+        buildViews();
         mLaneViews.get(0).start();
+    }
+
+    public void setListener(ILauncherViewListener listener) {
+        mListener = listener;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean result = super.onTouchEvent(event);
 
+        result = handleTouchEvent(event.getAction(), event.getX(), event.getY()) || result;
+
+        return result;
+    }
+
+    public boolean handleTouchEvent(int action, float x, float y) {
+        boolean result = false;
         int laneNum = 1;
 
         //find the lane to dispatch to
         for(LaunchLaneView l : mLaneViews)
         {
-            result = sendIfMatches(l, event, laneNum++) || result;
+            result = sendIfMatches(l, action, x, y, laneNum++) || result;
         }
 
         return result;
-
     }
 
     private void construct()
@@ -148,6 +165,10 @@ public class LauncherView extends RelativeLayout {
         llv.setLaneListener(new LaunchLaneView.ILaneListener() {
             @Override
             public void onItemSelected(IEntry selectedItem) {
+                mCurrentlySelectedItem = selectedItem;
+                if (selectedItem == null) {
+                    return;
+                }
                 if (selectedItem.isFolder()) {
                     Folder f = (Folder) selectedItem;
                     LaunchLaneView nextLaneView = mLaneViews.get(laneIndex + 1);
@@ -157,9 +178,14 @@ public class LauncherView extends RelativeLayout {
             }
 
             @Override
+            public void onItemSelecting(IEntry selectedItem) {
+                mCurrentlySelectedItem = selectedItem;
+            }
+
+            @Override
             public void onStateChanged(LaunchLaneViewModel.State oldState, LaunchLaneViewModel.State newState) {
-                if(newState == LaunchLaneViewModel.State.Focusing) {
-                    for(int idx = laneIndex + 1; idx < mLaneViews.size(); idx++) {
+                if (newState == LaunchLaneViewModel.State.Focusing) {
+                    for (int idx = laneIndex + 1; idx < mLaneViews.size(); idx++) {
                         mLaneViews.get(idx).stop();
                     }
                 }
@@ -170,7 +196,6 @@ public class LauncherView extends RelativeLayout {
     }
 
     private void setEntriesToLane(LaunchLaneView laneView, List<IEntry> entries) {
-        //TODO: handle folder icon
         //TODO: split into auto folders if there are too many of them
         List<LaunchEntryViewModel> entryModels = new ArrayList<>();
         for(IEntry e : entries)
@@ -202,21 +227,37 @@ public class LauncherView extends RelativeLayout {
         addView(mNeutralZone, params);
     }
 
-    private boolean sendIfMatches(LaunchLaneView laneView, MotionEvent event, int laneNumber)
+    private boolean sendIfMatches(LaunchLaneView laneView, int action, float x, float y, int laneNumber)
     {
-        float x = event.getX();
-        float y = event.getY();
-
 //        boolean hits = viewScreenRect.contains((int)rawX, (int)rawY);
 //
 //        if(hits
 //                || event.getAction() == MotionEvent.ACTION_MOVE
 //                || event.getAction() == MotionEvent.ACTION_UP)
 //        {
-            laneView.doHandleTouch(event.getAction(), (int)(x - laneView.getX()), (int)(y - laneView.getY()));
+            laneView.doHandleTouch(action, (int) (x - laneView.getX()), (int) (y - laneView.getY()));
+            if(action == MotionEvent.ACTION_UP) {
+                launchAppIfSelected();
+                if(mListener != null) {
+                    mListener.onFinished();
+                }
+            }
             return true;
 //        }
 //
 //        return false;
+    }
+
+    private void launchAppIfSelected() {
+        if(mCurrentlySelectedItem == null) {
+            return;
+        }
+        if(mCurrentlySelectedItem.isFolder()) {
+            return;
+        }
+        Launch l = (Launch)mCurrentlySelectedItem;
+        Intent intent = l.getLaunchIntent();
+        intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(intent);
     }
 }

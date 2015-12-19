@@ -13,6 +13,7 @@ import java.util.List;
 
 import de.devmil.paperlaunch.model.Folder;
 import de.devmil.paperlaunch.model.Launch;
+import de.devmil.paperlaunch.service.LauncherOverlayService;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
 import de.devmil.paperlaunch.view.fragments.EditFolderFragment;
 
@@ -26,6 +27,7 @@ public class SettingsActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LauncherOverlayService.launch(this);
         setContentView(R.layout.activity_settings);
 
         mDataSource = new EntriesDataSource(this);

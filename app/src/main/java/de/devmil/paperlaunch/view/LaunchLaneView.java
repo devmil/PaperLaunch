@@ -45,6 +45,7 @@ import de.devmil.paperlaunch.view.widgets.VerticalTextView;
 public class LaunchLaneView extends RelativeLayout {
     interface ILaneListener {
         void onItemSelected(IEntry selectedItem);
+        void onItemSelecting(IEntry selectedItem);
         void onStateChanged(LaunchLaneViewModel.State oldState, LaunchLaneViewModel.State newState);
     }
 
@@ -253,16 +254,19 @@ public class LaunchLaneView extends RelativeLayout {
         switch(state)
         {
             case Init:
+                fireNotSelectedEvents();
                 hideSelectionIndicator();
                 initEntryState(LaunchEntryViewModel.State.Inactive);
                 break;
             case Focusing:
+                fireNotSelectedEvents();
                 hideSelectionIndicator();
                 sendAllEntriesToState(LaunchEntryViewModel.State.Active, true);
                 break;
             case Selecting:
                 showSelectionIndicator();
                 sendAllEntriesToState(LaunchEntryViewModel.State.Inactive, true, mFocusedEntryView);
+                fireSelectingEvent();
                 break;
             case Selected:
                 fireSelectedEvent();
@@ -285,6 +289,19 @@ public class LaunchLaneView extends RelativeLayout {
     private void fireSelectedEvent() {
         if(mLaneListener != null) {
             mLaneListener.onItemSelected(mFocusedEntryView.getEntry());
+        }
+    }
+
+    private void fireSelectingEvent() {
+        if(mLaneListener != null) {
+            mLaneListener.onItemSelecting(mFocusedEntryView.getEntry());
+        }
+    }
+
+    private void fireNotSelectedEvents() {
+        if(mLaneListener != null) {
+            mLaneListener.onItemSelected(null);
+            mLaneListener.onItemSelecting(null);
         }
     }
 
