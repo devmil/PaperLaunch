@@ -195,7 +195,7 @@ public class EditFolderFragment extends Fragment {
     }
 
     private void initiateCreateFolder() {
-        long folderId = addFolder("New Folder");
+        long folderId = addFolder(getResources().getString(R.string.fragment_edit_folder_new_folder_name));
 
         Intent editFolderIntent = EditFolderActivity.createLaunchIntent(getContext(), folderId);
         startActivityForResult(editFolderIntent, REQUEST_EDIT_FOLDER);

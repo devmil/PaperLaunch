@@ -40,10 +40,12 @@ public class LaunchesAccess {
                 null
         );
 
+        LaunchDTO result = null;
         if(c.moveToFirst()) {
-            return cursorToLaunch(c);
+            result = cursorToLaunch(c);
         }
-        return null;
+        c.close();
+        return result;
     }
 
     public LaunchDTO createNew() {

@@ -15,4 +15,7 @@
     <string name="folder_settings_add_folder">Folder</string>
     <string name="title_activity_edit_folder">EditFolderActivity</string>
     <string name="title_activity_launcher">LauncherActivity</string>
+
+    <string name="fragment_edit_folder_name">Name:</string>
+    <string name="fragment_edit_folder_new_folder_name">New Folder</string>
 </resources>

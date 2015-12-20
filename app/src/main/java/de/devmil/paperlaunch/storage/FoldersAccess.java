@@ -37,10 +37,12 @@ public class FoldersAccess {
                 null
         );
 
+        FolderDTO result = null;
         if(c.moveToFirst()) {
-            return cursorToFolder(c);
+            result = cursorToFolder(c);
         }
-        return null;
+        c.close();
+        return result;
     }
 
     public FolderDTO createNew() {

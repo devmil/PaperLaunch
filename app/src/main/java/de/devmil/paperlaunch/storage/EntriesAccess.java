@@ -69,10 +69,13 @@ public class EntriesAccess {
                 null
         );
 
+        EntryDTO result = null;
+
         if(c.moveToFirst()) {
-            return cursorToEntry(c);
+            result = cursorToEntry(c);
         }
-        return null;
+        c.close();
+        return result;
     }
 
     public EntryDTO queryEntryForFolder(long folderId) {
@@ -86,10 +89,13 @@ public class EntriesAccess {
                 null
         );
 
+        EntryDTO result = null;
+
         if(c.moveToFirst()) {
-            return cursorToEntry(c);
+            result = cursorToEntry(c);
         }
-        return null;
+        c.close();
+        return result;
     }
 
     public EntryDTO queryEntryForLaunch(long launchId) {
@@ -103,10 +109,12 @@ public class EntriesAccess {
                 null
         );
 
+        EntryDTO result = null;
         if(c.moveToFirst()) {
-            return cursorToEntry(c);
+            result = cursorToEntry(c);
         }
-        return null;
+        c.close();
+        return result;
     }
 
     public EntryDTO createNew(int orderIndex) {

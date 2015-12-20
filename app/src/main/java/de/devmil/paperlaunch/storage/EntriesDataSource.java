@@ -21,7 +21,7 @@ public class EntriesDataSource {
     private EntriesDataSource() {
     }
 
-    private static Object sInstanceLockObject = new Object();
+    private static final Object sInstanceLockObject = new Object();
     private static EntriesDataSource sInstance = null;
     public static EntriesDataSource getInstance() {
         synchronized (sInstanceLockObject) {
@@ -34,12 +34,12 @@ public class EntriesDataSource {
 
     public synchronized void accessData(Context context, ITransactionAction action) {
         boolean opened = mDatabase == null;
-        if(opened) {
+        if (opened) {
             open(context);
         }
         TransactionContext transactionContext = new TransactionContext();
         action.execute(transactionContext);
-        if(opened) {
+        if (opened) {
             close(transactionContext);
         }
     }
@@ -234,6 +234,7 @@ public class EntriesDataSource {
 
     private void close(ITransactionContext context) {
         context.rollbackTransaction();
+        mDatabase.close();
         mDatabase = null;
         mEntriesAccess = null;
         mFoldersAccess = null;
