@@ -182,7 +182,6 @@ public class LauncherOverlayService extends Service {
                 new Intent(this, SettingsActivity.class),
                 0
         );
-        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle("PaperLaunch")
                 .setContentText("PaperLaunch running")
@@ -197,7 +196,9 @@ public class LauncherOverlayService extends Service {
 
         Notification notification = builder.build();
 
-        nm.notify(NOTIFICATION_ID, notification);
+        startForeground(NOTIFICATION_ID, notification);
+
         mNotificationShown = true;
+
     }
 }
