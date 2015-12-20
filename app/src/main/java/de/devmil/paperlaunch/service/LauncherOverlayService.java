@@ -24,18 +24,21 @@ import de.devmil.paperlaunch.SettingsActivity;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
+import de.devmil.paperlaunch.storage.ITransactionAction;
+import de.devmil.paperlaunch.storage.ITransactionContext;
 import de.devmil.paperlaunch.utils.ViewUtils;
 import de.devmil.paperlaunch.view.LauncherView;
 
 public class LauncherOverlayService extends Service {
     private static final String ACTION_LAUNCH = "ACTION_LAUNCH";
+    private static final String ACTION_NOTIFYDATACHANGED = "ACTION_NOTIFYDATACHANGED";
     private static final int NOTIFICATION_ID = 2000;
 
     private boolean mNotificationShown = false;
     private boolean mAlreadyRegistered = false;
-    private EntriesDataSource mDataSource;
     private LauncherView mLauncherView;
     private boolean mIsLauncherActive = false;
+    private LaunchConfig mCurrentConfig;
 
     public LauncherOverlayService() {
     }
@@ -51,12 +54,21 @@ public class LauncherOverlayService extends Service {
             ensureOverlayActive();
             ensureNotification();
         }
+        if(intent != null && ACTION_NOTIFYDATACHANGED.equals(intent.getAction())) {
+            ensureData(true);
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
     public static void launch(Context context) {
         Intent launchServiceIntent = new Intent(context, LauncherOverlayService.class);
         launchServiceIntent.setAction(ACTION_LAUNCH);
+        context.startService(launchServiceIntent);
+    }
+
+    public static void notifyDataChanged(Context context) {
+        Intent launchServiceIntent = new Intent(context, LauncherOverlayService.class);
+        launchServiceIntent.setAction(ACTION_NOTIFYDATACHANGED);
         context.startService(launchServiceIntent);
     }
 
@@ -67,6 +79,8 @@ public class LauncherOverlayService extends Service {
             return;
         }
 
+        ensureData(false);
+
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 (int)ViewUtils.getPxFromDip(this, 5),
                 WindowManager.LayoutParams.MATCH_PARENT,
@@ -75,7 +89,7 @@ public class LauncherOverlayService extends Service {
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT);
 
-        params.gravity = Gravity.RIGHT;
+        params.gravity = mCurrentConfig.isOnRightSide() ? Gravity.RIGHT : Gravity.LEFT;
 
         WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
 
@@ -94,27 +108,29 @@ public class LauncherOverlayService extends Service {
         mAlreadyRegistered = true;
     }
 
+    private void ensureData(boolean forceReload) {
+        if(forceReload) {
+            mCurrentConfig = null;
+        }
+        if(mCurrentConfig == null) {
+            mCurrentConfig = new LaunchConfig();
+            EntriesDataSource.getInstance().accessData(this, new ITransactionAction() {
+                @Override
+                public void execute(ITransactionContext transactionContext) {
+                    List<IEntry> entries = transactionContext.loadRootContent();
+                    mCurrentConfig.setEntries(entries);
+                }
+            });
+        }
+    }
+
     private LauncherView createLauncherView(MotionEvent event) {
         LauncherView result = new LauncherView(this);
-        final LaunchConfig cfg = new LaunchConfig();
-        getDataSource().executeWithOpenDataSource(new EntriesDataSource.IAction() {
-            @Override
-            public void execute() {
-                List<IEntry> entries = getDataSource().loadRootContent();
-                cfg.setEntries(entries);
-            }
-        });
-        result.doInitialize(cfg);
+        ensureData(false);
+        result.doInitialize(mCurrentConfig);
         result.doAutoStart(event);
 
         return result;
-    }
-
-    private EntriesDataSource getDataSource() {
-        if(mDataSource == null) {
-            mDataSource = new EntriesDataSource(this);
-        }
-        return mDataSource;
     }
 
     private boolean handleTouch(final LinearLayout touchReceiver, final MotionEvent event) {

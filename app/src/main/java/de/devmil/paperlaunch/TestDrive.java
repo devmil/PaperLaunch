@@ -13,33 +13,35 @@ import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
+import de.devmil.paperlaunch.storage.ITransactionAction;
+import de.devmil.paperlaunch.storage.ITransactionContext;
 import de.devmil.paperlaunch.view.LauncherView;
 
 
 public class TestDrive extends Activity {
 
     private LauncherView mLauncherView;
-    private EntriesDataSource mDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_drive);
+        mLauncherView = (LauncherView) findViewById(R.id.tstLauncherView);
 
         LaunchConfig cfg = new LaunchConfig();
-        final List<IEntry>[] entries = new List[] { null };
+        class Local {
+            List<IEntry> entries = null;
+        }
+        final Local local = new Local();
 
-        mDataSource = new EntriesDataSource(this);
-        mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+        EntriesDataSource.getInstance().accessData(this, new ITransactionAction() {
             @Override
-            public void execute() {
-                mLauncherView = (LauncherView) findViewById(R.id.tstLauncherView);
-
-                entries[0] = mDataSource.loadRootContent();
+            public void execute(ITransactionContext transactionContext) {
+                local.entries = transactionContext.loadRootContent();
             }
         });
 
-        cfg.setEntries(entries[0]);
+        cfg.setEntries(local.entries);
 
         mLauncherView.doInitialize(cfg);
 

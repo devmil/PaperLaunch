@@ -35,8 +35,11 @@ import de.devmil.paperlaunch.model.Folder;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.model.LaunchConfig;
+import de.devmil.paperlaunch.service.LauncherOverlayService;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
 import de.devmil.paperlaunch.storage.FolderDTO;
+import de.devmil.paperlaunch.storage.ITransactionAction;
+import de.devmil.paperlaunch.storage.ITransactionContext;
 import de.devmil.paperlaunch.utils.FolderImageHelper;
 import de.devmil.paperlaunch.view.utils.IntentSelector;
 
@@ -51,7 +54,6 @@ public class EditFolderFragment extends Fragment {
     private static final int REQUEST_EDIT_FOLDER = 1010;
 
     private EntriesAdapter mAdapter;
-    private EntriesDataSource mDataSource;
     private RecyclerView mRecyclerView;
     private FloatingActionButton mAddButton;
     private LinearLayout mEditNameLayout;
@@ -92,8 +94,6 @@ public class EditFolderFragment extends Fragment {
                              Bundle savedInstanceState) {
         View result = inflater.inflate(R.layout.fragment_edit_folder, container, false);
 
-        mDataSource = new EntriesDataSource(getContext());
-
         mRecyclerView = (RecyclerView)result.findViewById(R.id.fragment_edit_folder_entrieslist);
         mAddButton = (FloatingActionButton)result.findViewById(R.id.fragment_edit_folder_fab);
         mEditNameLayout = (LinearLayout)result.findViewById(R.id.fragment_edit_folder_editname_layout);
@@ -121,12 +121,13 @@ public class EditFolderFragment extends Fragment {
                     return;
                 }
                 mFolder.getDto().setName(mFolderNameEditText.getText().toString());
-                mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+                EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
                     @Override
-                    public void execute() {
-                        mDataSource.updateFolderData(mFolder);
+                    public void execute(ITransactionContext transactionContext) {
+                        transactionContext.updateFolderData(mFolder);
                     }
                 });
+                notifyDataChanged();
             }
         });
 
@@ -165,7 +166,7 @@ public class EditFolderFragment extends Fragment {
     }
 
     private void loadData() {
-        mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, loadEntries(), mDataSource));
+        mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, loadEntries()));
         if(mFolder != null) {
             mFolderNameEditText.setText(mFolder.getDto().getName());
         }
@@ -178,13 +179,13 @@ public class EditFolderFragment extends Fragment {
         }
 
         final Local local = new Local();
-        mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+        EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
             @Override
-            public void execute() {
+            public void execute(ITransactionContext transactionContext) {
                 if (mFolderId == -1) {
-                    local.result = mDataSource.loadRootContent();
+                    local.result = transactionContext.loadRootContent();
                 } else {
-                    mFolder = mDataSource.loadFolder(mFolderId);
+                    mFolder = transactionContext.loadFolder(mFolderId);
                     local.result = mFolder.getSubEntries();
                 }
             }
@@ -224,12 +225,12 @@ public class EditFolderFragment extends Fragment {
     }
 
     private void addLaunch(final Intent launchIntent) {
-        mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+        EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
             @Override
-            public void execute() {
-                Launch l = mDataSource.createLaunch(mFolderId);
+            public void execute(ITransactionContext transactionContext) {
+                Launch l = transactionContext.createLaunch(mFolderId);
                 l.getDto().setLaunchIntent(launchIntent);
-                mDataSource.updateLaunchData(l);
+                transactionContext.updateLaunchData(l);
 
                 mAdapter.addEntry(l);
 
@@ -238,35 +239,51 @@ public class EditFolderFragment extends Fragment {
                 }
             }
         });
+        notifyDataChanged();
     }
 
     private void updateFolderImage(Folder folder) {
         updateFolderImage(folder.getDto(), folder.getSubEntries());
     }
 
-    private void updateFolderImage(FolderDTO folderDto, List<IEntry> entries) {
+    private void updateFolderImage(final FolderDTO folderDto, List<IEntry> entries) {
         float imgWidth = mConfig.getImageWidthDip();
         Bitmap bmp = FolderImageHelper.createImageFromEntries(getContext(), entries, imgWidth);
         Drawable newIcon = new BitmapDrawable(getResources(), bmp);
         folderDto.setIcon(newIcon);
 
-        mDataSource.updateFolderData(folderDto);
+        EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
+            @Override
+            public void execute(ITransactionContext transactionContext) {
+                transactionContext.updateFolderData(folderDto);
+            }
+        });
+        notifyDataChanged();
     }
 
     private long addFolder(final String initialName) {
-        final Folder[] folder = new Folder[]{null};
-        mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+        class Local {
+            Folder folder = null;
+        }
+        final Local local = new Local();
+        EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
             @Override
-            public void execute() {
-                folder[0] = mDataSource.createFolder(mFolderId);
-                folder[0].getDto().setName(initialName);
-                mDataSource.updateFolderData(folder[0]);
+            public void execute(ITransactionContext transactionContext) {
+                local.folder = transactionContext.createFolder(mFolderId);
+                local.folder.getDto().setName(initialName);
+                transactionContext.updateFolderData(local.folder);
             }
         });
 
-        mAdapter.addEntry(folder[0]);
+        mAdapter.addEntry(local.folder);
 
-        return folder[0].getId();
+        notifyDataChanged();
+
+        return local.folder.getId();
+    }
+
+    private void notifyDataChanged() {
+        LauncherOverlayService.notifyDataChanged(getContext());
     }
 
     private class EntriesItemAnimator extends DefaultItemAnimator
@@ -295,12 +312,10 @@ public class EditFolderFragment extends Fragment {
     private class EntriesAdapter extends DragSortAdapter<EntriesAdapter.ViewHolder>
     {
         private List<IEntry> mEntries;
-        private EntriesDataSource mDataSource;
 
-        public EntriesAdapter(RecyclerView recyclerView, List<IEntry> entries, EntriesDataSource dataSource) {
+        public EntriesAdapter(RecyclerView recyclerView, List<IEntry> entries) {
             super(recyclerView);
             mEntries = entries;
-            mDataSource = dataSource;
         }
 
         public List<IEntry> getEntries() {
@@ -345,14 +360,10 @@ public class EditFolderFragment extends Fragment {
             }
             mEntries.add(toPosition, mEntries.remove(fromPosition));
             saveOrder();
-            mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
-                @Override
-                public void execute() {
-                    if (mFolder != null) {
-                        updateFolderImage(mFolder.getDto(), mEntries);
-                    }
-                }
-            });
+            if (mFolder != null) {
+                updateFolderImage(mFolder.getDto(), mEntries);
+            }
+            notifyDataChanged();
             return true;
         }
 
@@ -378,10 +389,10 @@ public class EditFolderFragment extends Fragment {
         }
 
         private void saveOrder() {
-            mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+            EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
                 @Override
-                public void execute() {
-                    mDataSource.updateOrders(mEntries);
+                public void execute(ITransactionContext transactionContext) {
+                    transactionContext.updateOrders(mEntries);
                 }
             });
         }
@@ -425,10 +436,10 @@ public class EditFolderFragment extends Fragment {
                     }
                 }
                 else if(v == deleteImg) {
-                    mDataSource.executeWithOpenDataSource(new EntriesDataSource.IAction() {
+                    EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
                         @Override
-                        public void execute() {
-                            mDataSource.deleteEntry(entry.getEntryId());
+                        public void execute(ITransactionContext transactionContext) {
+                            transactionContext.deleteEntry(entry.getEntryId());
 
                             int pos = getPositionForId(getItemId());
                             mEntries.remove(pos);
@@ -438,6 +449,7 @@ public class EditFolderFragment extends Fragment {
                             notifyItemRemoved(pos);
                         }
                     });
+                    notifyDataChanged();
                 }
             }
         }
