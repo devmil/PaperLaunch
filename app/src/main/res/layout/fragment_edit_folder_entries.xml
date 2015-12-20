@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:alpha="0.5"
-        android:src="@mipmap/ic_reorder_black_48dp" />
+        android:src="@mipmap/ic_reorder_grey600_24dp" />
 
     <ImageView
         android:id="@+id/fragment_edit_folder_entries_image"
