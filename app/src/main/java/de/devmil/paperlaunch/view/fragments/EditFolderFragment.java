@@ -367,7 +367,7 @@ public class EditFolderFragment extends Fragment {
         public void onBindViewHolder(ViewHolder holder, int position) {
             IEntry entry = mEntries.get(position);
 
-            holder.container.setVisibility(getDraggingId() == entry.getId() ? View.INVISIBLE : View.VISIBLE);
+            holder.container.setVisibility(getDraggingId() == entry.getEntryId() ? View.INVISIBLE : View.VISIBLE);
             holder.imageView.setImageDrawable(entry.getIcon(holder.imageView.getContext()));
             holder.textView.setText(entry.getName(holder.textView.getContext()));
         }
