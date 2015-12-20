@@ -28,6 +28,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:singleLine="true"
                 android:nextFocusUp="@id/fragment_edit_folder_editname_text"
                 android:nextFocusDown="@id/fragment_edit_folder_editname_text"
                 android:nextFocusLeft="@id/fragment_edit_folder_editname_text"

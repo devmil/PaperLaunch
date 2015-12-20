@@ -2,7 +2,6 @@ package de.devmil.paperlaunch.view.fragments;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -28,6 +27,10 @@ import com.cocosw.bottomsheet.BottomSheet;
 import com.makeramen.dragsortadapter.DragSortAdapter;
 
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import de.devmil.paperlaunch.EditFolderActivity;
 import de.devmil.paperlaunch.R;
@@ -61,6 +64,8 @@ public class EditFolderFragment extends Fragment {
     private long mFolderId = -1;
     private Folder mFolder = null;
     LaunchConfig mConfig;
+
+    private static final ScheduledExecutorService sNotifyDataChangedWorker = Executors.newSingleThreadScheduledExecutor();
 
     public EditFolderFragment() {
         mConfig = new LaunchConfig();
@@ -282,8 +287,18 @@ public class EditFolderFragment extends Fragment {
         return local.folder.getId();
     }
 
+    private ScheduledFuture<?> mScheduledNotifyDataChanged;
+
     private void notifyDataChanged() {
-        LauncherOverlayService.notifyDataChanged(getContext());
+        if(mScheduledNotifyDataChanged != null) {
+            mScheduledNotifyDataChanged.cancel(false);
+        }
+        mScheduledNotifyDataChanged = sNotifyDataChangedWorker.schedule(new Runnable() {
+            @Override
+            public void run() {
+                LauncherOverlayService.notifyDataChanged(getContext());
+            }
+        }, 1, TimeUnit.SECONDS);
     }
 
     private class EntriesItemAnimator extends DefaultItemAnimator
