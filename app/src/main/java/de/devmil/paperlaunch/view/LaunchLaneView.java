@@ -259,11 +259,13 @@ public class LaunchLaneView extends RelativeLayout {
             case Init:
                 fireNotSelectedEvents();
                 hideSelectionIndicator();
+                hideEntries();
                 initEntryState(LaunchEntryViewModel.State.Inactive);
                 break;
             case Focusing:
                 fireNotSelectedEvents();
                 hideSelectionIndicator();
+                showEntries();
                 sendAllEntriesToState(LaunchEntryViewModel.State.Active, true);
                 break;
             case Selecting:
@@ -452,6 +454,18 @@ public class LaunchLaneView extends RelativeLayout {
         }
         if(mSelectedItemTextView != null) {
             mSelectedItemTextView.setVisibility(View.GONE);
+        }
+    }
+
+    private void hideEntries() {
+        for(LaunchEntryView ev : mEntryViews) {
+            ev.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void showEntries() {
+        for(LaunchEntryView ev : mEntryViews) {
+            ev.setVisibility(View.VISIBLE);
         }
     }
 

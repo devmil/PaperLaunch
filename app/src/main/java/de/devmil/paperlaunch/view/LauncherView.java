@@ -15,13 +15,18 @@
  */
 package de.devmil.paperlaunch.view;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,13 +35,16 @@ import de.devmil.paperlaunch.model.Folder;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.model.Launch;
+import de.devmil.paperlaunch.utils.PositionAndSizeEvaluator;
 import de.devmil.paperlaunch.utils.ViewUtils;
 
 public class LauncherView extends RelativeLayout {
     private LauncherViewModel mViewModel;
     private List<LaunchLaneView> mLaneViews = new ArrayList<>();
     private LinearLayout mNeutralZone;
+    private LinearLayout mNeutralZoneBackground;
     private ILauncherViewListener mListener;
+    private MotionEvent mAutoStartMotionEvent;
 
     private IEntry mCurrentlySelectedItem;
 
@@ -72,11 +80,22 @@ public class LauncherView extends RelativeLayout {
     public void start()
     {
         buildViews();
-        mLaneViews.get(0).start();
+        transitToState(LauncherViewModel.State.Init);
+        transitToState(LauncherViewModel.State.Initializing);
     }
 
     public void setListener(ILauncherViewListener listener) {
         mListener = listener;
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        if(mAutoStartMotionEvent != null) {
+            start();
+            onTouchEvent(mAutoStartMotionEvent);
+            mAutoStartMotionEvent = null;
+        }
     }
 
     @Override
@@ -99,6 +118,10 @@ public class LauncherView extends RelativeLayout {
         }
 
         return result;
+    }
+
+    public void doAutoStart(MotionEvent firstMotionEvent) {
+        mAutoStartMotionEvent = firstMotionEvent;
     }
 
     private void construct()
@@ -142,6 +165,8 @@ public class LauncherView extends RelativeLayout {
         for(int i=mLaneViews.size() - 1; i>=0; i--) {
             mLaneViews.get(i).bringToFront();
         }
+        mNeutralZone.bringToFront();
+        mNeutralZoneBackground.bringToFront();
     }
 
     private LaunchLaneView addLaneView(final int laneIndex, int anchorId) {
@@ -211,9 +236,7 @@ public class LauncherView extends RelativeLayout {
     {
         mNeutralZone = new LinearLayout(getContext());
         mNeutralZone.setId(R.id.id_launchview_neutralzone);
-        mNeutralZone.setBackgroundColor(mViewModel.getDesignConfig().getFrameDefaultColor());
-        mNeutralZone.setElevation(ViewUtils.getPxFromDip(getContext(), mViewModel.getHighElevationDip()));
-        mNeutralZone.setMinimumWidth((int)ViewUtils.getPxFromDip(getContext(), mViewModel.getNeutralZoneWidthDip()));
+        mNeutralZone.setMinimumWidth((int) ViewUtils.getPxFromDip(getContext(), mViewModel.getNeutralZoneWidthDip()));
         mNeutralZone.setClickable(false);
 
         LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -225,27 +248,29 @@ public class LauncherView extends RelativeLayout {
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 
         addView(mNeutralZone, params);
+
+        mNeutralZoneBackground = new LinearLayout(getContext());
+        mNeutralZoneBackground.setBackgroundColor(mViewModel.getDesignConfig().getFrameDefaultColor());
+        mNeutralZoneBackground.setElevation(ViewUtils.getPxFromDip(getContext(), mViewModel.getHighElevationDip()));
+        mNeutralZoneBackground.setClickable(false);
+
+        LinearLayout.LayoutParams backParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+        );
+        mNeutralZone.addView(mNeutralZoneBackground, backParams);
     }
 
     private boolean sendIfMatches(LaunchLaneView laneView, int action, float x, float y, int laneNumber)
     {
-//        boolean hits = viewScreenRect.contains((int)rawX, (int)rawY);
-//
-//        if(hits
-//                || event.getAction() == MotionEvent.ACTION_MOVE
-//                || event.getAction() == MotionEvent.ACTION_UP)
-//        {
-            laneView.doHandleTouch(action, (int) (x - laneView.getX()), (int) (y - laneView.getY()));
-            if(action == MotionEvent.ACTION_UP) {
-                launchAppIfSelected();
-                if(mListener != null) {
-                    mListener.onFinished();
-                }
+        laneView.doHandleTouch(action, (int) (x - laneView.getX()), (int) (y - laneView.getY()));
+        if(action == MotionEvent.ACTION_UP) {
+            launchAppIfSelected();
+            if(mListener != null) {
+                mListener.onFinished();
             }
-            return true;
-//        }
-//
-//        return false;
+        }
+        return true;
     }
 
     private void launchAppIfSelected() {
@@ -259,5 +284,105 @@ public class LauncherView extends RelativeLayout {
         Intent intent = l.getLaunchIntent();
         intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NEW_TASK);
         getContext().startActivity(intent);
+    }
+
+    private void transitToState(LauncherViewModel.State newState) {
+        switch(newState) {
+            case Init:
+                hideNeutralZone();
+                break;
+            case Initializing:
+                animateNeutralZone();
+                break;
+            case Ready:
+                startLane();
+                break;
+        }
+        mViewModel.setState(newState);
+    }
+
+    private void startLane() {
+        mLaneViews.get(0).start();
+    }
+
+    private void hideNeutralZone() {
+        mNeutralZoneBackground.setVisibility(View.INVISIBLE);
+    }
+
+    private void animateNeutralZone() {
+        float size = mViewModel.getNeutralZoneWidthDip();
+
+        int fromLeft = mViewModel.isOnRightSide() ? getWidth() - (int)size : 0;
+        int fromTop = (getHeight() - (int)size) / 2;
+
+        if(mAutoStartMotionEvent != null) {
+            fromTop = Math.min(
+                    (getHeight() - (int)size),
+                    (int)mAutoStartMotionEvent.getY()
+            );
+        }
+
+        int fromRight = fromLeft + (int)size;
+        int fromBottom = fromTop + (int)size;
+
+        Rect fromRect = new Rect(
+                fromLeft,
+                fromTop,
+                fromRight,
+                fromBottom
+                );
+        Rect toRect = new Rect(
+                fromLeft,
+                0,
+                fromRight,
+                getHeight()
+        );
+
+        ObjectAnimator anim = null;
+        try {
+            anim = ObjectAnimator.ofObject(
+                    mNeutralZoneBackground,
+                    "margins",
+                    new PositionAndSizeEvaluator(mNeutralZoneBackground),
+                    fromRect,
+                    toRect);
+            anim.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    mNeutralZoneBackground.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                            }
+                            mNeutralZoneBackground.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    transitToState(LauncherViewModel.State.Ready);
+                                }
+                            });
+                        }
+                    }).start();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                }
+            });
+            anim.setDuration(mViewModel.getLauncherInitAnimationDurationMS());
+            anim.start();
+        } catch (InvalidClassException e) {
+            e.printStackTrace();
+        }
     }
 }

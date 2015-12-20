@@ -26,6 +26,13 @@ import de.devmil.paperlaunch.model.LaunchConfig;
 
 public class LauncherViewModel {
     private LaunchConfig mConfig;
+    private State mState = State.Init;
+
+    enum State {
+        Init,
+        Initializing,
+        Ready
+    }
 
     public LauncherViewModel(LaunchConfig config)
     {
@@ -58,5 +65,17 @@ public class LauncherViewModel {
 
     public float getNeutralZoneWidthDip() {
         return mConfig.getNeutralZoneWidthDip();
+    }
+
+    public int getLauncherInitAnimationDurationMS() {
+        return mConfig.getLauncherInitAnimationDurationMS();
+    }
+
+    public State getState() {
+        return mState;
+    }
+
+    public void setState(State mState) {
+        this.mState = mState;
     }
 }

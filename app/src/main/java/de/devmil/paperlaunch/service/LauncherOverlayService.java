@@ -94,7 +94,7 @@ public class LauncherOverlayService extends Service {
         mAlreadyRegistered = true;
     }
 
-    private LauncherView createLauncherView() {
+    private LauncherView createLauncherView(MotionEvent event) {
         LauncherView result = new LauncherView(this);
         final LaunchConfig cfg = new LaunchConfig();
         getDataSource().executeWithOpenDataSource(new EntriesDataSource.IAction() {
@@ -105,6 +105,7 @@ public class LauncherOverlayService extends Service {
             }
         });
         result.doInitialize(cfg);
+        result.doAutoStart(event);
 
         return result;
     }
@@ -116,9 +117,9 @@ public class LauncherOverlayService extends Service {
         return mDataSource;
     }
 
-    private boolean handleTouch(final LinearLayout touchReceiver, MotionEvent event) {
+    private boolean handleTouch(final LinearLayout touchReceiver, final MotionEvent event) {
         if(!mIsLauncherActive) {
-            mLauncherView = createLauncherView();
+            mLauncherView = createLauncherView(event);
             Rect hitRect = new Rect();
             touchReceiver.getHitRect(hitRect);
             if(!hitRect.contains((int)event.getX(), (int)event.getY()))
@@ -140,7 +141,7 @@ public class LauncherOverlayService extends Service {
             mLauncherView.setListener(new LauncherView.ILauncherViewListener() {
                 @Override
                 public void onFinished() {
-                    if(mLauncherView != null) {
+                    if (mLauncherView != null) {
                         wm.removeView(mLauncherView);
                         mLauncherView = null;
                     }
@@ -148,9 +149,10 @@ public class LauncherOverlayService extends Service {
                 }
             });
 
+            mLauncherView.requestLayout();
+
             mLauncherView.start();
-        }
-        if(mLauncherView != null) {
+        } else {
             transferMotionEvent(touchReceiver, mLauncherView, event);
         }
 

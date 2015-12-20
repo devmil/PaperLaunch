@@ -31,6 +31,7 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private float mItemNameTextSizeSP = 30;
     private IDesignConfig mDesignConfig = new DesignConfig();
     private float mNeutralZoneWidthDip = 50;
+    private int mLauncherInitAnimationDurationMS = 150;
     private float mImageOffsetDip = 5;
 
     public List<IEntry> getEntries()
@@ -97,6 +98,10 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
 
     public float getNeutralZoneWidthDip() {
         return mNeutralZoneWidthDip;
+    }
+
+    public int getLauncherInitAnimationDurationMS() {
+        return mLauncherInitAnimationDurationMS;
     }
 
     public float getImageOffsetDip()
