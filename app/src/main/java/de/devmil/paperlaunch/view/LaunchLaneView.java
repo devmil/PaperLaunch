@@ -118,7 +118,7 @@ public class LaunchLaneView extends RelativeLayout {
         if(mViewModel.getState() == LaunchLaneViewModel.State.Focusing)
         {
             if(action == MotionEvent.ACTION_UP) {
-                sendAllEntriesToState(LaunchEntryViewModel.State.Active, true);
+                sendAllEntriesToState(LaunchEntryViewModel.State.Active);
                 mFocusedEntryView = null;
             }
             else {
@@ -266,11 +266,11 @@ public class LaunchLaneView extends RelativeLayout {
                 fireNotSelectedEvents();
                 hideSelectionIndicator();
                 showEntries();
-                sendAllEntriesToState(LaunchEntryViewModel.State.Active, true);
+                sendAllEntriesToState(LaunchEntryViewModel.State.Active);
                 break;
             case Selecting:
                 showSelectionIndicator();
-                sendAllEntriesToState(LaunchEntryViewModel.State.Inactive, true, mFocusedEntryView);
+                sendAllEntriesToState(LaunchEntryViewModel.State.Inactive, mFocusedEntryView);
                 fireSelectingEvent();
                 break;
             case Selected:
@@ -323,28 +323,40 @@ public class LaunchLaneView extends RelativeLayout {
         }
     }
 
-    private void sendAllEntriesToState(final LaunchEntryViewModel.State state, boolean topDown)
+    private void sendAllEntriesToState(final LaunchEntryViewModel.State state)
     {
-        sendAllEntriesToState(state, topDown, null);
+        sendAllEntriesToState(state, null);
     }
 
-    private void sendAllEntriesToState(final LaunchEntryViewModel.State state, boolean topDown, LaunchEntryView except)
+    private void sendAllEntriesToState(final LaunchEntryViewModel.State state, LaunchEntryView except)
     {
         int delay = 0;
-        int start = 0;
-        int end = mEntryViews.size();
-        int diff = 1;
-        if(!topDown)
-        {
-            start = mEntryViews.size() - 1;
-            end = -1;
-            diff = -1;
+
+        int entryCount = mEntryViews.size();
+        int count = entryCount / 2;
+        int centerIndex = -1;
+        if(mEntryViews.size() % 2 != 0) {
+            centerIndex = count;
         }
-        for(int i=start; i<end; i+=diff)
-        {
-            if(mEntryViews.get(i) != except) {
-                mEntryViews.get(i).gotoState(state, delay += mViewModel.getEntryMoveDiffMS());
+
+        if(centerIndex >= 0) {
+            if(mEntryViews.get(centerIndex) != except) {
+                mEntryViews.get(centerIndex).gotoState(state, delay);
             }
+            delay += mViewModel.getEntryMoveDiffMS();
+        }
+
+        for(int i=count-1; i>=0;i--) {
+            int upperIdx = i;
+            int lowerIdx = entryCount - 1 - i;
+            if(mEntryViews.get(upperIdx) != except) {
+                mEntryViews.get(upperIdx).gotoState(state, delay);
+            }
+            if(mEntryViews.get(lowerIdx) != except) {
+                mEntryViews.get(lowerIdx).gotoState(state, delay);
+            }
+
+            delay += mViewModel.getEntryMoveDiffMS();
         }
     }
 
