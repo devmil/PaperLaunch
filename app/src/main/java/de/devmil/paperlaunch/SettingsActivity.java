@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toolbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import de.devmil.paperlaunch.view.fragments.EditFolderFragment;
 
 public class SettingsActivity extends FragmentActivity {
 
+    private Toolbar mToolbar;
     private Button mButtonTest;
     private Button mButtonReset;
     private EditFolderFragment mFragment;
@@ -30,9 +32,12 @@ public class SettingsActivity extends FragmentActivity {
         LauncherOverlayService.launch(this);
         setContentView(R.layout.activity_settings);
 
+        mToolbar = (Toolbar)findViewById(R.id.activity_settings_toolbar);
         mButtonTest = (Button)findViewById(R.id.activity_settings_buttontest);
         mButtonReset = (Button)findViewById(R.id.activity_settings_buttonreset);
         mFragment = (EditFolderFragment)getSupportFragmentManager().findFragmentById(R.id.activity_settings_editfolder_fragment);
+
+        setActionBar(mToolbar);
 
         mButtonTest.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -65,10 +65,23 @@ public class EditFolderFragment extends Fragment {
     private Folder mFolder = null;
     LaunchConfig mConfig;
 
+    IEditFolderFragmentListener mListener = null;
+
+    public interface IEditFolderFragmentListener {
+        void onFolderNameChanged(String newName);
+    }
+
     private static final ScheduledExecutorService sNotifyDataChangedWorker = Executors.newSingleThreadScheduledExecutor();
 
     public EditFolderFragment() {
         mConfig = new LaunchConfig();
+    }
+
+    public void setListener(IEditFolderFragmentListener listener) {
+        mListener = listener;
+        if(mListener != null && mFolder != null) {
+            mListener.onFolderNameChanged(mFolder.getDto().getName());
+        }
     }
 
     /**
@@ -132,6 +145,9 @@ public class EditFolderFragment extends Fragment {
                         transactionContext.updateFolderData(mFolder);
                     }
                 });
+                if(mListener != null) {
+                    mListener.onFolderNameChanged(mFolder.getDto().getName());
+                }
                 notifyDataChanged();
             }
         });
@@ -174,6 +190,9 @@ public class EditFolderFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, loadEntries()));
         if(mFolder != null) {
             mFolderNameEditText.setText(mFolder.getDto().getName());
+            if(mListener != null) {
+                mListener.onFolderNameChanged(mFolder.getDto().getName());
+            }
         }
     }
 

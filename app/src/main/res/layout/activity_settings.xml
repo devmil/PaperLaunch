@@ -6,13 +6,18 @@
     android:id="@+id/activity_settings_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.devmil.paperlaunch.SettingsActivity">
+
+    <include
+        android:id="@+id/activity_settings_toolbar"
+        layout="@layout/toolbar"
+        />
 
     <LinearLayout
         android:id="@+id/activity_settings_layout_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/activity_settings_toolbar"
         android:orientation="horizontal">
         <Button
             android:id="@+id/activity_settings_buttontest"
