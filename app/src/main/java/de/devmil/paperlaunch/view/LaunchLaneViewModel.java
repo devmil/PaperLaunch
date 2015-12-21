@@ -81,6 +81,14 @@ public class LaunchLaneViewModel {
         return mConfig.getSelectingAnimationDurationMS();
     }
 
+    public float getLaneIconTopMarginDip() {
+        return mConfig.getLaneIconTopMarginDip();
+    }
+
+    public float getLaneTextTopMarginDip() {
+        return mConfig.getLaneTextTopMarginDip();
+    }
+
     public float getItemNameTextSizeSP() {
         return mConfig.getItemNameTextSizeSP();
     }

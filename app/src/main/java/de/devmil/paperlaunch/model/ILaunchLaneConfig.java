@@ -24,4 +24,6 @@ public interface ILaunchLaneConfig {
     IDesignConfig getDesignConfig();
     int getSelectingAnimationDurationMS();
     float getItemNameTextSizeSP();
+    float getLaneIconTopMarginDip();
+    float getLaneTextTopMarginDip();
 }

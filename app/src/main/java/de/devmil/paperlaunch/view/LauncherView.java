@@ -21,8 +21,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -37,12 +40,16 @@ import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.utils.PositionAndSizeEvaluator;
 import de.devmil.paperlaunch.utils.ViewUtils;
+import de.devmil.paperlaunch.view.utils.ColorUtils;
+import de.devmil.paperlaunch.view.widgets.VerticalTextView;
 
 public class LauncherView extends RelativeLayout {
     private LauncherViewModel mViewModel;
     private List<LaunchLaneView> mLaneViews = new ArrayList<>();
     private LinearLayout mNeutralZone;
     private LinearLayout mNeutralZoneBackground;
+    private ImageView mNeutralZoneBackgroundImage;
+    private VerticalTextView mNeutralZoneBackgroundAppNameText;
     private ILauncherViewListener mListener;
     private MotionEvent mAutoStartMotionEvent;
 
@@ -253,12 +260,50 @@ public class LauncherView extends RelativeLayout {
         mNeutralZoneBackground.setBackgroundColor(mViewModel.getDesignConfig().getFrameDefaultColor());
         mNeutralZoneBackground.setElevation(ViewUtils.getPxFromDip(getContext(), mViewModel.getHighElevationDip()));
         mNeutralZoneBackground.setClickable(false);
+        mNeutralZoneBackground.setOrientation(LinearLayout.VERTICAL);
+        mNeutralZoneBackground.setGravity(Gravity.CENTER_HORIZONTAL);
 
         LinearLayout.LayoutParams backParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT
         );
         mNeutralZone.addView(mNeutralZoneBackground, backParams);
+
+        mNeutralZoneBackgroundImage = new ImageView(getContext());
+        mNeutralZoneBackgroundImage.setImageResource(R.mipmap.ic_launcher);
+        mNeutralZoneBackgroundImage.setClickable(false);
+        mNeutralZoneBackgroundImage.setVisibility(View.GONE);
+
+        LinearLayout.LayoutParams backImageParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        backImageParams.setMargins(0, (int) ViewUtils.getPxFromDip(getContext(), mViewModel.getLaneConfig().getLaneIconTopMarginDip()), 0, 0);
+        mNeutralZoneBackground.addView(mNeutralZoneBackgroundImage, backImageParams);
+
+        mNeutralZoneBackground.setBackgroundColor(
+                ColorUtils.getBackgroundColorFromImage(
+                        getResources().getDrawable(
+                                R.mipmap.ic_launcher,
+                                getContext().getTheme()
+                        ),
+                        mViewModel.getFrameDefaultColor()));
+
+        mNeutralZoneBackgroundAppNameText = new VerticalTextView(getContext());
+        mNeutralZoneBackgroundAppNameText.setVisibility(View.GONE);
+        mNeutralZoneBackgroundAppNameText.setTextSize(TypedValue.COMPLEX_UNIT_SP, mViewModel.getItemNameTextSizeSP());
+        //this is needed because the parts in the system run with another theme than the application parts
+        mNeutralZoneBackgroundAppNameText.setTextColor(getResources().getColor(R.color.name_label));
+        mNeutralZoneBackgroundAppNameText.setText(R.string.app_name);
+        mNeutralZoneBackgroundAppNameText.setVisibility(View.GONE);
+
+        LinearLayout.LayoutParams backTextParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        backTextParams.setMargins(0, (int) ViewUtils.getPxFromDip(getContext(), mViewModel.getLaneConfig().getLaneTextTopMarginDip()), 0, 0);
+
+        mNeutralZoneBackground.addView(mNeutralZoneBackgroundAppNameText, backTextParams);
     }
 
     private boolean sendIfMatches(LaunchLaneView laneView, int action, float x, float y, int laneNumber)
@@ -381,6 +426,24 @@ public class LauncherView extends RelativeLayout {
             });
             anim.setDuration(mViewModel.getLauncherInitAnimationDurationMS());
             anim.start();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(mViewModel.getLauncherInitAnimationDurationMS() / 2);
+                        mNeutralZoneBackgroundImage.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mNeutralZoneBackgroundImage.setVisibility(View.VISIBLE);
+                                mNeutralZoneBackgroundAppNameText.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }).start();
+
         } catch (InvalidClassException e) {
             e.printStackTrace();
         }

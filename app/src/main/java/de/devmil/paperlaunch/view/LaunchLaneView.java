@@ -41,6 +41,7 @@ import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.utils.BitmapUtils;
 import de.devmil.paperlaunch.utils.PositionAndSizeEvaluator;
 import de.devmil.paperlaunch.utils.ViewUtils;
+import de.devmil.paperlaunch.view.utils.ColorUtils;
 import de.devmil.paperlaunch.view.widgets.VerticalTextView;
 
 public class LaunchLaneView extends RelativeLayout {
@@ -218,7 +219,7 @@ public class LaunchLaneView extends RelativeLayout {
         LinearLayout.LayoutParams selectIconParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
-        selectIconParams.setMargins(0, (int)ViewUtils.getPxFromDip(getContext(), 5), 0, 0);
+        selectIconParams.setMargins(0, (int)ViewUtils.getPxFromDip(getContext(), mViewModel.getLaneIconTopMarginDip()), 0, 0);
 
         mSelectIndicator.addView(mSelectedIcon, selectIconParams);
 
@@ -231,7 +232,7 @@ public class LaunchLaneView extends RelativeLayout {
         LinearLayout.LayoutParams selectedItemTextViewParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
-        selectedItemTextViewParams.setMargins(0, (int)ViewUtils.getPxFromDip(getContext(), 20), 0, 0);
+        selectedItemTextViewParams.setMargins(0, (int)ViewUtils.getPxFromDip(getContext(), mViewModel.getLaneTextTopMarginDip()), 0, 0);
         mSelectIndicator.addView(mSelectedItemTextView, selectedItemTextViewParams);
     }
 
@@ -383,11 +384,13 @@ public class LaunchLaneView extends RelativeLayout {
 
         BitmapUtils.BitmapResult bmpResult = BitmapUtils.drawableToBitmap(drawable);
         if(bmpResult != null && bmpResult.getBitmap() != null) {
-            Palette p = Palette.from(bmpResult.getBitmap()).generate();
-
-            mSelectIndicator.setBackgroundColor(getColorFromPalette(p, mViewModel.getFrameDefaultColor()));
+            mSelectIndicator.setBackgroundColor(
+                    ColorUtils.getBackgroundColorFromImage(
+                            bmpResult.getBitmap(),
+                            mViewModel.getFrameDefaultColor()));
         } else {
-            mSelectIndicator.setBackgroundColor(mViewModel.getFrameDefaultColor());
+            mSelectIndicator.setBackgroundColor(
+                    mViewModel.getFrameDefaultColor());
         }
 
         if(bmpResult != null && bmpResult.isNew()) {
@@ -440,23 +443,6 @@ public class LaunchLaneView extends RelativeLayout {
         } catch(Exception e) {
         }
         mSelectIndicator.setVisibility(View.VISIBLE);
-    }
-
-    private int getColorFromPalette(Palette palette, int defaultColor) {
-        int result = palette.getLightMutedColor(Color.BLACK);
-        if(result == Color.BLACK) {
-            result = palette.getLightVibrantColor(Color.BLACK);
-        }
-        if(result == Color.BLACK) {
-            result = palette.getMutedColor(Color.BLACK);
-        }
-        if(result == Color.BLACK) {
-            result = palette.getVibrantColor(Color.BLACK);
-        }
-        if(result == Color.BLACK) {
-            result = defaultColor;
-        }
-        return result;
     }
 
     private void hideSelectionIndicator()

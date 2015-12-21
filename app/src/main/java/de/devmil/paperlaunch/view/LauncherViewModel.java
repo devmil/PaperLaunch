@@ -71,6 +71,14 @@ public class LauncherViewModel {
         return mConfig.getLauncherInitAnimationDurationMS();
     }
 
+    public int getFrameDefaultColor() {
+        return mConfig.getDesignConfig().getFrameDefaultColor();
+    }
+
+    public float getItemNameTextSizeSP() {
+        return mConfig.getItemNameTextSizeSP();
+    }
+
     public State getState() {
         return mState;
     }

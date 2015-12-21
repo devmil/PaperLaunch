@@ -165,9 +165,6 @@ public class LauncherOverlayService extends Service {
                 }
             });
 
-            mLauncherView.requestLayout();
-
-            mLauncherView.start();
         } else {
             transferMotionEvent(touchReceiver, mLauncherView, event);
         }

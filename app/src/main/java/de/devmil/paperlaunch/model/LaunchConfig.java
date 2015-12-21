@@ -33,6 +33,8 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private float mNeutralZoneWidthDip = 50;
     private int mLauncherInitAnimationDurationMS = 150;
     private float mImageOffsetDip = 5;
+    private float mLaneIconTopMarginDip = 5;
+    private float mLaneTextTopMarginDip = 20;
 
     public List<IEntry> getEntries()
     {
@@ -108,4 +110,13 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     {
         return mImageOffsetDip;
     }
+
+    public float getLaneIconTopMarginDip() {
+        return mLaneIconTopMarginDip;
+    }
+
+    public float getLaneTextTopMarginDip() {
+        return mLaneTextTopMarginDip;
+    }
+
 }
