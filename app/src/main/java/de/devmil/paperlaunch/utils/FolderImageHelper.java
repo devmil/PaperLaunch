@@ -3,6 +3,7 @@ package de.devmil.paperlaunch.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 
 import java.util.List;
 
+import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.model.IEntry;
 
 public class FolderImageHelper {
@@ -19,32 +21,53 @@ public class FolderImageHelper {
 
         FrameLayout imgLayout = new FrameLayout(context);
 
+        int cols = 3;
+        int rows = 2;
+
         int sizePx = (int)ViewUtils.getPxFromDip(context, imgSizeDip);
-        int entryImgSizePx = sizePx / 2;
 
-        int marginOffset = entryImgSizePx / 3;
-        int currentMargin = 0;
+        int offsetTopPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 4);
+        int offsetBottomPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 4);
+        int offsetLeftPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 8);
 
-        for(IEntry entry : entries) {
+        Rect contentRect = new Rect(offsetLeftPx, offsetTopPx, sizePx - 2*offsetLeftPx, offsetBottomPx);
 
-            if(currentMargin > sizePx) {
-                continue;
+        Rect cellRect = new Rect(0, 0, contentRect.width() / cols, contentRect.width() / rows);
+
+        imgLayout.setBackgroundResource(R.mipmap.folder_frame);
+
+        int idx = 0;
+
+        for(int r=0; r<rows; r++) {
+            if(entries.size() <= idx) {
+                break;
             }
+            for(int c=0; c<cols; c++) {
+                if(entries.size() <= idx) {
+                    break;
+                }
 
-            Drawable img = entry.getFolderSummaryIcon(context);
-            ImageView entryImageView = new ImageView(context);
-            entryImageView.setImageDrawable(img);
-            entryImageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                IEntry entry = entries.get(idx);
 
-            entryImageView.setMaxHeight(entryImgSizePx);
-            entryImageView.setMaxWidth(entryImgSizePx);
+                Drawable img = entry.getFolderSummaryIcon(context);
+                ImageView entryImageView = new ImageView(context);
+                entryImageView.setImageDrawable(img);
+                entryImageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(entryImgSizePx, entryImgSizePx);
-            params.setMargins(currentMargin, currentMargin, 0, 0);
+                entryImageView.setMaxHeight(cellRect.height());
+                entryImageView.setMaxWidth(cellRect.width());
 
-            imgLayout.addView(entryImageView, params);
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(cellRect.width(), cellRect.height());
+                params.setMargins(
+                        contentRect.left + c * cellRect.width(),
+                        contentRect.top + r * cellRect.height(),
+                        0,
+                        0);
 
-            currentMargin += marginOffset;
+                imgLayout.addView(entryImageView, params);
+
+                idx++;
+            }
         }
 
         imgLayout.measure(
