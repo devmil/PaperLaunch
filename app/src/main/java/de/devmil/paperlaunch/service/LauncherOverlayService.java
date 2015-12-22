@@ -3,8 +3,10 @@ package de.devmil.paperlaunch.service;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -41,6 +43,26 @@ public class LauncherOverlayService extends Service {
     private LaunchConfig mCurrentConfig;
 
     public LauncherOverlayService() {
+    }
+
+    class ScreenOnOffReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                finishLauncher();
+            }
+        }
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        BroadcastReceiver mReceiver = new ScreenOnOffReceiver();
+        registerReceiver(mReceiver, filter);
     }
 
     @Override
@@ -82,7 +104,7 @@ public class LauncherOverlayService extends Service {
         ensureData(false);
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                (int)ViewUtils.getPxFromDip(this, 5),
+                (int)ViewUtils.getPxFromDip(this, 10),
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
@@ -100,6 +122,15 @@ public class LauncherOverlayService extends Service {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 return handleTouch(touchReceiver, event);
+            }
+        });
+
+        touchReceiver.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus) {
+                    finishLauncher();
+                }
             }
         });
 
@@ -157,11 +188,7 @@ public class LauncherOverlayService extends Service {
             mLauncherView.setListener(new LauncherView.ILauncherViewListener() {
                 @Override
                 public void onFinished() {
-                    if (mLauncherView != null) {
-                        wm.removeView(mLauncherView);
-                        mLauncherView = null;
-                    }
-                    mIsLauncherActive = false;
+                    finishLauncher();
                 }
             });
 
@@ -170,6 +197,15 @@ public class LauncherOverlayService extends Service {
         }
 
         return true;
+    }
+
+    void finishLauncher() {
+        final WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        if (mLauncherView != null) {
+            wm.removeView(mLauncherView);
+            mLauncherView = null;
+        }
+        mIsLauncherActive = false;
     }
 
     private void transferMotionEvent(View from, LauncherView to, MotionEvent event) {
