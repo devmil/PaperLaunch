@@ -3,6 +3,8 @@ package de.devmil.paperlaunch.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.View;
@@ -27,12 +29,13 @@ public class FolderImageHelper {
         int sizePx = (int)ViewUtils.getPxFromDip(context, imgSizeDip);
 
         int offsetTopPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 4);
-        int offsetBottomPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 4);
+        int offsetBottomPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 4.2f);
         int offsetLeftPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 8);
+        int offsetRightPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 8);
 
-        Rect contentRect = new Rect(offsetLeftPx, offsetTopPx, sizePx - 2*offsetLeftPx, offsetBottomPx);
+        Rect contentRect = new Rect(offsetLeftPx, offsetTopPx, sizePx - offsetRightPx, sizePx - offsetBottomPx);
 
-        Rect cellRect = new Rect(0, 0, contentRect.width() / cols, contentRect.width() / rows);
+        Rect cellRect = new Rect(0, 0, contentRect.width() / cols, contentRect.height() / rows);
 
         imgLayout.setBackgroundResource(R.mipmap.folder_frame);
 
@@ -55,7 +58,9 @@ public class FolderImageHelper {
                 entryImageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
                 entryImageView.setMaxHeight(cellRect.height());
+                entryImageView.setMinimumHeight(cellRect.height());
                 entryImageView.setMaxWidth(cellRect.width());
+                entryImageView.setMinimumWidth(cellRect.width());
 
                 FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(cellRect.width(), cellRect.height());
                 params.setMargins(
