@@ -20,4 +20,9 @@
     <string name="fragment_edit_folder_new_folder_name">New Folder</string>
 
     <string name="launcher_virtual_folder_name">more...</string>
+
+    <string name="notification_pause">Pause</string>
+    <string name="notification_play">Start</string>
+    <string name="notification_content_active">PaperLaunch running</string>
+    <string name="notification_content_inactive">PaperLaunch paused</string>
 </resources>

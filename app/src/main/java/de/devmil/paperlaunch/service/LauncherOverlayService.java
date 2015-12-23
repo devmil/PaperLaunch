@@ -12,13 +12,10 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
@@ -34,15 +31,18 @@ import de.devmil.paperlaunch.model.VirtualFolder;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
 import de.devmil.paperlaunch.storage.ITransactionAction;
 import de.devmil.paperlaunch.storage.ITransactionContext;
+import de.devmil.paperlaunch.storage.UserSettings;
 import de.devmil.paperlaunch.utils.ViewUtils;
 import de.devmil.paperlaunch.view.LauncherView;
 
 public class LauncherOverlayService extends Service {
     private static final String ACTION_LAUNCH = "ACTION_LAUNCH";
     private static final String ACTION_NOTIFYDATACHANGED = "ACTION_NOTIFYDATACHANGED";
+    private static final String ACTION_PAUSE = "ACTION_PAUSE";
+    private static final String ACTION_PLAY = "ACTION_PLAY";
     private static final int NOTIFICATION_ID = 2000;
 
-    private boolean mNotificationShown = false;
+    private Notification mNotification = null;
     private boolean mAlreadyRegistered = false;
     private LinearLayout mTouchReceiver = null;
     private LauncherView mLauncherView = null;
@@ -148,12 +148,32 @@ public class LauncherOverlayService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent != null && ACTION_LAUNCH.equals(intent.getAction())) {
-            ensureOverlayActive();
-            ensureNotification();
+            UserSettings us = new UserSettings(this);
+            if(us.getIsActive()) {
+                ensureOverlayActive();
+                ensureNotification(true);
+            }
         }
-        if(intent != null && ACTION_NOTIFYDATACHANGED.equals(intent.getAction())) {
+        else if(intent != null && ACTION_NOTIFYDATACHANGED.equals(intent.getAction())) {
             ensureData(true);
-            reloadTouchReceiver();
+            UserSettings us = new UserSettings(this);
+            if(us.getIsActive()) {
+                reloadTouchReceiver();
+            }
+        }
+        else if(intent != null && ACTION_PAUSE.equals(intent.getAction())) {
+            ensureOverlayInActive();
+            UserSettings us = new UserSettings(this);
+            us.setIsActive(false);
+            us.save(this);
+            ensureNotification(true);
+        }
+        else if(intent != null && ACTION_PLAY.equals(intent.getAction())) {
+            ensureOverlayActive();
+            UserSettings us = new UserSettings(this);
+            us.setIsActive(true);
+            us.save(this);
+            ensureNotification(true);
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -182,6 +202,11 @@ public class LauncherOverlayService extends Service {
         reloadTouchReceiver();
 
         ensureData(false);
+    }
+
+    private void ensureOverlayInActive() {
+        finishLauncher();
+        removeTouchReceiver();
     }
 
     private void ensureConfig(boolean forceReload) {
@@ -297,6 +322,16 @@ public class LauncherOverlayService extends Service {
         return true;
     }
 
+    private synchronized void removeTouchReceiver() {
+        WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+
+        if(mTouchReceiver != null) {
+            wm.removeView(mTouchReceiver);
+            mTouchReceiver = null;
+            mAlreadyRegistered = false;
+        }
+    }
+
     private synchronized void reloadTouchReceiver() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 (int)ViewUtils.getPxFromDip(this, 10),
@@ -310,11 +345,7 @@ public class LauncherOverlayService extends Service {
 
         WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
 
-        if(mTouchReceiver != null) {
-            wm.removeView(mTouchReceiver);
-            mTouchReceiver = null;
-            mAlreadyRegistered = false;
-        }
+        removeTouchReceiver();
 
         mTouchReceiver = new LinearLayout(this);
         mTouchReceiver.setBackgroundColor(Color.TRANSPARENT);
@@ -369,7 +400,11 @@ public class LauncherOverlayService extends Service {
     }
 
     private void ensureNotification() {
-        if(mNotificationShown) {
+        ensureNotification(false);
+    }
+
+    private void ensureNotification(boolean force) {
+        if(!force && mNotification != null) {
             return;
         }
         PendingIntent settingsPendingIntent = PendingIntent.getActivity(
@@ -378,23 +413,55 @@ public class LauncherOverlayService extends Service {
                 new Intent(this, SettingsActivity.class),
                 0
         );
+        UserSettings settings = new UserSettings(this);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle("PaperLaunch")
-                .setContentText("PaperLaunch running")
+                .setContentText(getString(settings.getIsActive() ? R.string.notification_content_active : R.string.notification_content_inactive))
                 .setOngoing(true)
                 .setLocalOnly(true)
-                .setSmallIcon(R.drawable.empty)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setPriority(Notification.PRIORITY_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setContentIntent(settingsPendingIntent)
         ;
 
-        Notification notification = builder.build();
+        if(settings.getIsActive()) {
+            Intent pauseIntent = new Intent(ACTION_PAUSE);
+            pauseIntent.setClass(this, LauncherOverlayService.class);
+            PendingIntent pendingPauseIntent = PendingIntent.getService(
+                    this,
+                    0,
+                    pauseIntent,
+                    0);
+            builder.addAction(new NotificationCompat.Action(
+                R.mipmap.ic_pause_black_24dp,
+                getString(R.string.notification_pause),
+                pendingPauseIntent
+            ));
+        } else {
+            Intent playIntent = new Intent(ACTION_PLAY);
+            playIntent.setClass(this, LauncherOverlayService.class);
+            PendingIntent pendingPlayIntent = PendingIntent.getService(
+                    this,
+                    0,
+                    playIntent,
+                    0);
+            builder.addAction(new NotificationCompat.Action(
+                    R.mipmap.ic_play_arrow_black_24dp,
+                    getString(R.string.notification_play),
+                    pendingPlayIntent
+            ));
+        }
 
-        startForeground(NOTIFICATION_ID, notification);
+        Notification n = builder.build();
+        if(mNotification != null) {
+            n.when = mNotification.when;
+        }
+        mNotification = n;
 
-        mNotificationShown = true;
+        startForeground(NOTIFICATION_ID, n);
 
     }
 }
