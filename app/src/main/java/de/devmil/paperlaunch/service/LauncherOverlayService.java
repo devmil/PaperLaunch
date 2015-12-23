@@ -89,6 +89,7 @@ public class LauncherOverlayService extends Service {
                 if(mLastConfiguration != newOrientation) {
                     mLastConfiguration = newOrientation;
                     finishLauncher();
+                    ensureData(true);
                 }
             }
         }
