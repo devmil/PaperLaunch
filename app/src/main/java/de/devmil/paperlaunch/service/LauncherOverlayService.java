@@ -13,6 +13,7 @@ import android.graphics.Rect;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -43,6 +44,10 @@ public class LauncherOverlayService extends Service {
     private boolean mIsLauncherActive = false;
     private LaunchConfig mCurrentConfig;
 
+    //receivers
+    private ScreenOnOffReceiver mScreenOnOffReceiver;
+    private OrientationChangeReceiver mOrientationChangeReceiver;
+
     public LauncherOverlayService() {
     }
 
@@ -50,8 +55,35 @@ public class LauncherOverlayService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            if(intent == null) {
+                return;
+            }
             if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
                 finishLauncher();
+            }
+        }
+    }
+
+    class OrientationChangeReceiver extends BroadcastReceiver {
+
+        private int mLastConfiguration;
+
+        public OrientationChangeReceiver(Context context) {
+            super();
+            mLastConfiguration = context.getResources().getConfiguration().orientation;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent == null) {
+                return;
+            }
+            if(intent.getAction().equals(Intent.ACTION_CONFIGURATION_CHANGED)) {
+                int newOrientation = context.getResources().getConfiguration().orientation;
+                if(mLastConfiguration != newOrientation) {
+                    mLastConfiguration = newOrientation;
+                    finishLauncher();
+                }
             }
         }
     }
@@ -60,10 +92,45 @@ public class LauncherOverlayService extends Service {
     public void onCreate() {
         super.onCreate();
 
+        registerScreenOnReceiver();
+        registerOrientationChangeReceiver();
+    }
+
+    private void registerOrientationChangeReceiver() {
+        unregisterOrientationChangeReceiver();
+        IntentFilter filter = new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED);
+
+        mOrientationChangeReceiver = new OrientationChangeReceiver(this);
+        registerReceiver(mOrientationChangeReceiver, filter);
+    }
+
+    private void unregisterOrientationChangeReceiver() {
+        if(mOrientationChangeReceiver != null) {
+            unregisterReceiver(mOrientationChangeReceiver);
+            mOrientationChangeReceiver = null;
+        }
+    }
+
+    private void registerScreenOnReceiver() {
+        unregisterScreenOnOffReceiver();
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
-        BroadcastReceiver mReceiver = new ScreenOnOffReceiver();
-        registerReceiver(mReceiver, filter);
+        mScreenOnOffReceiver = new ScreenOnOffReceiver();
+        registerReceiver(mScreenOnOffReceiver, filter);
+    }
+
+    private void unregisterScreenOnOffReceiver() {
+        if(mScreenOnOffReceiver != null) {
+            unregisterReceiver(mScreenOnOffReceiver);
+            mScreenOnOffReceiver = null;
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        unregisterScreenOnOffReceiver();
+        unregisterOrientationChangeReceiver();
+        super.onDestroy();
     }
 
     @Override
@@ -217,7 +284,11 @@ public class LauncherOverlayService extends Service {
     private synchronized void finishLauncher() {
         final WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         if (mLauncherView != null) {
-            wm.removeView(mLauncherView);
+            try {
+                wm.removeView(mLauncherView);
+            }
+            catch(Exception e) {
+            }
             mLauncherView = null;
         }
         mIsLauncherActive = false;
