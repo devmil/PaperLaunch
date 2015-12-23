@@ -41,21 +41,22 @@ public abstract class AppMetadataUtils {
         if(appInfo == null) {
             return null;
         } else {
-            StringBuilder result = new StringBuilder();
-
             CharSequence appName = pm.getApplicationLabel(appInfo);
-            if(appName != null) {
-                result.append(appName);
-            }
+            CharSequence activityName = null;
 
             if(activityInfo != null) {
-                CharSequence activityName = activityInfo.loadLabel(pm);
-                if(activityName != null && !activityName.equals(appName)) {
-                    result.append(" - ").append(activityName);
-                }
+                activityName = activityInfo.loadLabel(pm);
             }
 
-            return result.toString();
+            if(activityName != null) {
+                return activityName.toString();
+            }
+
+            if(appName != null) {
+                appName.toString();
+            }
+
+            return null;
         }
     }
 
