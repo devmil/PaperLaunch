@@ -93,6 +93,11 @@ public class Launch implements IEntry {
         return false;
     }
 
+    @Override
+    public boolean useIconColor() {
+        return false;
+    }
+
     public Intent getLaunchIntent()
     {
         return mDto.getLaunchIntent();

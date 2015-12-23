@@ -36,6 +36,7 @@ import java.util.List;
 import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.model.Folder;
 import de.devmil.paperlaunch.model.IEntry;
+import de.devmil.paperlaunch.model.IFolder;
 import de.devmil.paperlaunch.model.LaunchConfig;
 import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.utils.PositionAndSizeEvaluator;
@@ -202,7 +203,7 @@ public class LauncherView extends RelativeLayout {
                     return;
                 }
                 if (selectedItem.isFolder()) {
-                    Folder f = (Folder) selectedItem;
+                    IFolder f = (IFolder) selectedItem;
                     LaunchLaneView nextLaneView = mLaneViews.get(laneIndex + 1);
                     setEntriesToLane(nextLaneView, f.getSubEntries());
                     nextLaneView.start();

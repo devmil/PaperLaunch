@@ -10,7 +10,7 @@ import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.storage.EntryDTO;
 import de.devmil.paperlaunch.storage.FolderDTO;
 
-public class Folder implements IEntry {
+public class Folder implements IFolder {
     private FolderDTO mDto;
     private EntryDTO mEntryDto;
     private List<IEntry> mSubEntries;
@@ -55,9 +55,17 @@ public class Folder implements IEntry {
     public Drawable getIcon(Context context) {
         return mDto.getIcon();
     }
+    @Override
+    public boolean useIconColor() {
+        return true;
+    }
 
     public List<IEntry> getSubEntries() {
         return mSubEntries;
+    }
+
+    public void setSubEntries(List<IEntry> entries) {
+        mSubEntries = entries;
     }
 
     public FolderDTO getDto() {

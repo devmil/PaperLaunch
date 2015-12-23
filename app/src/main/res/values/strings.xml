@@ -18,4 +18,6 @@
 
     <string name="fragment_edit_folder_name">Name:</string>
     <string name="fragment_edit_folder_new_folder_name">New Folder</string>
+
+    <string name="launcher_virtual_folder_name">more...</string>
 </resources>

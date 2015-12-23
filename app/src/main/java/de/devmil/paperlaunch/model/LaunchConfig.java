@@ -21,6 +21,8 @@ import java.util.List;
 public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private List<IEntry> mEntries;
     private float mImageWidthDip = 48;
+    private float mImageMarginDip = 1;
+    private float mEntriesMarginDip = 3;
     private float mLowerElevationDip = 2;
     private float mHighElevationDip = 6;
     private int mEntryMoveAnimationDuration = 100;
@@ -53,6 +55,14 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     public float getImageWidthDip()
     {
         return mImageWidthDip;
+    }
+
+    public float getImageMarginDip() {
+        return mImageMarginDip;
+    }
+
+    public float getEntriesMarginDip() {
+        return mEntriesMarginDip;
     }
 
     public float getLowElevationDip()

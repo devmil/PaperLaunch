@@ -19,6 +19,8 @@ public interface ILaunchEntryConfig {
     int getEntryMoveAnimationDuration();
     int getEntryAlphaAnimationDuration();
     float getImageWidthDip();
+    float getImageMarginDip();
+    float getEntriesMarginDip();
     float getLowElevationDip();
     float getHighElevationDip();
     IDesignConfig getDesignConfig();

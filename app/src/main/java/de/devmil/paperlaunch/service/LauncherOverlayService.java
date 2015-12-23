@@ -13,19 +13,24 @@ import android.graphics.Rect;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.SettingsActivity;
 import de.devmil.paperlaunch.model.IEntry;
+import de.devmil.paperlaunch.model.IFolder;
 import de.devmil.paperlaunch.model.LaunchConfig;
+import de.devmil.paperlaunch.model.VirtualFolder;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
 import de.devmil.paperlaunch.storage.ITransactionAction;
 import de.devmil.paperlaunch.storage.ITransactionContext;
@@ -43,6 +48,7 @@ public class LauncherOverlayService extends Service {
     private LauncherView mLauncherView = null;
     private boolean mIsLauncherActive = false;
     private LaunchConfig mCurrentConfig;
+    private boolean mEntriesLoaded = false;
 
     //receivers
     private ScreenOnOffReceiver mScreenOnOffReceiver;
@@ -170,25 +176,80 @@ public class LauncherOverlayService extends Service {
             return;
         }
 
-        ensureData(false);
+        ensureConfig(false);
 
         reloadTouchReceiver();
+
+        ensureData(false);
     }
 
-    private void ensureData(boolean forceReload) {
+    private void ensureConfig(boolean forceReload) {
         if(forceReload) {
             mCurrentConfig = null;
         }
         if(mCurrentConfig == null) {
             mCurrentConfig = new LaunchConfig();
+        }
+    }
+
+    private void ensureData(boolean forceReload) {
+        ensureConfig(forceReload);
+        if(forceReload) {
+            mEntriesLoaded = false;
+        }
+        if(!mEntriesLoaded) {
+            class Local {
+                List<IEntry> entries = null;
+            }
+            final Local local = new Local();
             EntriesDataSource.getInstance().accessData(this, new ITransactionAction() {
                 @Override
                 public void execute(ITransactionContext transactionContext) {
-                    List<IEntry> entries = transactionContext.loadRootContent();
-                    mCurrentConfig.setEntries(entries);
+                    local.entries = transactionContext.loadRootContent();
                 }
             });
+
+            mCurrentConfig.setEntries(prepareEntries(local.entries));
+            mEntriesLoaded = true;
         }
+    }
+
+    private List<IEntry> prepareEntries(List<IEntry> entries) {
+
+        final WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(metrics);
+
+        float entryHeightDip = mCurrentConfig.getImageWidthDip()
+                + 2 * mCurrentConfig.getImageMarginDip()
+                + 2 * mCurrentConfig.getEntriesMarginDip();
+
+        int entryHeightPx = (int)ViewUtils.getPxFromDip(this, entryHeightDip);
+
+        int numberOfEntriesPossible = metrics.heightPixels / entryHeightPx;
+
+        if(entries.size() > numberOfEntriesPossible) {
+            List<IEntry> virtualFolderContent = new ArrayList<>();
+            while(entries.size() >= numberOfEntriesPossible) {
+                virtualFolderContent.add(entries.get(numberOfEntriesPossible - 1));
+                entries.remove(numberOfEntriesPossible - 1);
+            }
+            VirtualFolder vf = new VirtualFolder(
+                    getString(R.string.launcher_virtual_folder_name),
+                    getDrawable(R.mipmap.ic_auto_folder_grey),
+                    virtualFolderContent);
+            entries.add(vf);
+        }
+
+        for(IEntry entry : entries) {
+            if(entry.isFolder()) {
+                IFolder folder = (IFolder)entry;
+                folder.setSubEntries(prepareEntries(folder.getSubEntries()));
+            }
+        }
+
+        return entries;
     }
 
     private LauncherView createLauncherView(MotionEvent event) {
@@ -260,9 +321,6 @@ public class LauncherOverlayService extends Service {
         mTouchReceiver.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(v != mTouchReceiver) {
-                    return false;
-                }
                 return handleTouch(mTouchReceiver, event);
             }
         });

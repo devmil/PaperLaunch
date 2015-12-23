@@ -13,4 +13,5 @@ public interface IEntry {
     Drawable getIcon(Context context);
     Drawable getFolderSummaryIcon(Context context);
     boolean isFolder();
+    boolean useIconColor();
 }

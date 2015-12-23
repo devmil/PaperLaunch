@@ -53,8 +53,6 @@ public class LaunchEntryView extends LinearLayout {
     {
         mViewModel = viewModel;
 
-        mImgFrame.setBackgroundColor(mViewModel.getFrameDefaultColor());
-
         adaptModelState();
     }
 
@@ -84,14 +82,6 @@ public class LaunchEntryView extends LinearLayout {
     private void construct()
     {
         ViewUtils.disableClipping(this);
-
-        mImgFrame = new LinearLayout(getContext());
-        LayoutParams imgFrameParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        int marginsFramePx = (int)ViewUtils.getPxFromDip(getContext(), 3);
-        imgFrameParams.setMargins(marginsFramePx, marginsFramePx, marginsFramePx, marginsFramePx);
-
-        addView(mImgFrame, imgFrameParams);
-        ViewUtils.disableClipping(mImgFrame);
     }
 
     private void adaptModelState()
@@ -103,6 +93,16 @@ public class LaunchEntryView extends LinearLayout {
 
     private void applyParameters()
     {
+        removeAllViews();
+        mImgFrame = new LinearLayout(getContext());
+        mImgFrame.setBackgroundColor(mViewModel.getFrameDefaultColor());
+        LayoutParams imgFrameParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        int marginsFramePx = (int)ViewUtils.getPxFromDip(getContext(), mViewModel.getEntriesMarginDip());
+        imgFrameParams.setMargins(marginsFramePx, marginsFramePx, marginsFramePx, marginsFramePx);
+
+        addView(mImgFrame, imgFrameParams);
+        ViewUtils.disableClipping(mImgFrame);
+
         mImgFrame.removeAllViews();
         mAppIcon = new ImageView(getContext());
         mAppIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
@@ -110,7 +110,7 @@ public class LaunchEntryView extends LinearLayout {
         int imgHeight = (int) ViewUtils.getPxFromDip(getContext(), mViewModel.getImageWidthDip());
 
         LayoutParams imgParams = new LayoutParams(imgWidth, imgHeight);
-        int marginsImgPx = (int)ViewUtils.getPxFromDip(getContext(), 1);
+        int marginsImgPx = (int)ViewUtils.getPxFromDip(getContext(), mViewModel.getImageMarginDip());
         imgParams.setMargins(marginsImgPx, marginsImgPx, marginsImgPx, marginsImgPx);
 
         mImgFrame.addView(mAppIcon, imgParams);

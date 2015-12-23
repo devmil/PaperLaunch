@@ -380,10 +380,14 @@ public class LaunchLaneView extends RelativeLayout {
         Drawable drawable = mFocusedEntryView.getEntry().getIcon(getContext());
         mSelectedIcon.setImageDrawable(drawable);
 
+        boolean useIconColor = mFocusedEntryView.getEntry().useIconColor();
+
         mSelectedItemTextView.setText(mFocusedEntryView.getEntry().getName(getContext()));
 
         BitmapUtils.BitmapResult bmpResult = BitmapUtils.drawableToBitmap(drawable);
-        if(bmpResult != null && bmpResult.getBitmap() != null) {
+        if(useIconColor
+                && bmpResult != null
+                && bmpResult.getBitmap() != null) {
             mSelectIndicator.setBackgroundColor(
                     ColorUtils.getBackgroundColorFromImage(
                             bmpResult.getBitmap(),

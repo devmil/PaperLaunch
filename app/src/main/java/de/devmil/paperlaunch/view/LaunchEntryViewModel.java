@@ -57,6 +57,14 @@ public class LaunchEntryViewModel {
         return mConfig.getImageWidthDip();
     }
 
+    public float getImageMarginDip() {
+        return mConfig.getImageMarginDip();
+    }
+
+    public float getEntriesMarginDip() {
+        return mConfig.getEntriesMarginDip();
+    }
+
     public float getImageElevationDip()
     {
         return mConfig.getLowElevationDip();
