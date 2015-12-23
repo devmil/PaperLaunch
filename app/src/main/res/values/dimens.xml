@@ -3,4 +3,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="entries_list_padding_top">10dp</dimen>
+    <dimen name="entries_list_padding_bottom">60dp</dimen>
+    <dimen name="fab_margin_bottom">5dp</dimen>
 </resources>

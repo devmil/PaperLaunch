@@ -40,6 +40,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/fragment_edit_folder_entrieslist"
         android:paddingTop="@dimen/entries_list_padding_top"
+        android:paddingBottom="@dimen/entries_list_padding_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/fragment_edit_folder_editname_layout_container"
@@ -60,8 +61,8 @@
     <LinearLayout
         android:id="@id/fragment_edit_folder_fab_padding"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/activity_vertical_margin"
-        android:minHeight="@dimen/activity_vertical_margin"
+        android:layout_height="@dimen/fab_margin_bottom"
+        android:minHeight="@dimen/fab_margin_bottom"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"></LinearLayout>
