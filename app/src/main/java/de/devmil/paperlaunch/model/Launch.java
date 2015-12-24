@@ -95,7 +95,7 @@ public class Launch implements IEntry {
 
     @Override
     public boolean useIconColor() {
-        return false;
+        return true;
     }
 
     public Intent getLaunchIntent()
