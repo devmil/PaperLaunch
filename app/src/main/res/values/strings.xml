@@ -21,6 +21,6 @@
     <string name="notification_play">Start</string>
     <string name="notification_content_active">PaperLaunch running</string>
     <string name="notification_content_inactive">PaperLaunch paused</string>
-
     <string name="title_activity_settings">Settings</string>
+
 </resources>

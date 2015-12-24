@@ -42,6 +42,9 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private int mLauncherBackgroundColor = Color.BLACK;
     private float mLauncherBackgroundAlpha = 0.3f;
     private int mLauncherBackgroundAnimationDurationMS = 250;
+    private int mLauncherSensitivityDipMin = 5;
+    private int mLauncherSensitivityDipMax = 50;
+    private int mLauncherSensitivityDipDefault = 15;
 
     public List<IEntry> getEntries()
     {
@@ -143,5 +146,17 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
 
     public int getLauncherBackgroundColor() {
         return mLauncherBackgroundColor;
+    }
+
+    public int getLauncherSensitivityDipMin() {
+        return mLauncherSensitivityDipMin;
+    }
+
+    public int getLauncherSensitivityDipMax() {
+        return mLauncherSensitivityDipMax;
+    }
+
+    public int getLauncherSensitivityDipDefault() {
+        return mLauncherSensitivityDipDefault;
     }
 }

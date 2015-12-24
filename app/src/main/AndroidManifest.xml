@@ -21,7 +21,7 @@
         </activity>
         <activity
             android:name=".view.utils.IntentSelector"
-            android:label="Select an Intent"></activity>
+            android:label="Select an Intent" />
         <activity
             android:name=".EditFolderActivity"
             android:label="@string/title_activity_edit_folder" />
@@ -42,7 +42,12 @@
 
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.devmil.paperlaunch.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
