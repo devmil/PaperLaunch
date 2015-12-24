@@ -1,15 +1,15 @@
 package de.devmil.paperlaunch;
 
+import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.widget.Toolbar;
 
 import de.devmil.paperlaunch.view.fragments.EditFolderFragment;
 
-public class EditFolderActivity extends FragmentActivity {
+public class EditFolderActivity extends Activity {
 
     private static final String ARG_FOLDERID = "folderId";
 
@@ -38,11 +38,11 @@ public class EditFolderActivity extends FragmentActivity {
         EditFolderFragment fragment = null;
 
         if(savedInstanceState  == null) {
-            FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+            FragmentTransaction trans = getFragmentManager().beginTransaction();
             trans.add(R.id.activity_edit_folder_folder_fragment, fragment = EditFolderFragment.newInstance(folderId));
             trans.commit();
         } else {
-            fragment = (EditFolderFragment)getSupportFragmentManager().findFragmentById(R.id.activity_edit_folder_folder_fragment);
+            fragment = (EditFolderFragment)getFragmentManager().findFragmentById(R.id.activity_edit_folder_folder_fragment);
         }
 
         if(fragment != null) {

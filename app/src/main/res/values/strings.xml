@@ -3,10 +3,6 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_settings">SettingsActivity</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="folder_settings_add_title">Create...</string>
     <string name="folder_settings_add_app">App</string>
@@ -25,4 +21,6 @@
     <string name="notification_play">Start</string>
     <string name="notification_content_active">PaperLaunch running</string>
     <string name="notification_content_inactive">PaperLaunch paused</string>
+
+    <string name="title_activity_settings">Settings</string>
 </resources>

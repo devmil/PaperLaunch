@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -416,7 +415,7 @@ public class LauncherOverlayService extends Service {
         );
         UserSettings settings = new UserSettings(this);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+        Notification.Builder builder = new Notification.Builder(this)
                 .setContentTitle("PaperLaunch")
                 .setContentText(getString(settings.getIsActive() ? R.string.notification_content_active : R.string.notification_content_inactive))
                 .setOngoing(true)
@@ -436,7 +435,7 @@ public class LauncherOverlayService extends Service {
                     0,
                     pauseIntent,
                     0);
-            builder.addAction(new NotificationCompat.Action(
+            builder.addAction(new Notification.Action(
                 R.mipmap.ic_pause_black_24dp,
                 getString(R.string.notification_pause),
                 pendingPauseIntent
@@ -449,7 +448,7 @@ public class LauncherOverlayService extends Service {
                     0,
                     playIntent,
                     0);
-            builder.addAction(new NotificationCompat.Action(
+            builder.addAction(new Notification.Action(
                     R.mipmap.ic_play_arrow_black_24dp,
                     getString(R.string.notification_play),
                     pendingPlayIntent

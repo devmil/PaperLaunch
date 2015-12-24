@@ -2,6 +2,7 @@ package de.devmil.paperlaunch.view.fragments;
 
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,7 +10,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -119,7 +119,7 @@ public class EditFolderFragment extends Fragment {
 
         mEditNameLayout.setVisibility(mFolderId >= 0 ? View.VISIBLE : View.GONE);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayout.VERTICAL, false));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false));
         mRecyclerView.setItemAnimator(new EntriesItemAnimator());
 
         loadData();
@@ -139,7 +139,7 @@ public class EditFolderFragment extends Fragment {
                     return;
                 }
                 mFolder.getDto().setName(mFolderNameEditText.getText().toString());
-                EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
+                EntriesDataSource.getInstance().accessData(getActivity(), new ITransactionAction() {
                     @Override
                     public void execute(ITransactionContext transactionContext) {
                         transactionContext.updateFolderData(mFolder);
@@ -203,7 +203,7 @@ public class EditFolderFragment extends Fragment {
         }
 
         final Local local = new Local();
-        EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
+        EntriesDataSource.getInstance().accessData(getActivity(), new ITransactionAction() {
             @Override
             public void execute(ITransactionContext transactionContext) {
                 if (mFolderId == -1) {
@@ -221,13 +221,13 @@ public class EditFolderFragment extends Fragment {
     private void initiateCreateFolder() {
         long folderId = addFolder(getResources().getString(R.string.fragment_edit_folder_new_folder_name));
 
-        Intent editFolderIntent = EditFolderActivity.createLaunchIntent(getContext(), folderId);
+        Intent editFolderIntent = EditFolderActivity.createLaunchIntent(getActivity(), folderId);
         startActivityForResult(editFolderIntent, REQUEST_EDIT_FOLDER);
     }
 
     private void initiateCreateLaunch() {
         Intent intent = new Intent();
-        intent.setClass(getContext(), IntentSelector.class);
+        intent.setClass(getActivity(), IntentSelector.class);
         intent.putExtra(IntentSelector.EXTRA_STRING_ACTIVITIES, getResources().getString(R.string.folder_settings_add_app_activities));
         intent.putExtra(IntentSelector.EXTRA_STRING_SHORTCUTS, getResources().getString(R.string.folder_settings_add_app_shortcuts));
 
@@ -249,7 +249,7 @@ public class EditFolderFragment extends Fragment {
     }
 
     private void addLaunch(final Intent launchIntent) {
-        EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
+        EntriesDataSource.getInstance().accessData(getActivity(), new ITransactionAction() {
             @Override
             public void execute(ITransactionContext transactionContext) {
                 Launch l = transactionContext.createLaunch(mFolderId);
@@ -272,11 +272,11 @@ public class EditFolderFragment extends Fragment {
 
     private void updateFolderImage(final FolderDTO folderDto, List<IEntry> entries) {
         float imgWidth = mConfig.getImageWidthDip();
-        Bitmap bmp = FolderImageHelper.createImageFromEntries(getContext(), entries, imgWidth);
+        Bitmap bmp = FolderImageHelper.createImageFromEntries(getActivity(), entries, imgWidth);
         Drawable newIcon = new BitmapDrawable(getResources(), bmp);
         folderDto.setIcon(newIcon);
 
-        EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
+        EntriesDataSource.getInstance().accessData(getActivity(), new ITransactionAction() {
             @Override
             public void execute(ITransactionContext transactionContext) {
                 transactionContext.updateFolderData(folderDto);
@@ -290,7 +290,7 @@ public class EditFolderFragment extends Fragment {
             Folder folder = null;
         }
         final Local local = new Local();
-        EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
+        EntriesDataSource.getInstance().accessData(getActivity(), new ITransactionAction() {
             @Override
             public void execute(ITransactionContext transactionContext) {
                 local.folder = transactionContext.createFolder(mFolderId);
@@ -315,7 +315,7 @@ public class EditFolderFragment extends Fragment {
         mScheduledNotifyDataChanged = sNotifyDataChangedWorker.schedule(new Runnable() {
             @Override
             public void run() {
-                LauncherOverlayService.notifyDataChanged(getContext());
+                LauncherOverlayService.notifyDataChanged(getActivity());
             }
         }, 1, TimeUnit.SECONDS);
     }
@@ -403,7 +403,7 @@ public class EditFolderFragment extends Fragment {
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = getLayoutInflater(null).inflate(R.layout.fragment_edit_folder_entries, parent, false);
+            View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_edit_folder_entries, parent, false);
             ViewHolder vh = new ViewHolder(this, view);
             return vh;
         }
@@ -423,7 +423,7 @@ public class EditFolderFragment extends Fragment {
         }
 
         private void saveOrder() {
-            EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
+            EntriesDataSource.getInstance().accessData(getActivity(), new ITransactionAction() {
                 @Override
                 public void execute(ITransactionContext transactionContext) {
                     transactionContext.updateOrders(mEntries);
@@ -465,12 +465,12 @@ public class EditFolderFragment extends Fragment {
                 final IEntry entry = getEntryById(getItemId());
                 if(v == container) {
                     if(entry.isFolder()) {
-                        Intent editFolderIntent = EditFolderActivity.createLaunchIntent(getContext(), entry.getId());
+                        Intent editFolderIntent = EditFolderActivity.createLaunchIntent(getActivity(), entry.getId());
                         startActivityForResult(editFolderIntent, REQUEST_EDIT_FOLDER);
                     }
                 }
                 else if(v == deleteImg) {
-                    EntriesDataSource.getInstance().accessData(getContext(), new ITransactionAction() {
+                    EntriesDataSource.getInstance().accessData(getActivity(), new ITransactionAction() {
                         @Override
                         public void execute(ITransactionContext transactionContext) {
                             transactionContext.deleteEntry(entry.getEntryId());

@@ -1,13 +1,16 @@
 package de.devmil.paperlaunch;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toolbar;
 
 import de.devmil.paperlaunch.service.LauncherOverlayService;
 import de.devmil.paperlaunch.view.fragments.EditFolderFragment;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends Activity {
 
     private Toolbar mToolbar;
     private EditFolderFragment mFragment;
@@ -19,8 +22,25 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         mToolbar = (Toolbar)findViewById(R.id.activity_main_toolbar);
-        mFragment = (EditFolderFragment)getSupportFragmentManager().findFragmentById(R.id.activity_main_editfolder_fragment);
+        mFragment = (EditFolderFragment)getFragmentManager().findFragmentById(R.id.activity_main_editfolder_fragment);
 
         setActionBar(mToolbar);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean result = super.onCreateOptionsMenu(menu);
+
+        MenuItem item = menu.add(R.string.title_activity_settings);
+        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+            }
+        });
+
+        return result;
     }
 }

@@ -20,9 +20,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="de.devmil.paperlaunch.view.utils.IntentSelector"
-            android:label="Select an Intent" >
-        </activity>
+            android:name=".view.utils.IntentSelector"
+            android:label="Select an Intent"></activity>
         <activity
             android:name=".EditFolderActivity"
             android:label="@string/title_activity_edit_folder" />
@@ -41,6 +40,9 @@
             </intent-filter>
         </receiver>
 
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

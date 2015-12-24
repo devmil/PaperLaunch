@@ -1,0 +1,21 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingsActivity">
+
+    <include
+        android:id="@+id/activity_settings_toolbar"
+        layout="@layout/toolbar"
+        />
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/activity_settings_fragment"
+        android:name="de.devmil.paperlaunch.view.fragments.SettingsActivityFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_settings" />
+
+</RelativeLayout>
