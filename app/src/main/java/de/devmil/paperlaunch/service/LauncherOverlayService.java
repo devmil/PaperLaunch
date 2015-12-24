@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.devmil.paperlaunch.R;
-import de.devmil.paperlaunch.SettingsActivity;
+import de.devmil.paperlaunch.MainActivity;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.IFolder;
 import de.devmil.paperlaunch.model.LaunchConfig;
@@ -411,7 +411,7 @@ public class LauncherOverlayService extends Service {
         PendingIntent settingsPendingIntent = PendingIntent.getActivity(
                 this,
                 0,
-                new Intent(this, SettingsActivity.class),
+                new Intent(this, MainActivity.class),
                 0
         );
         UserSettings settings = new UserSettings(this);

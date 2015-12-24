@@ -6,10 +6,10 @@
     android:id="@+id/activity_settings_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="de.devmil.paperlaunch.SettingsActivity">
+    tools:context=".MainActivity">
 
     <include
-        android:id="@+id/activity_settings_toolbar"
+        android:id="@+id/activity_main_toolbar"
         layout="@layout/toolbar"
         />
 
@@ -17,8 +17,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="de.devmil.paperlaunch.view.fragments.EditFolderFragment"
-        android:id="@+id/activity_settings_editfolder_fragment"
-        android:layout_below="@+id/activity_settings_toolbar"
+        android:id="@+id/activity_main_editfolder_fragment"
+        android:layout_below="@+id/activity_main_toolbar"
         android:layout_alignParentStart="true"
         tools:layout="@layout/fragment_edit_folder" />
 
