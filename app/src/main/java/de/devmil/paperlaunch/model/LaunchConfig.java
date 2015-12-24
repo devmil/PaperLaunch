@@ -15,6 +15,8 @@
  */
 package de.devmil.paperlaunch.model;
 
+import android.graphics.Color;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +39,9 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private float mImageOffsetDip = 5;
     private float mLaneIconTopMarginDip = 5;
     private float mLaneTextTopMarginDip = 20;
+    private int mLauncherBackgroundColor = Color.BLACK;
+    private float mLauncherBackgroundAlpha = 0.3f;
+    private int mLauncherBackgroundAnimationDurationMS = 250;
 
     public List<IEntry> getEntries()
     {
@@ -129,4 +134,14 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
         return mLaneTextTopMarginDip;
     }
 
+    public float getLauncherBackgroundAlpha() {
+        return mLauncherBackgroundAlpha;
+    }
+    public int getLauncherBackgroundAnimationDurationMS() {
+        return mLauncherBackgroundAnimationDurationMS;
+    }
+
+    public int getLauncherBackgroundColor() {
+        return mLauncherBackgroundColor;
+    }
 }

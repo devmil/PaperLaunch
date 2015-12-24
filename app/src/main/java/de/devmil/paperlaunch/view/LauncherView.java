@@ -19,6 +19,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -47,6 +48,7 @@ import de.devmil.paperlaunch.view.widgets.VerticalTextView;
 public class LauncherView extends RelativeLayout {
     private LauncherViewModel mViewModel;
     private List<LaunchLaneView> mLaneViews = new ArrayList<>();
+    private RelativeLayout mBackground;
     private LinearLayout mNeutralZone;
     private LinearLayout mNeutralZoneBackground;
     private ImageView mNeutralZoneBackgroundImage;
@@ -159,6 +161,7 @@ public class LauncherView extends RelativeLayout {
     {
         removeAllViews();
         mLaneViews.clear();
+        addBackground();
         addNeutralZone();
         int currentAnchor = mNeutralZone.getId();
         int[] laneIds = getLaneIds();
@@ -238,6 +241,20 @@ public class LauncherView extends RelativeLayout {
 
         LaunchLaneViewModel vm = new LaunchLaneViewModel(entryModels, mViewModel.getLaneConfig());
         laneView.doInitializeData(vm);
+    }
+
+    private void addBackground() {
+        mBackground = new RelativeLayout(getContext());
+        mBackground.setBackgroundColor(mViewModel.getBackgroundColor());
+        mBackground.setAlpha(0f);
+
+        LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+
+        addView(mBackground, params);
     }
 
     private void addNeutralZone()
@@ -335,9 +352,11 @@ public class LauncherView extends RelativeLayout {
     private void transitToState(LauncherViewModel.State newState) {
         switch(newState) {
             case Init:
+                hideBackground();
                 hideNeutralZone();
                 break;
             case Initializing:
+                animateBackground();
                 animateNeutralZone();
                 break;
             case Ready:
@@ -351,8 +370,20 @@ public class LauncherView extends RelativeLayout {
         mLaneViews.get(0).start();
     }
 
+    private void hideBackground() {
+        mBackground.setAlpha(0f);
+    }
+
     private void hideNeutralZone() {
         mNeutralZoneBackground.setVisibility(View.INVISIBLE);
+    }
+
+    private void animateBackground() {
+        mBackground
+                .animate()
+                .alpha(mViewModel.getBackgroundAlpha())
+                .setDuration(mViewModel.getBackgroundAnimationDurationMS())
+                .start();
     }
 
     private void animateNeutralZone() {
