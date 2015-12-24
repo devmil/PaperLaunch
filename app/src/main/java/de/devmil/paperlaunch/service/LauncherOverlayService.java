@@ -103,6 +103,52 @@ public class LauncherOverlayService extends Service {
         registerOrientationChangeReceiver();
     }
 
+    @Override
+    public void onDestroy() {
+        unregisterScreenOnOffReceiver();
+        unregisterOrientationChangeReceiver();
+        super.onDestroy();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if(intent != null && ACTION_LAUNCH.equals(intent.getAction())) {
+            adaptState(false);
+        }
+        else if(intent != null && ACTION_NOTIFYDATACHANGED.equals(intent.getAction())) {
+            adaptState(true);
+        }
+        else if(intent != null && ACTION_PAUSE.equals(intent.getAction())) {
+            UserSettings us = new UserSettings(this);
+            us.setIsActive(false);
+            us.save(this);
+            adaptState(false);
+        }
+        else if(intent != null && ACTION_PLAY.equals(intent.getAction())) {
+            UserSettings us = new UserSettings(this);
+            us.setIsActive(true);
+            us.save(this);
+            adaptState(false);
+        }
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void adaptState(boolean forceReload) {
+        UserSettings us = new UserSettings(this);
+
+        if(us.getIsActive()) {
+            ensureOverlayActive(forceReload);
+        } else {
+            ensureOverlayInActive();
+        }
+        ensureNotification(true);
+    }
+
     private void registerOrientationChangeReceiver() {
         unregisterOrientationChangeReceiver();
         IntentFilter filter = new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED);
@@ -133,51 +179,6 @@ public class LauncherOverlayService extends Service {
         }
     }
 
-    @Override
-    public void onDestroy() {
-        unregisterScreenOnOffReceiver();
-        unregisterOrientationChangeReceiver();
-        super.onDestroy();
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent != null && ACTION_LAUNCH.equals(intent.getAction())) {
-            UserSettings us = new UserSettings(this);
-            if(us.getIsActive()) {
-                ensureOverlayActive();
-                ensureNotification(true);
-            }
-        }
-        else if(intent != null && ACTION_NOTIFYDATACHANGED.equals(intent.getAction())) {
-            ensureData(true);
-            UserSettings us = new UserSettings(this);
-            if(us.getIsActive()) {
-                reloadTouchReceiver();
-            }
-        }
-        else if(intent != null && ACTION_PAUSE.equals(intent.getAction())) {
-            ensureOverlayInActive();
-            UserSettings us = new UserSettings(this);
-            us.setIsActive(false);
-            us.save(this);
-            ensureNotification(true);
-        }
-        else if(intent != null && ACTION_PLAY.equals(intent.getAction())) {
-            ensureOverlayActive();
-            UserSettings us = new UserSettings(this);
-            us.setIsActive(true);
-            us.save(this);
-            ensureNotification(true);
-        }
-        return super.onStartCommand(intent, flags, startId);
-    }
-
     public static void launch(Context context) {
         Intent launchServiceIntent = new Intent(context, LauncherOverlayService.class);
         launchServiceIntent.setAction(ACTION_LAUNCH);
@@ -190,18 +191,18 @@ public class LauncherOverlayService extends Service {
         context.startService(launchServiceIntent);
     }
 
-    private void ensureOverlayActive() {
+    private void ensureOverlayActive(boolean forceReload) {
         boolean alreadyRegistered = mAlreadyRegistered;
 
-        if(alreadyRegistered) {
+        if(!forceReload && alreadyRegistered) {
             return;
         }
 
-        ensureConfig(false);
+        ensureConfig(forceReload);
 
         reloadTouchReceiver();
 
-        ensureData(false);
+        ensureData(forceReload);
     }
 
     private void ensureOverlayInActive() {
