@@ -13,30 +13,12 @@
         layout="@layout/toolbar"
         />
 
-    <LinearLayout
-        android:id="@+id/activity_settings_layout_buttons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/activity_settings_toolbar"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/activity_settings_buttontest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Test"/>
-        <Button
-            android:id="@+id/activity_settings_buttonreset"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Reset"/>
-    </LinearLayout>
-
     <fragment
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="de.devmil.paperlaunch.view.fragments.EditFolderFragment"
         android:id="@+id/activity_settings_editfolder_fragment"
-        android:layout_below="@+id/activity_settings_layout_buttons"
+        android:layout_below="@+id/activity_settings_toolbar"
         android:layout_alignParentStart="true"
         tools:layout="@layout/fragment_edit_folder" />
 
