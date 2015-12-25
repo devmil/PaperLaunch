@@ -3,7 +3,9 @@ package de.devmil.paperlaunch.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class UserSettings {
+import de.devmil.paperlaunch.model.IUserSettings;
+
+public class UserSettings implements IUserSettings {
 
     private static final String SHARED_PREFS_NAME = "paperLaunch";
 

@@ -37,6 +37,7 @@ import de.devmil.paperlaunch.view.LauncherView;
 public class LauncherOverlayService extends Service {
     private static final String ACTION_LAUNCH = "ACTION_LAUNCH";
     private static final String ACTION_NOTIFYDATACHANGED = "ACTION_NOTIFYDATACHANGED";
+    private static final String ACTION_NOTIFYACTIVATIONSETTINGSCHANGED = "ACTION_NOTIFYACTIVATIONSETTINGSCHANGED";
     private static final String ACTION_PAUSE = "ACTION_PAUSE";
     private static final String ACTION_PLAY = "ACTION_PLAY";
     private static final int NOTIFICATION_ID = 2000;
@@ -122,6 +123,10 @@ public class LauncherOverlayService extends Service {
         else if(intent != null && ACTION_NOTIFYDATACHANGED.equals(intent.getAction())) {
             adaptState(true);
         }
+        else if (intent != null && ACTION_NOTIFYACTIVATIONSETTINGSCHANGED.equals(intent.getAction())) {
+            reloadConfigMetadata();
+            reloadTouchReceiver();
+        }
         else if(intent != null && ACTION_PAUSE.equals(intent.getAction())) {
             UserSettings us = new UserSettings(this);
             us.setIsActive(false);
@@ -190,6 +195,12 @@ public class LauncherOverlayService extends Service {
         context.startService(launchServiceIntent);
     }
 
+    public static void notifyActivationSettingsChanged(Context context) {
+        Intent launchServiceIntent = new Intent(context, LauncherOverlayService.class);
+        launchServiceIntent.setAction(ACTION_NOTIFYACTIVATIONSETTINGSCHANGED);
+        context.startService(launchServiceIntent);
+    }
+
     private void ensureOverlayActive(boolean forceReload) {
         boolean alreadyRegistered = mAlreadyRegistered;
 
@@ -214,8 +225,16 @@ public class LauncherOverlayService extends Service {
             mCurrentConfig = null;
         }
         if(mCurrentConfig == null) {
-            mCurrentConfig = new LaunchConfig();
+            mCurrentConfig = new LaunchConfig(new UserSettings(this));
         }
+    }
+
+    private void reloadConfigMetadata() {
+        ensureConfig(false);
+
+        List<IEntry> entries =  mCurrentConfig.getEntries();
+        mCurrentConfig = new LaunchConfig(new UserSettings(this));
+        mCurrentConfig.setEntries(entries);
     }
 
     private void ensureData(boolean forceReload) {

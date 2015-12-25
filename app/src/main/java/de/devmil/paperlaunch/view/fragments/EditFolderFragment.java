@@ -43,6 +43,7 @@ import de.devmil.paperlaunch.storage.EntriesDataSource;
 import de.devmil.paperlaunch.storage.FolderDTO;
 import de.devmil.paperlaunch.storage.ITransactionAction;
 import de.devmil.paperlaunch.storage.ITransactionContext;
+import de.devmil.paperlaunch.storage.UserSettings;
 import de.devmil.paperlaunch.utils.FolderImageHelper;
 import de.devmil.paperlaunch.view.utils.IntentSelector;
 
@@ -74,7 +75,6 @@ public class EditFolderFragment extends Fragment {
     private static final ScheduledExecutorService sNotifyDataChangedWorker = Executors.newSingleThreadScheduledExecutor();
 
     public EditFolderFragment() {
-        mConfig = new LaunchConfig();
     }
 
     public void setListener(IEditFolderFragmentListener listener) {
@@ -102,6 +102,7 @@ public class EditFolderFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mConfig = new LaunchConfig(new UserSettings(getActivity()));
         if (getArguments() != null) {
             mFolderId = getArguments().getLong(ARG_PARAM_FOLDERID, -1);
         }

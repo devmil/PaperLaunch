@@ -39,10 +39,12 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private float mImageOffsetDip = 5;
     private float mLaneIconTopMarginDip = 5;
     private float mLaneTextTopMarginDip = 20;
-    private boolean mShowLauncherBackground = true;
+    private boolean mShowLauncherBackground = false;
     private int mLauncherBackgroundColor = Color.BLACK;
     private float mLauncherBackgroundAlpha = 0.3f;
     private int mLauncherBackgroundAnimationDurationMS = 250;
+
+    //UserSettings
     private int mLauncherSensitivityDip = 10;
 
     public List<IEntry> getEntries()
@@ -50,8 +52,9 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
         return new ArrayList<>(mEntries);
     }
 
-    public LaunchConfig()
+    public LaunchConfig(IUserSettings userSettings)
     {
+        mLauncherSensitivityDip = userSettings.getSensitivityDip();
     }
 
     public void setEntries(List<IEntry> entries)

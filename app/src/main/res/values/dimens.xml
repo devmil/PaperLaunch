@@ -5,4 +5,6 @@
     <dimen name="entries_list_padding_top">10dp</dimen>
     <dimen name="entries_list_padding_bottom">60dp</dimen>
     <dimen name="fab_margin_bottom">5dp</dimen>
+
+    <dimen name="preference_seekbar_margin_left">15dip</dimen>
 </resources>
