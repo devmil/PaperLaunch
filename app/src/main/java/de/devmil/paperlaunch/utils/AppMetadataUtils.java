@@ -10,6 +10,8 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Parcelable;
 
+import de.devmil.paperlaunch.R;
+
 public abstract class AppMetadataUtils {
 
     public static String getAppName(Context context, Intent appIntent)
@@ -85,7 +87,7 @@ public abstract class AppMetadataUtils {
             appInfo = null;
         }
         if(appInfo == null) {
-            return null;
+            return context.getResources().getDrawable(R.mipmap.ic_missing_app_red, context.getTheme());
         } else {
             return pm.getApplicationIcon(appInfo);
         }

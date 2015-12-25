@@ -87,6 +87,10 @@ public class LauncherViewModel {
         this.mState = mState;
     }
 
+    boolean showBackground() {
+        return mConfig.getShowLauncherBackground();
+    }
+
     public float getBackgroundAlpha() {
         return mConfig.getLauncherBackgroundAlpha();
     }

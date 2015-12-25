@@ -334,7 +334,7 @@ public class LauncherOverlayService extends Service {
 
     private synchronized void reloadTouchReceiver() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                (int)ViewUtils.getPxFromDip(this, 10),
+                (int)ViewUtils.getPxFromDip(this, mCurrentConfig.getLauncherSensitivityDip()),
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE

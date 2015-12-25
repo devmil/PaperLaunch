@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -46,6 +47,9 @@ import de.devmil.paperlaunch.view.utils.ColorUtils;
 import de.devmil.paperlaunch.view.widgets.VerticalTextView;
 
 public class LauncherView extends RelativeLayout {
+
+    private static final String TAG = LauncherView.class.getSimpleName();
+
     private LauncherViewModel mViewModel;
     private List<LaunchLaneView> mLaneViews = new ArrayList<>();
     private RelativeLayout mBackground;
@@ -346,7 +350,11 @@ public class LauncherView extends RelativeLayout {
         Launch l = (Launch)mCurrentlySelectedItem;
         Intent intent = l.getLaunchIntent();
         intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NEW_TASK);
-        getContext().startActivity(intent);
+        try {
+            getContext().startActivity(intent);
+        } catch(Exception e) {
+            Log.e(TAG, "Error while launching app", e);
+        }
     }
 
     private void transitToState(LauncherViewModel.State newState) {
@@ -379,11 +387,16 @@ public class LauncherView extends RelativeLayout {
     }
 
     private void animateBackground() {
-        mBackground
+        if(mViewModel.showBackground()) {
+            mBackground.setVisibility(View.VISIBLE);
+            mBackground
                 .animate()
-                .alpha(mViewModel.getBackgroundAlpha())
-                .setDuration(mViewModel.getBackgroundAnimationDurationMS())
-                .start();
+                    .alpha(mViewModel.getBackgroundAlpha())
+                    .setDuration(mViewModel.getBackgroundAnimationDurationMS())
+                    .start();
+        } else {
+            mBackground.setVisibility(View.GONE);
+        }
     }
 
     private void animateNeutralZone() {
