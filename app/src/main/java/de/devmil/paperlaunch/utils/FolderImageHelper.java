@@ -3,12 +3,9 @@ package de.devmil.paperlaunch.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -16,6 +13,7 @@ import java.util.List;
 
 import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.model.IEntry;
+import de.devmil.paperlaunch.view.utils.ViewUtils;
 
 public class FolderImageHelper {
 
@@ -26,7 +24,7 @@ public class FolderImageHelper {
         int cols = 3;
         int rows = 2;
 
-        int sizePx = (int)ViewUtils.getPxFromDip(context, imgSizeDip);
+        int sizePx = (int) ViewUtils.getPxFromDip(context, imgSizeDip);
 
         int offsetTopPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 4);
         int offsetBottomPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 4.2f);

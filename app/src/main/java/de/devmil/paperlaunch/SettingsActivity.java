@@ -1,18 +1,13 @@
 package de.devmil.paperlaunch;
 
 import android.app.Activity;
-import android.graphics.Rect;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toolbar;
 
 import de.devmil.paperlaunch.config.UserSettings;
 import de.devmil.paperlaunch.service.LauncherOverlayService;
-import de.devmil.paperlaunch.utils.ActivationIndicatorHelper;
-import de.devmil.paperlaunch.utils.ViewUtils;
+import de.devmil.paperlaunch.view.utils.ViewUtils;
 import de.devmil.paperlaunch.view.fragments.SettingsFragment;
 
 public class SettingsActivity extends Activity implements SettingsFragment.IActivationParametersChangedListener {

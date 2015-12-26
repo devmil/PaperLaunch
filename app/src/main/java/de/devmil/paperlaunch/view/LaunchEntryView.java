@@ -21,7 +21,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import de.devmil.paperlaunch.model.IEntry;
-import de.devmil.paperlaunch.utils.ViewUtils;
+import de.devmil.paperlaunch.view.utils.ViewUtils;
 
 public class LaunchEntryView extends LinearLayout {
     private LaunchEntryViewModel mViewModel;

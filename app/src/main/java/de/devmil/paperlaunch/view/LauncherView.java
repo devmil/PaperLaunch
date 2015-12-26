@@ -40,7 +40,7 @@ import de.devmil.paperlaunch.model.IFolder;
 import de.devmil.paperlaunch.config.LaunchConfig;
 import de.devmil.paperlaunch.model.Launch;
 import de.devmil.paperlaunch.utils.PositionAndSizeEvaluator;
-import de.devmil.paperlaunch.utils.ViewUtils;
+import de.devmil.paperlaunch.view.utils.ViewUtils;
 import de.devmil.paperlaunch.view.utils.ColorUtils;
 import de.devmil.paperlaunch.view.widgets.VerticalTextView;
 

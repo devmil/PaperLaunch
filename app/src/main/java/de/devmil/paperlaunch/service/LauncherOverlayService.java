@@ -16,7 +16,6 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ActionMenuView;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ import de.devmil.paperlaunch.storage.ITransactionAction;
 import de.devmil.paperlaunch.storage.ITransactionContext;
 import de.devmil.paperlaunch.config.UserSettings;
 import de.devmil.paperlaunch.utils.ActivationIndicatorHelper;
-import de.devmil.paperlaunch.utils.ViewUtils;
+import de.devmil.paperlaunch.view.utils.ViewUtils;
 import de.devmil.paperlaunch.view.LauncherView;
 
 public class LauncherOverlayService extends Service {

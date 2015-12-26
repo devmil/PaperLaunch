@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.paperlaunch.utils;
+package de.devmil.paperlaunch.view.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -24,9 +24,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 
-/**
- * Created by michaellamers on 29.05.15.
- */
 public class ViewUtils {
 
     public static float getPxFromDip(Context context, float dip)

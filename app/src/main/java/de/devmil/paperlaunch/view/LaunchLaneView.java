@@ -18,10 +18,8 @@ package de.devmil.paperlaunch.view;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -33,14 +31,12 @@ import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.utils.BitmapUtils;
 import de.devmil.paperlaunch.utils.PositionAndSizeEvaluator;
-import de.devmil.paperlaunch.utils.ViewUtils;
+import de.devmil.paperlaunch.view.utils.ViewUtils;
 import de.devmil.paperlaunch.view.utils.ColorUtils;
 import de.devmil.paperlaunch.view.widgets.VerticalTextView;
 

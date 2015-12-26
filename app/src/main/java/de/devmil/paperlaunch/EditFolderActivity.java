@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Toolbar;
 
 import de.devmil.paperlaunch.view.fragments.EditFolderFragment;
@@ -29,6 +30,8 @@ public class EditFolderActivity extends Activity {
         mToolbar = (Toolbar)findViewById(R.id.activity_edit_folder_toolbar);
 
         setActionBar(mToolbar);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setDisplayShowHomeEnabled(true);
 
         long folderId = -1;
         if(getIntent().hasExtra(ARG_FOLDERID)) {
@@ -55,4 +58,14 @@ public class EditFolderActivity extends Activity {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
