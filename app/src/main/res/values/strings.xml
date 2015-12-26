@@ -32,5 +32,6 @@
     <string name="fragment_settings_category_appearance_title">Appearance</string>
     <string name="fragment_settings_appearance_background_summary_on">Background is shown</string>
     <string name="fragment_settings_appearance_background_summary_off">Background is not shown</string>
+    <string name="title_activity_about">About</string>
 
 </resources>

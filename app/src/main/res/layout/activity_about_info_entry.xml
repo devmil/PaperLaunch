@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_vertical"
+    android:layout_margin="10dp"
+    android:elevation="2dp"
+    android:background="@android:color/white">
+    <ImageView
+        android:id="@+id/activity_license_info_entry_image"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="5dp"
+        android:scaleType="centerInside"
+        android:layout_weight="0" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="1">
+        <TextView
+            android:id="@+id/activity_license_info_entry_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/activity_license_info_entry_copyright"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            android:textSize="12sp"
+            android:textStyle="italic"/>
+        <TextView
+            android:id="@+id/activity_license_info_entry_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            android:textSize="14sp"
+            android:focusable="true"
+            android:clickable="true"
+            android:linksClickable="true"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0">
+        <Button
+            android:id="@+id/activity_license_info_entry_licensebutton"
+            android:layout_width="60dip"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            android:textSize="8sp"/>
+    </LinearLayout>
+</LinearLayout>

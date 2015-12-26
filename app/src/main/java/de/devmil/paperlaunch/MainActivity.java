@@ -31,11 +31,21 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean result = super.onCreateOptionsMenu(menu);
 
-        MenuItem item = menu.add(R.string.title_activity_settings);
-        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        MenuItem itemSettings = menu.add(R.string.title_activity_settings);
+        itemSettings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+            }
+        });
+
+        MenuItem itemAbout = menu.add(R.string.title_activity_about);
+        itemAbout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent settingsIntent = new Intent(MainActivity.this, AboutActivity.class);
                 startActivity(settingsIntent);
                 return true;
             }
