@@ -17,6 +17,11 @@ public class SettingsFragment extends PreferenceFragment {
 
     private PreferenceScreen mScreen;
     private UserSettings mUserSettings;
+    private IActivationParametersChangedListener mActivationParametersChangedListener;
+
+    public interface IActivationParametersChangedListener {
+        void onActivationParametersChanged();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,6 +36,16 @@ public class SettingsFragment extends PreferenceFragment {
 
         addActivationSettings(context, mScreen);
         addAppearanceSettings(context, mScreen);
+    }
+
+    public void setOnActivationParametersChangedListener(IActivationParametersChangedListener listener) {
+        mActivationParametersChangedListener = listener;
+    }
+
+    private void fireActivationParametersChanged() {
+        if(mActivationParametersChangedListener != null) {
+            mActivationParametersChangedListener.onActivationParametersChanged();
+        }
     }
 
     private void addActivationSettings(Context context, PreferenceScreen screen) {
@@ -54,6 +69,7 @@ public class SettingsFragment extends PreferenceFragment {
                 mUserSettings.setSensitivityDip((Integer) newValue);
                 mUserSettings.save(getActivity());
                 LauncherOverlayService.notifyConfigChanged(getActivity());
+                fireActivationParametersChanged();
                 return true;
             }
         });
@@ -71,15 +87,16 @@ public class SettingsFragment extends PreferenceFragment {
 
         showBackgroundPreference.setPersistent(false);
         showBackgroundPreference.setTitle("Show background");
-//        showBackgroundPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-//            @Override
-//            public boolean onPreferenceChange(Preference preference, Object newValue) {
-//                mUserSettings.load(getActivity());
-//                mUserSettings.setShowBackground((Boolean) newValue);
-//                mUserSettings.save(getActivity());
-//                LauncherOverlayService.notifyActivationSettingsChanged(getActivity());
-//                return false;
-//            }
-//        });
+        showBackgroundPreference.setChecked(mUserSettings.isShowBackground());
+        showBackgroundPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                mUserSettings.load(getActivity());
+                mUserSettings.setShowBackground((Boolean) newValue);
+                mUserSettings.save(getActivity());
+                LauncherOverlayService.notifyConfigChanged(getActivity());
+                return true;
+            }
+        });
     }
 }

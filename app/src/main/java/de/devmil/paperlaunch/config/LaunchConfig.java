@@ -32,7 +32,6 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private int mEntryMoveAnimationDuration = 100;
     private int mEntryMoveDiffMS = 50;
     private int mEntryAlphaAnimationDuration = 100;
-    private boolean mIsOnRightSide = true;
     private int mSelectingAnimationDurationMS = 200;
     private float mItemNameTextSizeSP = 30;
     private IDesignConfig mDesignConfig = new DesignConfig();
@@ -41,13 +40,16 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private float mImageOffsetDip = 5;
     private float mLaneIconTopMarginDip = 5;
     private float mLaneTextTopMarginDip = 20;
-    private boolean mShowLauncherBackground = false;
     private int mLauncherBackgroundColor = Color.BLACK;
     private float mLauncherBackgroundAlpha = 0.3f;
     private int mLauncherBackgroundAnimationDurationMS = 250;
 
     //UserSettings
-    private int mLauncherSensitivityDip = 10;
+    private int mLauncherSensitivityDip;
+    private boolean mIsOnRightSide;
+    private int mLauncherOffsetPositionDip;
+    private int mLauncherOffsetHeightDip;
+    private boolean mShowLauncherBackground;
 
     public List<IEntry> getEntries()
     {
@@ -57,6 +59,10 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     public LaunchConfig(IUserSettings userSettings)
     {
         mLauncherSensitivityDip = userSettings.getSensitivityDip();
+        mIsOnRightSide = userSettings.isOnRightSide();
+        mLauncherOffsetPositionDip = userSettings.getActivationOffsetPositionDip();
+        mLauncherOffsetHeightDip = userSettings.getActivationOffsetHeightDip();
+        mShowLauncherBackground = userSettings.isShowBackground();
     }
 
     public void setEntries(List<IEntry> entries)
@@ -158,5 +164,13 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
 
     public int getLauncherSensitivityDip() {
         return mLauncherSensitivityDip;
+    }
+
+    public int getLauncherOffsetPositionDip() {
+        return mLauncherOffsetPositionDip;
+    }
+
+    public int getLauncherOffsetHeightDip() {
+        return mLauncherOffsetHeightDip;
     }
 }
