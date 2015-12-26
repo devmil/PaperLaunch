@@ -59,6 +59,7 @@ public class EditFolderFragment extends Fragment {
 
     private EntriesAdapter mAdapter;
     private RecyclerView mRecyclerView;
+    private View mEmptyListView;
     private FloatingActionButton mAddButton;
     private LinearLayout mEditNameLayout;
     private EditText mFolderNameEditText;
@@ -114,6 +115,7 @@ public class EditFolderFragment extends Fragment {
         View result = inflater.inflate(R.layout.fragment_edit_folder, container, false);
 
         mRecyclerView = (RecyclerView)result.findViewById(R.id.fragment_edit_folder_entrieslist);
+        mEmptyListView = result.findViewById(R.id.fragment_edit_folder_emptyentries);
         mAddButton = (FloatingActionButton)result.findViewById(R.id.fragment_edit_folder_fab);
         mEditNameLayout = (LinearLayout)result.findViewById(R.id.fragment_edit_folder_editname_layout);
         mFolderNameEditText = (EditText)result.findViewById(R.id.fragment_edit_folder_editname_text);
@@ -136,7 +138,7 @@ public class EditFolderFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(mFolder == null) {
+                if (mFolder == null) {
                     return;
                 }
                 mFolder.getDto().setName(mFolderNameEditText.getText().toString());
@@ -146,7 +148,7 @@ public class EditFolderFragment extends Fragment {
                         transactionContext.updateFolderData(mFolder);
                     }
                 });
-                if(mListener != null) {
+                if (mListener != null) {
                     mListener.onFolderNameChanged(mFolder.getDto().getName());
                 }
                 notifyDataChanged();
@@ -189,12 +191,27 @@ public class EditFolderFragment extends Fragment {
 
     private void loadData() {
         mRecyclerView.setAdapter(mAdapter = new EntriesAdapter(mRecyclerView, loadEntries()));
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                checkEntryViewStates();
+            }
+        });
         if(mFolder != null) {
             mFolderNameEditText.setText(mFolder.getDto().getName());
             if(mListener != null) {
                 mListener.onFolderNameChanged(mFolder.getDto().getName());
             }
         }
+        checkEntryViewStates();
+    }
+    private void checkEntryViewStates() {
+        boolean isEmpty = mAdapter == null
+                || mAdapter.getItemCount() <= 0;
+
+        mEmptyListView.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        mRecyclerView.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
     }
 
     private List<IEntry> loadEntries() {

@@ -8,16 +8,14 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.util.DisplayMetrics;
-import android.view.WindowManager;
 
 import de.devmil.paperlaunch.R;
-import de.devmil.paperlaunch.service.LauncherOverlayService;
 import de.devmil.paperlaunch.config.UserSettings;
+import de.devmil.paperlaunch.service.LauncherOverlayService;
 import de.devmil.paperlaunch.view.preferences.SeekBarPreference;
 
 public class SettingsFragment extends PreferenceFragment {
 
-    private PreferenceScreen mScreen;
     private UserSettings mUserSettings;
     private IActivationParametersChangedListener mActivationParametersChangedListener;
 
@@ -33,11 +31,11 @@ public class SettingsFragment extends PreferenceFragment {
 
         mUserSettings = new UserSettings(context);
 
-        mScreen = getPreferenceManager().createPreferenceScreen(context);
-        setPreferenceScreen(mScreen);
+        PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(context);
+        setPreferenceScreen(screen);
 
-        addActivationSettings(context, mScreen);
-        addAppearanceSettings(context, mScreen);
+        addActivationSettings(context, screen);
+        addAppearanceSettings(context, screen);
     }
 
     public void setOnActivationParametersChangedListener(IActivationParametersChangedListener listener) {
@@ -56,14 +54,14 @@ public class SettingsFragment extends PreferenceFragment {
         screen.addPreference(activationCategory);
 
         activationCategory.setPersistent(false);
-        activationCategory.setTitle("Activation");
+        activationCategory.setTitle(R.string.fragment_settings_category_activation_title);
         activationCategory.setIcon(R.mipmap.ic_wifi_tethering_black_36dp);
 
         SeekBarPreference sensitivityPreference = new SeekBarPreference(context, 5, 40);
         activationCategory.addPreference(sensitivityPreference);
 
         sensitivityPreference.setValue(mUserSettings.getSensitivityDip());
-        sensitivityPreference.setTitle("Sensitivity");
+        sensitivityPreference.setTitle(R.string.fragment_settings_activation_sensitivity_title);
         sensitivityPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -85,7 +83,7 @@ public class SettingsFragment extends PreferenceFragment {
         activationCategory.addPreference(offsetHeightPreference);
 
         offsetHeightPreference.setValue((int)heightDpi - mUserSettings.getActivationOffsetHeightDip());
-        offsetHeightPreference.setTitle("Height");
+        offsetHeightPreference.setTitle(R.string.fragment_settings_activation_offset_height_title);
         offsetHeightPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -105,7 +103,7 @@ public class SettingsFragment extends PreferenceFragment {
         activationCategory.addPreference(offsetPositionPreference);
 
         offsetPositionPreference.setValue(mUserSettings.getActivationOffsetPositionDip());
-        offsetPositionPreference.setTitle("Position");
+        offsetPositionPreference.setTitle(R.string.fragment_settings_activation_offset_position_title);
         offsetPositionPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -124,13 +122,15 @@ public class SettingsFragment extends PreferenceFragment {
         screen.addPreference(apperanceCategory);
 
         apperanceCategory.setPersistent(false);
-        apperanceCategory.setTitle("Appearance");
+        apperanceCategory.setTitle(R.string.fragment_settings_category_appearance_title);
 
         CheckBoxPreference showBackgroundPreference = new CheckBoxPreference(context);
         apperanceCategory.addPreference(showBackgroundPreference);
 
         showBackgroundPreference.setPersistent(false);
-        showBackgroundPreference.setTitle("Show background");
+        showBackgroundPreference.setTitle(R.string.fragment_settings_appearance_background_title);
+        showBackgroundPreference.setSummaryOn(R.string.fragment_settings_appearance_background_summary_on);
+        showBackgroundPreference.setSummaryOff(R.string.fragment_settings_appearance_background_summary_off);
         showBackgroundPreference.setChecked(mUserSettings.isShowBackground());
         showBackgroundPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
