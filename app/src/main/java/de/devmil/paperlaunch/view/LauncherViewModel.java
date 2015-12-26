@@ -15,14 +15,13 @@
  */
 package de.devmil.paperlaunch.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import de.devmil.paperlaunch.model.IDesignConfig;
+import de.devmil.paperlaunch.config.IDesignConfig;
 import de.devmil.paperlaunch.model.IEntry;
-import de.devmil.paperlaunch.model.ILaunchEntryConfig;
-import de.devmil.paperlaunch.model.ILaunchLaneConfig;
-import de.devmil.paperlaunch.model.LaunchConfig;
+import de.devmil.paperlaunch.config.ILaunchEntryConfig;
+import de.devmil.paperlaunch.config.ILaunchLaneConfig;
+import de.devmil.paperlaunch.config.LaunchConfig;
 
 public class LauncherViewModel {
     private LaunchConfig mConfig;

@@ -1,4 +1,4 @@
-package de.devmil.paperlaunch.model;
+package de.devmil.paperlaunch.config;
 
 public interface IUserSettings {
 

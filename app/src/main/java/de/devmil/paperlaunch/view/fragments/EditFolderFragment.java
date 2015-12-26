@@ -37,13 +37,13 @@ import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.model.Folder;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.Launch;
-import de.devmil.paperlaunch.model.LaunchConfig;
+import de.devmil.paperlaunch.config.LaunchConfig;
 import de.devmil.paperlaunch.service.LauncherOverlayService;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
 import de.devmil.paperlaunch.storage.FolderDTO;
 import de.devmil.paperlaunch.storage.ITransactionAction;
 import de.devmil.paperlaunch.storage.ITransactionContext;
-import de.devmil.paperlaunch.storage.UserSettings;
+import de.devmil.paperlaunch.config.UserSettings;
 import de.devmil.paperlaunch.utils.FolderImageHelper;
 import de.devmil.paperlaunch.view.utils.IntentSelector;
 

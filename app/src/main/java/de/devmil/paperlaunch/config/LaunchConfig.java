@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.paperlaunch.model;
+package de.devmil.paperlaunch.config;
 
 import android.graphics.Color;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.devmil.paperlaunch.model.IEntry;
 
 public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private List<IEntry> mEntries;

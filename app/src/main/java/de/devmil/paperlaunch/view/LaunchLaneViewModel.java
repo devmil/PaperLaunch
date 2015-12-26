@@ -18,7 +18,7 @@ package de.devmil.paperlaunch.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.devmil.paperlaunch.model.ILaunchLaneConfig;
+import de.devmil.paperlaunch.config.ILaunchLaneConfig;
 
 public class LaunchLaneViewModel {
     private List<LaunchEntryViewModel> mEntryModels;

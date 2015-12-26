@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.paperlaunch.model;
+package de.devmil.paperlaunch.config;
 
-import android.graphics.Color;
+import de.devmil.paperlaunch.config.IDesignConfig;
 
-import de.devmil.paperlaunch.R;
+public interface ILaunchEntryConfig {
+    int getEntryMoveAnimationDuration();
+    int getEntryAlphaAnimationDuration();
+    float getImageWidthDip();
+    float getImageMarginDip();
+    float getEntriesMarginDip();
+    float getLowElevationDip();
+    float getHighElevationDip();
+    IDesignConfig getDesignConfig();
 
-public class DesignConfig implements IDesignConfig {
-
-    private int mFrameDefaultColor = Color.WHITE;
-    private int mUnknownAppImageId = R.mipmap.ic_missing_app_red;
-
-    public int getFrameDefaultColor()
-    {
-        return mFrameDefaultColor;
-    }
-
-    public int getUnknownAppImageId()
-    {
-        return mUnknownAppImageId;
-    }
+    float getImageOffsetDip();
 }

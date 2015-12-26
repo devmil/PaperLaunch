@@ -25,19 +25,19 @@ import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.MainActivity;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.model.IFolder;
-import de.devmil.paperlaunch.model.LaunchConfig;
+import de.devmil.paperlaunch.config.LaunchConfig;
 import de.devmil.paperlaunch.model.VirtualFolder;
 import de.devmil.paperlaunch.storage.EntriesDataSource;
 import de.devmil.paperlaunch.storage.ITransactionAction;
 import de.devmil.paperlaunch.storage.ITransactionContext;
-import de.devmil.paperlaunch.storage.UserSettings;
+import de.devmil.paperlaunch.config.UserSettings;
 import de.devmil.paperlaunch.utils.ViewUtils;
 import de.devmil.paperlaunch.view.LauncherView;
 
 public class LauncherOverlayService extends Service {
     private static final String ACTION_LAUNCH = "ACTION_LAUNCH";
     private static final String ACTION_NOTIFYDATACHANGED = "ACTION_NOTIFYDATACHANGED";
-    private static final String ACTION_NOTIFYACTIVATIONSETTINGSCHANGED = "ACTION_NOTIFYACTIVATIONSETTINGSCHANGED";
+    private static final String ACTION_NOTIFYCONFIGCHANGED = "ACTION_NOTIFYCONFIGCHANGED";
     private static final String ACTION_PAUSE = "ACTION_PAUSE";
     private static final String ACTION_PLAY = "ACTION_PLAY";
     private static final int NOTIFICATION_ID = 2000;
@@ -53,6 +53,8 @@ public class LauncherOverlayService extends Service {
     //receivers
     private ScreenOnOffReceiver mScreenOnOffReceiver;
     private OrientationChangeReceiver mOrientationChangeReceiver;
+
+    private ServiceState mState;
 
     public LauncherOverlayService() {
     }
@@ -99,6 +101,8 @@ public class LauncherOverlayService extends Service {
     public void onCreate() {
         super.onCreate();
 
+        mState = new ServiceState(this);
+
         registerScreenOnReceiver();
         registerOrientationChangeReceiver();
     }
@@ -123,29 +127,25 @@ public class LauncherOverlayService extends Service {
         else if(intent != null && ACTION_NOTIFYDATACHANGED.equals(intent.getAction())) {
             adaptState(true);
         }
-        else if (intent != null && ACTION_NOTIFYACTIVATIONSETTINGSCHANGED.equals(intent.getAction())) {
+        else if (intent != null && ACTION_NOTIFYCONFIGCHANGED.equals(intent.getAction())) {
             reloadConfigMetadata();
             reloadTouchReceiver();
         }
         else if(intent != null && ACTION_PAUSE.equals(intent.getAction())) {
-            UserSettings us = new UserSettings(this);
-            us.setIsActive(false);
-            us.save(this);
+            mState.setIsActive(false);
+            mState.save(this);
             adaptState(false);
         }
         else if(intent != null && ACTION_PLAY.equals(intent.getAction())) {
-            UserSettings us = new UserSettings(this);
-            us.setIsActive(true);
-            us.save(this);
+            mState.setIsActive(true);
+            mState.save(this);
             adaptState(false);
         }
         return super.onStartCommand(intent, flags, startId);
     }
 
     private void adaptState(boolean forceReload) {
-        UserSettings us = new UserSettings(this);
-
-        if(us.getIsActive()) {
+        if(mState.getIsActive()) {
             ensureOverlayActive(forceReload);
         } else {
             ensureOverlayInActive();
@@ -195,9 +195,9 @@ public class LauncherOverlayService extends Service {
         context.startService(launchServiceIntent);
     }
 
-    public static void notifyActivationSettingsChanged(Context context) {
+    public static void notifyConfigChanged(Context context) {
         Intent launchServiceIntent = new Intent(context, LauncherOverlayService.class);
-        launchServiceIntent.setAction(ACTION_NOTIFYACTIVATIONSETTINGSCHANGED);
+        launchServiceIntent.setAction(ACTION_NOTIFYCONFIGCHANGED);
         context.startService(launchServiceIntent);
     }
 
@@ -432,11 +432,10 @@ public class LauncherOverlayService extends Service {
                 new Intent(this, MainActivity.class),
                 0
         );
-        UserSettings settings = new UserSettings(this);
 
         Notification.Builder builder = new Notification.Builder(this)
                 .setContentTitle("PaperLaunch")
-                .setContentText(getString(settings.getIsActive() ? R.string.notification_content_active : R.string.notification_content_inactive))
+                .setContentText(getString(mState.getIsActive() ? R.string.notification_content_active : R.string.notification_content_inactive))
                 .setOngoing(true)
                 .setLocalOnly(true)
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -446,7 +445,7 @@ public class LauncherOverlayService extends Service {
                 .setContentIntent(settingsPendingIntent)
         ;
 
-        if(settings.getIsActive()) {
+        if(mState.getIsActive()) {
             Intent pauseIntent = new Intent(ACTION_PAUSE);
             pauseIntent.setClass(this, LauncherOverlayService.class);
             PendingIntent pendingPauseIntent = PendingIntent.getService(

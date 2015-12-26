@@ -13,17 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.paperlaunch.model;
+package de.devmil.paperlaunch.config;
 
-public interface ILaunchLaneConfig {
-    float getImageWidthDip();
-    boolean isOnRightSide();
-    int getEntryMoveDiffMS();
-    float getLowElevationDip();
-    float getHighElevationDip();
-    IDesignConfig getDesignConfig();
-    int getSelectingAnimationDurationMS();
-    float getItemNameTextSizeSP();
-    float getLaneIconTopMarginDip();
-    float getLaneTextTopMarginDip();
+import android.graphics.Color;
+
+import de.devmil.paperlaunch.R;
+
+public class DesignConfig implements IDesignConfig {
+
+    private int mFrameDefaultColor = Color.WHITE;
+    private int mUnknownAppImageId = R.mipmap.ic_missing_app_red;
+
+    public int getFrameDefaultColor()
+    {
+        return mFrameDefaultColor;
+    }
+
+    public int getUnknownAppImageId()
+    {
+        return mUnknownAppImageId;
+    }
 }

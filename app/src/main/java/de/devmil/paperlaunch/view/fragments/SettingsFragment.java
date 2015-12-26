@@ -7,13 +7,10 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.service.LauncherOverlayService;
-import de.devmil.paperlaunch.storage.UserSettings;
+import de.devmil.paperlaunch.config.UserSettings;
 import de.devmil.paperlaunch.view.preferences.SeekBarPreference;
 
 public class SettingsFragment extends PreferenceFragment {
@@ -56,7 +53,7 @@ public class SettingsFragment extends PreferenceFragment {
                 mUserSettings.load(getActivity());
                 mUserSettings.setSensitivityDip((Integer) newValue);
                 mUserSettings.save(getActivity());
-                LauncherOverlayService.notifyActivationSettingsChanged(getActivity());
+                LauncherOverlayService.notifyConfigChanged(getActivity());
                 return true;
             }
         });

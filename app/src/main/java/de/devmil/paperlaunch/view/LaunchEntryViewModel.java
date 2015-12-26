@@ -19,8 +19,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import de.devmil.paperlaunch.model.IEntry;
-import de.devmil.paperlaunch.model.ILaunchEntryConfig;
-import de.devmil.paperlaunch.model.Launch;
+import de.devmil.paperlaunch.config.ILaunchEntryConfig;
 
 /**
  * Created by michaellamers on 29.05.15.

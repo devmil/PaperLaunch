@@ -13,9 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.paperlaunch.model;
+package de.devmil.paperlaunch.config;
 
-public interface IDesignConfig {
-    int getFrameDefaultColor();
-    int getUnknownAppImageId();
+import de.devmil.paperlaunch.config.IDesignConfig;
+
+public interface ILaunchLaneConfig {
+    float getImageWidthDip();
+    boolean isOnRightSide();
+    int getEntryMoveDiffMS();
+    float getLowElevationDip();
+    float getHighElevationDip();
+    IDesignConfig getDesignConfig();
+    int getSelectingAnimationDurationMS();
+    float getItemNameTextSizeSP();
+    float getLaneIconTopMarginDip();
+    float getLaneTextTopMarginDip();
 }
