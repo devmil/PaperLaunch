@@ -29,11 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:singleLine="true"
-                android:nextFocusUp="@id/fragment_edit_folder_editname_text"
-                android:nextFocusDown="@id/fragment_edit_folder_editname_text"
-                android:nextFocusLeft="@id/fragment_edit_folder_editname_text"
-                android:nextFocusRight="@id/fragment_edit_folder_editname_text"
-                android:nextFocusForward="@id/fragment_edit_folder_editname_text"/>
+                android:imeOptions="actionDone"/>
         </LinearLayout>
     </LinearLayout>
 
