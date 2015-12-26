@@ -25,7 +25,7 @@ public abstract class ActivationIndicatorHelper {
         }
 
         int height = availableRect.height() - offsetSize;
-        top = top + offsetPosition;
+        top = top + offsetPosition + (offsetSize / 2);
         bottom = top + height;
 
         Rect result = new Rect(left, top, right, bottom);
