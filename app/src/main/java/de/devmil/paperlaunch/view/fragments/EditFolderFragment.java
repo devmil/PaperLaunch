@@ -431,6 +431,7 @@ public class EditFolderFragment extends Fragment {
             IEntry entry = mEntries.get(position);
 
             holder.container.setVisibility(getDraggingId() == entry.getEntryId() ? View.INVISIBLE : View.VISIBLE);
+            holder.detailsImg.setVisibility(entry.isFolder() ? View.VISIBLE : View.GONE);
             holder.imageView.setImageDrawable(entry.getIcon(holder.imageView.getContext()));
             holder.textView.setText(entry.getName(holder.textView.getContext()));
         }
@@ -455,6 +456,7 @@ public class EditFolderFragment extends Fragment {
             public TextView textView;
             private ImageView handle;
             private ImageView deleteImg;
+            private ImageView detailsImg;
 
             public ViewHolder(DragSortAdapter<?> dragSortAdapter, View itemView) {
                 super(dragSortAdapter, itemView);
@@ -463,8 +465,8 @@ public class EditFolderFragment extends Fragment {
                 textView = (TextView)itemView.findViewById(R.id.fragment_edit_folder_entries_text);
                 handle = (ImageView)itemView.findViewById(R.id.fragment_edit_folder_entries_handle);
                 deleteImg = (ImageView)itemView.findViewById(R.id.fragment_edit_folder_entries_delete);
+                detailsImg = (ImageView)itemView.findViewById(R.id.fragment_edit_folder_entries_details);
 
-                //TODO: check if a long click or a tap event fits better
                 handle.setOnLongClickListener(this);
 
                 container.setOnClickListener(this);

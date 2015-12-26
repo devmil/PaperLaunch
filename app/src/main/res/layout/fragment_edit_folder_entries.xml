@@ -38,12 +38,21 @@
         android:layout_height="wrap_content" />
 
     <ImageView
-        android:id="@+id/fragment_edit_folder_entries_delete"
-        android:clickable="true"
-        android:layout_margin="10dp"
+        android:id="@+id/fragment_edit_folder_entries_details"
+        android:clickable="false"
+        android:layout_margin="5dp"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:alpha="0.8"
-        android:src="@mipmap/ic_delete_grey600_36dp" />
+        android:src="@mipmap/ic_mode_edit_grey600_24dp" />
+
+    <ImageView
+        android:id="@+id/fragment_edit_folder_entries_delete"
+        android:clickable="true"
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:alpha="0.8"
+        android:src="@mipmap/ic_delete_grey600_24dp" />
 
 </LinearLayout>
