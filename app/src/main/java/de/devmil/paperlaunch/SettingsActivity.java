@@ -1,12 +1,16 @@
 package de.devmil.paperlaunch;
 
 import android.app.Activity;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toolbar;
 
 import de.devmil.paperlaunch.config.UserSettings;
+import de.devmil.paperlaunch.utils.ActivationIndicatorHelper;
 import de.devmil.paperlaunch.utils.ViewUtils;
 import de.devmil.paperlaunch.view.fragments.SettingsFragment;
 
@@ -39,21 +43,27 @@ public class SettingsActivity extends Activity implements SettingsFragment.IActi
     private void updateActivationIndicator() {
         UserSettings us = new UserSettings(this);
 
-        int windowHeightPx = getWindow().getDecorView().getHeight();
-        int offsetPositionPx = (int)ViewUtils.getPxFromDip(this, us.getActivationOffsetPositionDip());
-        int offsetHeightPx = (int)ViewUtils.getPxFromDip(this, us.getActivationOffsetHeightDip());
-        int width = (int)ViewUtils.getPxFromDip(this, us.getSensitivityDip());
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        int activationHeight = windowHeightPx - offsetHeightPx;
-        int marginTop = (windowHeightPx - activationHeight) / 2;
-        int marginBottom = marginTop;
+        Rect windowRect = new Rect(0, 0, metrics.widthPixels, metrics.heightPixels);
 
-        marginTop -= offsetPositionPx;
-        marginBottom += offsetPositionPx;
+        Rect indicatorRect = ActivationIndicatorHelper.calculateActivationIndicatorSize(
+                (int)ViewUtils.getPxFromDip(this, us.getSensitivityDip()),
+                (int)ViewUtils.getPxFromDip(this, us.getActivationOffsetPositionDip()),
+                (int)ViewUtils.getPxFromDip(this, us.getActivationOffsetHeightDip()),
+                us.isOnRightSide(),
+                windowRect
+        );
 
         RelativeLayout.LayoutParams newParams = new RelativeLayout.LayoutParams(mActivationIndicator.getLayoutParams());
-        newParams.setMargins(0, marginTop, 0, marginBottom);
-        newParams.width = width;
+        newParams.width = indicatorRect.width();
+        newParams.height = indicatorRect.height();
+        newParams.setMargins(
+                0,
+                indicatorRect.top - windowRect.top,
+                0,
+                windowRect.bottom - indicatorRect.bottom);
 
         newParams.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         newParams.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);

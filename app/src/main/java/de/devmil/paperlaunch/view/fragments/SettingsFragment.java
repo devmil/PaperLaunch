@@ -7,6 +7,8 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import de.devmil.paperlaunch.R;
 import de.devmil.paperlaunch.service.LauncherOverlayService;
@@ -67,6 +69,48 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 mUserSettings.load(getActivity());
                 mUserSettings.setSensitivityDip((Integer) newValue);
+                mUserSettings.save(getActivity());
+                LauncherOverlayService.notifyConfigChanged(getActivity());
+                fireActivationParametersChanged();
+                return true;
+            }
+        });
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        float heightDpi = metrics.heightPixels / metrics.density;
+
+        SeekBarPreference offsetHeightPreference = new SeekBarPreference(context, 0, (int)heightDpi);
+        activationCategory.addPreference(offsetHeightPreference);
+
+        offsetHeightPreference.setValue(mUserSettings.getActivationOffsetHeightDip());
+        offsetHeightPreference.setTitle("Height");
+        offsetHeightPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                mUserSettings.load(getActivity());
+                mUserSettings.setActivationOffsetHeightDip((Integer) newValue);
+                mUserSettings.save(getActivity());
+                LauncherOverlayService.notifyConfigChanged(getActivity());
+                fireActivationParametersChanged();
+                return true;
+            }
+        });
+
+        int offsetMin = -(int)(heightDpi / 2);
+        int offsetMax = (int)(heightDpi / 2);
+
+        SeekBarPreference offsetPositionPreference = new SeekBarPreference(context, offsetMin, offsetMax);
+        activationCategory.addPreference(offsetPositionPreference);
+
+        offsetPositionPreference.setValue(mUserSettings.getActivationOffsetPositionDip());
+        offsetPositionPreference.setTitle("Position");
+        offsetPositionPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                mUserSettings.load(getActivity());
+                mUserSettings.setActivationOffsetPositionDip((Integer) newValue);
                 mUserSettings.save(getActivity());
                 LauncherOverlayService.notifyConfigChanged(getActivity());
                 fireActivationParametersChanged();

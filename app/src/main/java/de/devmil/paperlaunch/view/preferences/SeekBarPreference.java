@@ -66,7 +66,7 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
     }
 
     public void setValue(int value) {
-        if(mCurrentValue == value) {
+        if(mValueSet && mCurrentValue == value) {
             return;
         }
         mCurrentValue = value;
