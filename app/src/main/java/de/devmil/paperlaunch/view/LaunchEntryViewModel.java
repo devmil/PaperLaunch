@@ -149,6 +149,10 @@ public class LaunchEntryViewModel {
         return mConfig.getEntryAlphaAnimationDuration();
     }
 
+    public boolean isOnRightSide() {
+        return mConfig.isOnRightSide();
+    }
+
     public static LaunchEntryViewModel createFrom(Context context, IEntry entry, ILaunchEntryConfig config) {
         return new LaunchEntryViewModel(context, entry, config);
     }

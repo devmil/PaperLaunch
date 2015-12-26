@@ -143,7 +143,7 @@ public class SettingsFragment extends PreferenceFragment {
         });
     }
 
-    private void addAppearanceSettings(Context context, PreferenceScreen screen) {
+    private void addAppearanceSettings(final Context context, PreferenceScreen screen) {
         PreferenceCategory apperanceCategory = new PreferenceCategory(context);
         screen.addPreference(apperanceCategory);
 
@@ -169,7 +169,7 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
 
-        ListPreference sidePreference = new ListPreference(context);
+        final ListPreference sidePreference = new ListPreference(context);
         apperanceCategory.addPreference(sidePreference);
 
         class SideEntry {
@@ -200,12 +200,12 @@ public class SettingsFragment extends PreferenceFragment {
             sideEntryValues.add(Boolean.toString(se.value));
         }
 
-
         sidePreference.setPersistent(false);
-        sidePreference.setTitle("Activation side");
+        sidePreference.setTitle(R.string.fragment_settings_appearance_side_title);
         sidePreference.setEntries(sideEntryTitles.toArray(new CharSequence[sideEntryTitles.size()]));
         sidePreference.setEntryValues(sideEntryValues.toArray(new CharSequence[sideEntryValues.size()]));
         sidePreference.setValue(Boolean.toString(mUserSettings.isOnRightSide()));
+        sidePreference.setSummary(context.getString(getSideSummary(mUserSettings.isOnRightSide())));
         sidePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -213,10 +213,17 @@ public class SettingsFragment extends PreferenceFragment {
                 mUserSettings.load(getActivity());
                 mUserSettings.setIsOnRightSide(newBooleanValue);
                 mUserSettings.save(getActivity());
+                sidePreference.setSummary(context.getString(getSideSummary(mUserSettings.isOnRightSide())));
                 LauncherOverlayService.notifyConfigChanged(getActivity());
                 fireActivationParametersChanged();
                 return true;
             }
         });
+    }
+
+    private int getSideSummary(boolean isOnRightSide) {
+        return isOnRightSide ?
+                R.string.fragment_settings_appearance_side_optionright_summary
+                : R.string.fragment_settings_appearance_side_optionleft_summary;
     }
 }

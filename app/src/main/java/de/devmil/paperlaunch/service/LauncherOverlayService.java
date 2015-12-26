@@ -345,7 +345,7 @@ public class LauncherOverlayService extends Service {
             if(mCurrentConfig.isVibrateOnActivation()) {
                 try {
                     Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-                    v.vibrate(30);
+                    v.vibrate(60);
                 } catch (Exception e) {
                     Log.w(TAG, "Vibrate didn't work", e);
                 }

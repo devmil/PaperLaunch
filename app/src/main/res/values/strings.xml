@@ -38,4 +38,7 @@
     <string name="fragment_settings_activation_vibrate_on_activation_summary_off">PaperLaunch doesn\'t vibrate on activation</string>
     <string name="fragment_settings_appearance_side_optionleft">Left</string>
     <string name="fragment_settings_appearance_side_optionright">Right</string>
+    <string name="fragment_settings_appearance_side_optionright_summary">PaperLaunch gets activated from the right</string>
+    <string name="fragment_settings_appearance_side_optionleft_summary">PaperLaunch gets activated from the left</string>
+    <string name="fragment_settings_appearance_side_title">Activation side</string>
 </resources>

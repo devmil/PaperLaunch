@@ -128,10 +128,18 @@ public class LaunchEntryView extends LinearLayout {
         switch(state)
         {
             case Inactive:
-                return imgWidthPx + 2*offset;
+                if(mViewModel.isOnRightSide()) {
+                    return imgWidthPx + 2 * offset;
+                } else {
+                    return -(imgWidthPx + 2 * offset);
+                }
             case Active:
             case Activating:
-                return imgWidthPx/2.0f + offset;
+                if(mViewModel.isOnRightSide()) {
+                    return imgWidthPx / 2.0f + offset;
+                } else {
+                    return -(imgWidthPx / 2.0f + offset);
+                }
             case Focusing:
             case Focused:
             case Selected:

@@ -155,7 +155,9 @@ public class LauncherView extends RelativeLayout {
                 R.id.id_launchview_lane5,
                 R.id.id_launchview_lane6,
                 R.id.id_launchview_lane7,
-                R.id.id_launchview_lane8
+                R.id.id_launchview_lane8,
+                R.id.id_launchview_lane9,
+                R.id.id_launchview_lane10
         };
     }
 
@@ -234,7 +236,6 @@ public class LauncherView extends RelativeLayout {
     }
 
     private void setEntriesToLane(LaunchLaneView laneView, List<IEntry> entries) {
-        //TODO: split into auto folders if there are too many of them
         List<LaunchEntryViewModel> entryModels = new ArrayList<>();
         for(IEntry e : entries)
         {
@@ -328,7 +329,9 @@ public class LauncherView extends RelativeLayout {
 
     private boolean sendIfMatches(LaunchLaneView laneView, int action, float x, float y, int laneNumber)
     {
-        laneView.doHandleTouch(action, (int) (x - laneView.getX()), (int) (y - laneView.getY()));
+        int laneX = (int) (x - laneView.getX());
+        int laneY = (int) (y - laneView.getY());
+        laneView.doHandleTouch(action, laneX, laneY);
         if(action == MotionEvent.ACTION_UP) {
             launchAppIfSelected();
             if(mListener != null) {

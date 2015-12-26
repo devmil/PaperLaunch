@@ -126,8 +126,9 @@ public class LaunchLaneView extends RelativeLayout {
                             transitToState(LaunchLaneViewModel.State.Selecting);
                         }
                     } else {
-                        if (x > focusSelectionBorder)
+                        if (x > 0) {
                             transitToState(LaunchLaneViewModel.State.Selecting);
+                        }
                     }
                 }
             }
@@ -138,7 +139,7 @@ public class LaunchLaneView extends RelativeLayout {
                 if (x > focusSelectionBorder)
                     transitToState(LaunchLaneViewModel.State.Focusing);
             } else {
-                if (x < focusSelectionBorder)
+                if (x < 0)
                     transitToState(LaunchLaneViewModel.State.Focusing);
             }
         }

@@ -28,4 +28,6 @@ public interface ILaunchEntryConfig {
     IDesignConfig getDesignConfig();
 
     float getImageOffsetDip();
+
+    boolean isOnRightSide();
 }
