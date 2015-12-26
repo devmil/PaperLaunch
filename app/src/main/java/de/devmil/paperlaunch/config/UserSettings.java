@@ -13,17 +13,23 @@ public class UserSettings implements IUserSettings {
     private static final String KEY_ACTIVATION_OFFSET_POSITION_DIP = "activationOffsetPositionDip";
     private static final String KEY_ACTIVATION_OFFSET_HEIGHT_DIP = "activationOffsetHeightDip";
     private static final String KEY_SHOW_BACKGROUND = "showBackground";
+    private static final String KEY_VIBRATE_ON_ACTIVATION = "vibrateOnActivation";
+    private static final String KEY_IS_ON_RIGHT_SIDE = "isOnRightSide";
 
     private static final int DEFAULT_SENSITIVITY_DIP = 15;
     private static final int DEFAULT_ACTIVATION_OFFSET_POSITION_DIP = 0;
     private static final int DEFAULT_ACTIVATION_OFFSET_HEIGHT_DIP = 0;
     private static final boolean DEFAULT_SHOW_BACKGROUND = false;
+    private static final boolean DEFAULT_VIBRATE_ON_ACTIVATION = false;
+    private static final boolean DEFAULT_IS_ON_RIGHT_SIDE = true;
 
 
     private int mSensitivityDip;
     private int mActivationOffsetPositionDip;
     private int mActivationOffsetHeightDip;
     private boolean mShowBackground;
+    private boolean mVibrateOnActivation;
+    private boolean mIsOnRightSide;
 
     public UserSettings(Context context) {
         load(context);
@@ -35,6 +41,8 @@ public class UserSettings implements IUserSettings {
         mActivationOffsetPositionDip = prefs.getInt(KEY_ACTIVATION_OFFSET_POSITION_DIP, DEFAULT_ACTIVATION_OFFSET_POSITION_DIP);
         mActivationOffsetHeightDip = prefs.getInt(KEY_ACTIVATION_OFFSET_HEIGHT_DIP, DEFAULT_ACTIVATION_OFFSET_HEIGHT_DIP);
         mShowBackground = prefs.getBoolean(KEY_SHOW_BACKGROUND, DEFAULT_SHOW_BACKGROUND);
+        mVibrateOnActivation = prefs.getBoolean(KEY_VIBRATE_ON_ACTIVATION, DEFAULT_VIBRATE_ON_ACTIVATION);
+        mIsOnRightSide = prefs.getBoolean(KEY_IS_ON_RIGHT_SIDE, DEFAULT_IS_ON_RIGHT_SIDE);
     }
 
     public void save(Context context) {
@@ -44,6 +52,8 @@ public class UserSettings implements IUserSettings {
                 .putInt(KEY_ACTIVATION_OFFSET_POSITION_DIP, mActivationOffsetPositionDip)
                 .putInt(KEY_ACTIVATION_OFFSET_HEIGHT_DIP, mActivationOffsetHeightDip)
                 .putBoolean(KEY_SHOW_BACKGROUND, mShowBackground)
+                .putBoolean(KEY_VIBRATE_ON_ACTIVATION, mVibrateOnActivation)
+                .putBoolean(KEY_IS_ON_RIGHT_SIDE, mIsOnRightSide)
                 .apply();
     }
 
@@ -80,7 +90,18 @@ public class UserSettings implements IUserSettings {
     }
 
     public boolean isOnRightSide() {
-        //TODO: make this a setting
-        return true;
+        return mIsOnRightSide;
+    }
+
+    public void setIsOnRightSide(boolean isOnRightSide) {
+        mIsOnRightSide = isOnRightSide;
+    }
+
+    public boolean isVibrateOnActivation() {
+        return mVibrateOnActivation;
+    }
+
+    public void setVibrateOnActivation(boolean vibrateOnActivation) {
+        mVibrateOnActivation = vibrateOnActivation;
     }
 }

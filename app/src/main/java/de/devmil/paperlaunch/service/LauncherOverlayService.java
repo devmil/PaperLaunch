@@ -11,7 +11,9 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,6 +38,9 @@ import de.devmil.paperlaunch.view.utils.ViewUtils;
 import de.devmil.paperlaunch.view.LauncherView;
 
 public class LauncherOverlayService extends Service {
+
+    private static final String TAG = LauncherOverlayService.class.getSimpleName();
+
     private static final String ACTION_LAUNCH = "ACTION_LAUNCH";
     private static final String ACTION_NOTIFYDATACHANGED = "ACTION_NOTIFYDATACHANGED";
     private static final String ACTION_NOTIFYCONFIGCHANGED = "ACTION_NOTIFYCONFIGCHANGED";
@@ -337,6 +342,14 @@ public class LauncherOverlayService extends Service {
             final WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
 
             wm.addView(mLauncherView, params);
+            if(mCurrentConfig.isVibrateOnActivation()) {
+                try {
+                    Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                    v.vibrate(30);
+                } catch (Exception e) {
+                    Log.w(TAG, "Vibrate didn't work", e);
+                }
+            }
             mIsLauncherActive = true;
             mLauncherView.setListener(new LauncherView.ILauncherViewListener() {
                 @Override

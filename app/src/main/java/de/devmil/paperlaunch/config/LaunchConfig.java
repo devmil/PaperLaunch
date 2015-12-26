@@ -50,6 +50,7 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private int mLauncherOffsetPositionDip;
     private int mLauncherOffsetHeightDip;
     private boolean mShowLauncherBackground;
+    private boolean mIsVibrateOnActivation;
 
     public List<IEntry> getEntries()
     {
@@ -63,6 +64,7 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
         mLauncherOffsetPositionDip = userSettings.getActivationOffsetPositionDip();
         mLauncherOffsetHeightDip = userSettings.getActivationOffsetHeightDip();
         mShowLauncherBackground = userSettings.isShowBackground();
+        mIsVibrateOnActivation = userSettings.isVibrateOnActivation();
     }
 
     public void setEntries(List<IEntry> entries)
@@ -172,5 +174,9 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
 
     public int getLauncherOffsetHeightDip() {
         return mLauncherOffsetHeightDip;
+    }
+
+    public boolean isVibrateOnActivation() {
+        return mIsVibrateOnActivation;
     }
 }

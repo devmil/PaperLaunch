@@ -7,4 +7,5 @@ public interface IUserSettings {
     int getSensitivityDip();
     boolean isOnRightSide();
     boolean isShowBackground();
+    boolean isVibrateOnActivation();
 }
