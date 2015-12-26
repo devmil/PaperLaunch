@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toolbar;
 
 import de.devmil.paperlaunch.config.UserSettings;
+import de.devmil.paperlaunch.service.LauncherOverlayService;
 import de.devmil.paperlaunch.utils.ActivationIndicatorHelper;
 import de.devmil.paperlaunch.utils.ViewUtils;
 import de.devmil.paperlaunch.view.fragments.SettingsFragment;
@@ -17,7 +18,7 @@ import de.devmil.paperlaunch.view.fragments.SettingsFragment;
 public class SettingsActivity extends Activity implements SettingsFragment.IActivationParametersChangedListener {
 
     private Toolbar mToolbar;
-    private LinearLayout mActivationIndicator;
+    private LinearLayout mActivationIndicatorContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +26,6 @@ public class SettingsActivity extends Activity implements SettingsFragment.IActi
         setContentView(R.layout.activity_settings);
 
         mToolbar = (Toolbar)findViewById(R.id.activity_settings_toolbar);
-        mActivationIndicator = (LinearLayout)findViewById(R.id.activity_settings_activation_indicator);
 
         setActionBar(mToolbar);
 
@@ -36,48 +36,43 @@ public class SettingsActivity extends Activity implements SettingsFragment.IActi
         sf.setOnActivationParametersChangedListener(this);
 
         updateActivationIndicator();
-
-        mActivationIndicator.bringToFront();
     }
 
     private void updateActivationIndicator() {
         UserSettings us = new UserSettings(this);
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        Rect windowRect = new Rect(0, 0, metrics.widthPixels, metrics.heightPixels);
-
-        Rect indicatorRect = ActivationIndicatorHelper.calculateActivationIndicatorSize(
+        LauncherOverlayService.ActivationViewResult avr = LauncherOverlayService.addActivationViewToWindow(
+                mActivationIndicatorContainer,
+                this,
                 (int)ViewUtils.getPxFromDip(this, us.getSensitivityDip()),
                 (int)ViewUtils.getPxFromDip(this, us.getActivationOffsetPositionDip()),
                 (int)ViewUtils.getPxFromDip(this, us.getActivationOffsetHeightDip()),
-                us.isOnRightSide(),
-                windowRect
+                us.isOnRightSide()
         );
 
-        RelativeLayout.LayoutParams newParams = new RelativeLayout.LayoutParams(mActivationIndicator.getLayoutParams());
-        newParams.width = indicatorRect.width();
-        newParams.height = indicatorRect.height();
-        newParams.setMargins(
-                0,
-                indicatorRect.top - windowRect.top,
-                0,
-                windowRect.bottom - indicatorRect.bottom);
+        mActivationIndicatorContainer = avr.container;
 
-        newParams.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        newParams.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        if(us.isOnRightSide()) {
-            newParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        } else {
-            newParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        }
+        avr.activationView.setElevation(ViewUtils.getPxFromDip(this, 3));
+        avr.activationView.setBackgroundColor(getResources().getColor(R.color.theme_accent));
 
-        mActivationIndicator.setLayoutParams(newParams);
+        LauncherOverlayService.ensureActivationTappable(this);
     }
 
     @Override
     public void onActivationParametersChanged() {
+        updateActivationIndicator();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LauncherOverlayService.removeTouchReceiver(this, mActivationIndicatorContainer);
+        mActivationIndicatorContainer = null;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         updateActivationIndicator();
     }
 }

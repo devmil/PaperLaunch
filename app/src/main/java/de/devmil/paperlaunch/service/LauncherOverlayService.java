@@ -40,6 +40,7 @@ public class LauncherOverlayService extends Service {
     private static final String ACTION_LAUNCH = "ACTION_LAUNCH";
     private static final String ACTION_NOTIFYDATACHANGED = "ACTION_NOTIFYDATACHANGED";
     private static final String ACTION_NOTIFYCONFIGCHANGED = "ACTION_NOTIFYCONFIGCHANGED";
+    private static final String ACTION_ENSUREACTIVATIONTAPPABLE = "ACTION_ENSUREACTIVATIONTAPPABLE";
     private static final String ACTION_PAUSE = "ACTION_PAUSE";
     private static final String ACTION_PLAY = "ACTION_PLAY";
     private static final int NOTIFICATION_ID = 2000;
@@ -143,6 +144,8 @@ public class LauncherOverlayService extends Service {
             mState.setIsActive(true);
             mState.save(this);
             adaptState(false);
+        } else if(intent != null && ACTION_ENSUREACTIVATIONTAPPABLE.equals(intent.getAction())) {
+            reloadTouchReceiver();
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -201,6 +204,12 @@ public class LauncherOverlayService extends Service {
     public static void notifyConfigChanged(Context context) {
         Intent launchServiceIntent = new Intent(context, LauncherOverlayService.class);
         launchServiceIntent.setAction(ACTION_NOTIFYCONFIGCHANGED);
+        context.startService(launchServiceIntent);
+    }
+
+    public static void ensureActivationTappable(Context context) {
+        Intent launchServiceIntent = new Intent(context, LauncherOverlayService.class);
+        launchServiceIntent.setAction(ACTION_ENSUREACTIVATIONTAPPABLE);
         context.startService(launchServiceIntent);
     }
 
@@ -345,18 +354,68 @@ public class LauncherOverlayService extends Service {
     }
 
     private synchronized void removeTouchReceiver() {
-        WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        removeTouchReceiver(this, mTouchReceiverContainer);
+        mTouchReceiverContainer = null;
+        mAlreadyRegistered = false;
+    }
 
-        if(mTouchReceiverContainer != null) {
-            wm.removeView(mTouchReceiverContainer);
-            mTouchReceiverContainer = null;
-            mAlreadyRegistered = false;
+    public static void removeTouchReceiver(Context context, LinearLayout container) {
+
+        if(container != null) {
+            WindowManager wm = (WindowManager) context.getSystemService(WINDOW_SERVICE);
+            wm.removeView(container);
         }
     }
 
     private synchronized void reloadTouchReceiver() {
 
-        WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        final ActivationViewResult avr = addActivationViewToWindow(
+                mTouchReceiverContainer,
+                this,
+                (int)ViewUtils.getPxFromDip(this, mCurrentConfig.getLauncherSensitivityDip()),
+                (int)ViewUtils.getPxFromDip(this, mCurrentConfig.getLauncherOffsetPositionDip()),
+                (int)ViewUtils.getPxFromDip(this, mCurrentConfig.getLauncherOffsetHeightDip()),
+                mCurrentConfig.isOnRightSide());
+
+        avr.activationView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return handleTouch(avr.activationView, event);
+            }
+        });
+
+        avr.activationView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    finishLauncher();
+                }
+            }
+        });
+
+        mTouchReceiverContainer = avr.container;
+
+        mAlreadyRegistered = true;
+    }
+
+    public static class ActivationViewResult {
+        public LinearLayout container;
+        public LinearLayout activationView;
+    }
+
+    public static ActivationViewResult addActivationViewToWindow(
+            LinearLayout oldContainer,
+            Context context,
+            int sensitivityPx,
+            int offsetPositionPx,
+            int offsetHeightPx,
+            boolean isOnRightSide) {
+
+        removeTouchReceiver(context, oldContainer);
+
+        ActivationViewResult result = new ActivationViewResult();
+
+        WindowManager wm = (WindowManager) context.getSystemService(WINDOW_SERVICE);
 
         DisplayMetrics metrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(metrics);
@@ -364,10 +423,10 @@ public class LauncherOverlayService extends Service {
         Rect windowRect = new Rect(0, 0, metrics.widthPixels, metrics.heightPixels);
 
         Rect activationRect = ActivationIndicatorHelper.calculateActivationIndicatorSize(
-                (int)ViewUtils.getPxFromDip(this, mCurrentConfig.getLauncherSensitivityDip()),
-                (int)ViewUtils.getPxFromDip(this, mCurrentConfig.getLauncherOffsetPositionDip()),
-                (int)ViewUtils.getPxFromDip(this, mCurrentConfig.getLauncherOffsetHeightDip()),
-                mCurrentConfig.isOnRightSide(),
+                sensitivityPx,
+                offsetPositionPx,
+                offsetHeightPx,
+                isOnRightSide,
                 windowRect
         );
 
@@ -379,41 +438,23 @@ public class LauncherOverlayService extends Service {
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT);
 
-        params.gravity = mCurrentConfig.isOnRightSide() ? Gravity.RIGHT : Gravity.LEFT;
+        params.gravity = isOnRightSide ? Gravity.RIGHT : Gravity.LEFT;
 
-        removeTouchReceiver();
+        result.container = new LinearLayout(context);
 
-        mTouchReceiverContainer = new LinearLayout(this);
+        wm.addView(result.container, params);
 
-        wm.addView(mTouchReceiverContainer, params);
-
-        final LinearLayout touchReceiver = new LinearLayout(this);
-        touchReceiver.setBackgroundColor(Color.TRANSPARENT);
-
-        touchReceiver.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return handleTouch(touchReceiver, event);
-            }
-        });
-
-        touchReceiver.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    finishLauncher();
-                }
-            }
-        });
+        result.activationView = new LinearLayout(context);
+        result.activationView.setBackgroundColor(Color.TRANSPARENT);
 
         LinearLayout.LayoutParams touchReceiverParams = new LinearLayout.LayoutParams(
                 activationRect.width(),
                 activationRect.height());
         touchReceiverParams.setMargins(0, activationRect.top, 0, windowRect.height() - activationRect.bottom);
 
-        mTouchReceiverContainer.addView(touchReceiver, touchReceiverParams);
+        result.container.addView(result.activationView, touchReceiverParams);
 
-        mAlreadyRegistered = true;
+        return result;
     }
 
     private synchronized void finishLauncher() {

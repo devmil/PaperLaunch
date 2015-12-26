@@ -12,13 +12,6 @@
         />
 
     <LinearLayout
-        android:id="@+id/activity_settings_activation_indicator"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/theme_accent"/>
-
-    <LinearLayout
         android:id="@+id/activity_settings_fragment_placeholder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -79,18 +79,18 @@ public class SettingsFragment extends PreferenceFragment {
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        float heightDpi = metrics.heightPixels / metrics.density;
+        final float heightDpi = metrics.heightPixels / metrics.density;
 
         SeekBarPreference offsetHeightPreference = new SeekBarPreference(context, 0, (int)heightDpi);
         activationCategory.addPreference(offsetHeightPreference);
 
-        offsetHeightPreference.setValue(mUserSettings.getActivationOffsetHeightDip());
+        offsetHeightPreference.setValue((int)heightDpi - mUserSettings.getActivationOffsetHeightDip());
         offsetHeightPreference.setTitle("Height");
         offsetHeightPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 mUserSettings.load(getActivity());
-                mUserSettings.setActivationOffsetHeightDip((Integer) newValue);
+                mUserSettings.setActivationOffsetHeightDip((int)heightDpi - (Integer) newValue);
                 mUserSettings.save(getActivity());
                 LauncherOverlayService.notifyConfigChanged(getActivity());
                 fireActivationParametersChanged();
