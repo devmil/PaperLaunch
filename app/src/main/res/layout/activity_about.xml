@@ -12,33 +12,23 @@
         layout="@layout/toolbar"
         />
 
-    <ImageView
+    <include
         android:id="@+id/activity_about_featuregraphic"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitStart"
-        android:adjustViewBounds="true"
-        android:src="@mipmap/featuregraphic"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="(c) 2015 by Devmil Solutions"/>
+        layout="@layout/feature_image" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Open source licenses"/>
+        android:text="@string/activity_about_opensource_headline"/>
 
     <ListView
         android:id="@+id/activity_about_info_listView"
         android:paddingTop="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </ListView>
 

@@ -41,4 +41,6 @@
     <string name="fragment_settings_appearance_side_optionright_summary">PaperLaunch gets activated from the right</string>
     <string name="fragment_settings_appearance_side_optionleft_summary">PaperLaunch gets activated from the left</string>
     <string name="fragment_settings_appearance_side_title">Activation side</string>
+    <string name="activity_about_copyright">(c) 2015 by Devmil Solutions</string>
+    <string name="activity_about_opensource_headline">Open source licenses</string>
 </resources>
