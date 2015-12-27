@@ -65,6 +65,12 @@ public abstract class AppMetadataUtils {
     public static Drawable getAppIcon(Context context, Intent launchIntent)
     {
         Drawable result = null;
+        boolean isShortcut = false;
+
+        if(launchIntent.hasExtra(Intent.EXTRA_SHORTCUT_INTENT)) {
+            isShortcut = true;
+        }
+
 
         if(launchIntent.hasExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE)) {
             result = getShortcutIcon(context, launchIntent);
@@ -87,7 +93,10 @@ public abstract class AppMetadataUtils {
             appInfo = null;
         }
         if(appInfo == null) {
-            return context.getResources().getDrawable(R.mipmap.ic_missing_app_red, context.getTheme());
+            if(!isShortcut) {
+                return context.getResources().getDrawable(R.mipmap.ic_missing_app_red, context.getTheme());
+            }
+            return context.getResources().getDrawable(R.mipmap.ic_link_black_48dp, context.getTheme());
         } else {
             return pm.getApplicationIcon(appInfo);
         }
