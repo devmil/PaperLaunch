@@ -157,7 +157,10 @@ public class LauncherView extends RelativeLayout {
                 R.id.id_launchview_lane7,
                 R.id.id_launchview_lane8,
                 R.id.id_launchview_lane9,
-                R.id.id_launchview_lane10
+                R.id.id_launchview_lane10,
+                R.id.id_launchview_lane11,
+                R.id.id_launchview_lane12,
+                R.id.id_launchview_lane13
         };
     }
 
@@ -211,6 +214,9 @@ public class LauncherView extends RelativeLayout {
                 }
                 if (selectedItem.isFolder()) {
                     IFolder f = (IFolder) selectedItem;
+                    if(mLaneViews.size() <= laneIndex + 1) {
+                        return;
+                    }
                     LaunchLaneView nextLaneView = mLaneViews.get(laneIndex + 1);
                     setEntriesToLane(nextLaneView, f.getSubEntries());
                     nextLaneView.start();

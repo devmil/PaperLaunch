@@ -2,6 +2,7 @@ package de.devmil.paperlaunch.view.fragments;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -164,6 +165,7 @@ public class EditFolderFragment extends Fragment {
                         .grid()
                         .sheet(2001, R.mipmap.ic_link_black_48dp, R.string.folder_settings_add_app)
                         .sheet(2002, R.mipmap.ic_folder_black_48dp, R.string.folder_settings_add_folder)
+                        .icon(R.mipmap.ic_add_black_24dp)
                         .listener(new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -267,6 +269,16 @@ public class EditFolderFragment extends Fragment {
     }
 
     private void initiateCreateFolder() {
+        if(mFolder != null
+                && mFolder.getDto().getDepth() >= mConfig.getMaxFolderDepth())
+        {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.folder_settings_add_folder_maxdepth_alert_title)
+                    .setMessage(R.string.folder_settings_add_folder_maxdepth_alert_message)
+                    .setPositiveButton(R.string.folder_settings_add_folder_maxdepth_alert_OK, null)
+                    .show();
+            return;
+        }
         long folderId = addFolder(getResources().getString(R.string.fragment_edit_folder_new_folder_name));
 
         Intent editFolderIntent = EditFolderActivity.createLaunchIntent(getActivity(), folderId);
@@ -341,7 +353,7 @@ public class EditFolderFragment extends Fragment {
         EntriesDataSource.getInstance().accessData(getActivity(), new ITransactionAction() {
             @Override
             public void execute(ITransactionContext transactionContext) {
-                local.folder = transactionContext.createFolder(mFolderId);
+                local.folder = transactionContext.createFolder(mFolderId, -1, mFolder == null ? 0 : mFolder.getDto().getDepth());
                 local.folder.getDto().setName(initialName);
                 transactionContext.updateFolderData(local.folder);
             }

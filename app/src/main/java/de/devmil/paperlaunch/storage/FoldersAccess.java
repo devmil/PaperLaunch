@@ -12,11 +12,13 @@ public class FoldersAccess {
             {
                     EntriesSQLiteOpenHelper.COLUMN_ID,
                     EntriesSQLiteOpenHelper.COLUMN_FOLDERS_NAME,
-                    EntriesSQLiteOpenHelper.COLUMN_FOLDERS_ICON
+                    EntriesSQLiteOpenHelper.COLUMN_FOLDERS_ICON,
+                    EntriesSQLiteOpenHelper.COLUMN_FOLDERS_DEPTH
             };
     private static final int INDEX_COLUMN_ID = 0;
     private static final int INDEX_COLUMN_NAME = 1;
     private static final int INDEX_COLUMN_ICON = 2;
+    private static final int INDEX_COLUMN_DEPTH = 3;
 
     private SQLiteDatabase mDatabase;
     private Context mContext;
@@ -86,12 +88,14 @@ public class FoldersAccess {
         return new FolderDTO(
                 cursor.getInt(INDEX_COLUMN_ID),
                 cursor.getString(INDEX_COLUMN_NAME),
-                BitmapUtils.getIcon(mContext, cursor.getBlob(INDEX_COLUMN_ICON))
+                BitmapUtils.getIcon(mContext, cursor.getBlob(INDEX_COLUMN_ICON)),
+                cursor.getInt(INDEX_COLUMN_DEPTH)
         );
     }
 
     private void folderToValues(FolderDTO folder, ContentValues values) {
         values.put(EntriesSQLiteOpenHelper.COLUMN_FOLDERS_NAME, folder.getName());
         values.put(EntriesSQLiteOpenHelper.COLUMN_FOLDERS_ICON, BitmapUtils.getBytes(folder.getIcon()));
+        values.put(EntriesSQLiteOpenHelper.COLUMN_FOLDERS_DEPTH, folder.getDepth());
     }
 }

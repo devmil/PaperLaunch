@@ -11,4 +11,8 @@
     <item type="id" name="id_launchview_lane8" />
     <item type="id" name="id_launchview_lane9" />
     <item type="id" name="id_launchview_lane10" />
+    <item type="id" name="id_launchview_lane11" />
+    <item type="id" name="id_launchview_lane12" />
+    <item type="id" name="id_launchview_lane13" />
+
 </resources>

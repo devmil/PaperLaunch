@@ -14,8 +14,7 @@ public interface ITransactionContext {
     void clear();
     Launch createLaunch(long parentFolderId);
     Launch createLaunch(long parentFolderId, int orderIndex);
-    Folder createFolder(long parentFolderId);
-    Folder createFolder(long parentFolderId, int orderIndex);
+    Folder createFolder(long parentFolderId, int orderIndex, int parentFolderDepth);
     Launch loadLaunch(long launchId);
     List<IEntry> loadRootContent();
     Folder loadFolder(long folderId);

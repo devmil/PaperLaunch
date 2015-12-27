@@ -93,17 +93,14 @@ public class EntriesDataSource {
         }
 
         @Override
-        public Folder createFolder(long parentFolderId) {
-            return createFolder(parentFolderId, -1);
-        }
-
-        @Override
-        public Folder createFolder(long parentFolderId, int orderIndex) {
+        public Folder createFolder(long parentFolderId, int orderIndex, int parentFolderDepth) {
             //create Entry
             EntryDTO entry = mEntriesAccess.createNew(orderIndex);
             entry.setParentFolderId(parentFolderId);
             //create folder
             FolderDTO folder = mFoldersAccess.createNew();
+            folder.setDepth(parentFolderDepth + 1);
+            mFoldersAccess.update(folder);
             //relate them
             entry.setFolderId(folder.getId());
 

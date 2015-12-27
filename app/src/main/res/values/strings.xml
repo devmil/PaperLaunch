@@ -55,4 +55,7 @@
     <string name="fragment_edit_folder_entries_details_content_description">Open entry details</string>
     <string name="fragment_edit_folder_entries_delete_content_description">Delete entry</string>
     <string name="fragment_edit_folder_editname_text_hint">Folder name</string>
+    <string name="folder_settings_add_folder_maxdepth_alert_title">Maximal depth reached</string>
+    <string name="folder_settings_add_folder_maxdepth_alert_message">The maximal depth has been reached. No more subfolders possible!</string>
+    <string name="folder_settings_add_folder_maxdepth_alert_OK">OK</string>
 </resources>

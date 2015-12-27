@@ -43,6 +43,7 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private int mLauncherBackgroundColor = Color.BLACK;
     private float mLauncherBackgroundAlpha = 0.3f;
     private int mLauncherBackgroundAnimationDurationMS = 250;
+    private int mMaxFolderDepth = 9;
 
     //UserSettings
     private int mLauncherSensitivityDip;
@@ -178,5 +179,9 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
 
     public boolean isVibrateOnActivation() {
         return mIsVibrateOnActivation;
+    }
+
+    public int getMaxFolderDepth() {
+        return mMaxFolderDepth;
     }
 }

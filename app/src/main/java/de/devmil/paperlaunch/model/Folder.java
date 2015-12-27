@@ -53,8 +53,13 @@ public class Folder implements IFolder {
 
     @Override
     public Drawable getIcon(Context context) {
-        return mDto.getIcon();
+        Drawable result = mDto.getIcon();
+        if(result == null) {
+            result = context.getDrawable(R.mipmap.folder_frame);
+        }
+        return result;
     }
+
     @Override
     public boolean useIconColor() {
         return true;
