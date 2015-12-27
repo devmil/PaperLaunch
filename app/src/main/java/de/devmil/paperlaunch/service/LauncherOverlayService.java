@@ -387,7 +387,8 @@ public class LauncherOverlayService extends Service {
                 (int)ViewUtils.getPxFromDip(this, mCurrentConfig.getLauncherSensitivityDip()),
                 (int)ViewUtils.getPxFromDip(this, mCurrentConfig.getLauncherOffsetPositionDip()),
                 (int)ViewUtils.getPxFromDip(this, mCurrentConfig.getLauncherOffsetHeightDip()),
-                mCurrentConfig.isOnRightSide());
+                mCurrentConfig.isOnRightSide(),
+                Color.TRANSPARENT);
 
         avr.activationView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -421,9 +422,8 @@ public class LauncherOverlayService extends Service {
             int sensitivityPx,
             int offsetPositionPx,
             int offsetHeightPx,
-            boolean isOnRightSide) {
-
-        removeTouchReceiver(context, oldContainer);
+            boolean isOnRightSide,
+            int backgroundColor) {
 
         ActivationViewResult result = new ActivationViewResult();
 
@@ -457,7 +457,7 @@ public class LauncherOverlayService extends Service {
         wm.addView(result.container, params);
 
         result.activationView = new LinearLayout(context);
-        result.activationView.setBackgroundColor(Color.TRANSPARENT);
+        result.activationView.setBackgroundColor(backgroundColor);
 
         LinearLayout.LayoutParams touchReceiverParams = new LinearLayout.LayoutParams(
                 activationRect.width(),
@@ -465,6 +465,8 @@ public class LauncherOverlayService extends Service {
         touchReceiverParams.setMargins(0, activationRect.top, 0, windowRect.height() - activationRect.bottom);
 
         result.container.addView(result.activationView, touchReceiverParams);
+
+        removeTouchReceiver(context, oldContainer);
 
         return result;
     }

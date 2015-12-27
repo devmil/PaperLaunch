@@ -15,6 +15,14 @@
       "url": "https://github.com/vinc3m1/DragSortAdapter",
       "copyright": "Copyright (C) 2015 Vincent Mi",
       "icon": "license_github"
+    },
+    {
+      "name": "RxAndroid",
+      "vendor": "The RxAndroid authors",
+      "license": "apache-v2",
+      "url": "https://github.com/ReactiveX/RxAndroid",
+      "copyright": "Copyright 2015 The RxAndroid authors",
+      "icon": "license_github"
     }
   ],
   "license": [

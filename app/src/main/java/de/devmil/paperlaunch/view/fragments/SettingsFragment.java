@@ -73,7 +73,6 @@ public class SettingsFragment extends PreferenceFragment {
                 mUserSettings.load(getActivity());
                 mUserSettings.setSensitivityDip((Integer) newValue);
                 mUserSettings.save(getActivity());
-                LauncherOverlayService.notifyConfigChanged(getActivity());
                 fireActivationParametersChanged();
                 return true;
             }
@@ -94,9 +93,8 @@ public class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 mUserSettings.load(getActivity());
-                mUserSettings.setActivationOffsetHeightDip((int)heightDpi - (Integer) newValue);
+                mUserSettings.setActivationOffsetHeightDip((int) heightDpi - (Integer) newValue);
                 mUserSettings.save(getActivity());
-                LauncherOverlayService.notifyConfigChanged(getActivity());
                 fireActivationParametersChanged();
                 return true;
             }
@@ -117,7 +115,6 @@ public class SettingsFragment extends PreferenceFragment {
                 mUserSettings.load(getActivity());
                 mUserSettings.setActivationOffsetPositionDip((Integer) newValue);
                 mUserSettings.save(getActivity());
-                LauncherOverlayService.notifyConfigChanged(getActivity());
                 fireActivationParametersChanged();
                 return true;
             }
@@ -214,7 +211,6 @@ public class SettingsFragment extends PreferenceFragment {
                 mUserSettings.setIsOnRightSide(newBooleanValue);
                 mUserSettings.save(getActivity());
                 sidePreference.setSummary(context.getString(getSideSummary(mUserSettings.isOnRightSide())));
-                LauncherOverlayService.notifyConfigChanged(getActivity());
                 fireActivationParametersChanged();
                 return true;
             }
