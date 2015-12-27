@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +47,8 @@ public class IntentSelector extends Activity {
     private CheckBox chkShowAllActivities;
 	private ExpandableListView lvShortcuts;
 	private TextView txtShortcuts;
+
+    private Toolbar mToolbar;
 	
 	private Thread searchThread = null;
     private Object searchThreadLockObject = new Object();
@@ -114,6 +117,9 @@ public class IntentSelector extends Activity {
         chkShowAllActivities = (CheckBox)findViewById(R.id.common__intentSelector_chkShowAllActivities);
 		lvShortcuts = (ExpandableListView)findViewById(R.id.common__intentSelector_lvShortcuts);
 		txtShortcuts = (TextView)findViewById(R.id.common__intentSelector_txtShortcuts);
+        mToolbar = (Toolbar)findViewById(R.id.common__intentSelector_toolbar);
+
+        setActionBar(mToolbar);
 		
 		txtShortcuts.setText(shortcutText);
 		
