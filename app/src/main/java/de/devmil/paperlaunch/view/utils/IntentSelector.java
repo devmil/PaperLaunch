@@ -365,7 +365,7 @@ public class IntentSelector extends Activity {
 		public View getChildView(int groupPosition, int childPosition,
 				boolean isLastChild, View convertView, ViewGroup parent) {
 			if(convertView == null) {
-				convertView = LayoutInflater.from(context).inflate(R.layout.common__intentselectoritem, null);
+				convertView = LayoutInflater.from(context).inflate(R.layout.common__intentselectoritem, parent, false);
 			}
 			TextView txt = (TextView)convertView.findViewById(R.id.common__intentselectoritem_text);
 			TextView txtActivityName = (TextView)convertView.findViewById(R.id.common__intentselectoritem_activityName);
@@ -399,7 +399,7 @@ public class IntentSelector extends Activity {
 		public View getGroupView(int groupPosition, boolean isExpanded,
 				View convertView, ViewGroup parent) {
 			if(convertView == null) {
-				convertView = LayoutInflater.from(context).inflate(R.layout.common__intentselectorgroup, null);
+				convertView = LayoutInflater.from(context).inflate(R.layout.common__intentselectorgroup, parent, false);
 			}
 			ImageView img = (ImageView)convertView.findViewById(R.id.common__intentselectorgroup_img);
 			TextView txt = (TextView)convertView.findViewById(R.id.common__intentselectorgroup_text);

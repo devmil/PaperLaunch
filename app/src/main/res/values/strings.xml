@@ -8,7 +8,7 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_about">About</string>
 
-    <string name="folder_settings_add_title">Create...</string>
+    <string name="folder_settings_add_title">Create&#8230;</string>
     <string name="folder_settings_add_app">App</string>
     <string name="folder_settings_add_app_activities">Activities</string>
     <string name="folder_settings_add_app_shortcuts">Shortcuts</string>
@@ -17,7 +17,7 @@
     <string name="fragment_edit_folder_name">Name:</string>
     <string name="fragment_edit_folder_new_folder_name">New Folder</string>
 
-    <string name="launcher_virtual_folder_name">more...</string>
+    <string name="launcher_virtual_folder_name">more&#8230;</string>
 
     <string name="notification_pause">Pause</string>
     <string name="notification_play">Start</string>
@@ -43,4 +43,16 @@
     <string name="fragment_settings_appearance_side_title">Activation side</string>
     <string name="activity_about_copyright">(c) 2015 by Devmil Solutions</string>
     <string name="activity_about_opensource_headline">Open source licenses</string>
+    <string name="common__intentselectorgroup_text_default">Group</string>
+    <string name="common__intentselectoritem_text_default">Item</string>
+    <string name="common__intentselectorgroup_activityName_default">Activity</string>
+    <string name="common__intentselectorview_chkshowall_text">Show all</string>
+    <string name="activity_license_info_entry_image_content_description">Entry image</string>
+    <string name="common__intentselectorgroup_img_content_description">Intent group image</string>
+    <string name="feature_image_content_description">PaperLaunch feature image</string>
+    <string name="fragment_edit_folder_entries_handle_content_description">Entry drag and drop handle</string>
+    <string name="fragment_edit_folder_entries_image_content_description">Entry image</string>
+    <string name="fragment_edit_folder_entries_details_content_description">Open entry details</string>
+    <string name="fragment_edit_folder_entries_delete_content_description">Delete entry</string>
+    <string name="fragment_edit_folder_editname_text_hint">Folder name</string>
 </resources>

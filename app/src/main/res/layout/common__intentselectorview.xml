@@ -58,7 +58,7 @@
                             android:id="@+id/common__intentSelector_chkShowAllActivities"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Show all" />
+                            android:text="@string/common__intentselectorview_chkshowall_text" />
 
                         <ExpandableListView
                             android:id="@+id/common__intentSelector_lvActivities"

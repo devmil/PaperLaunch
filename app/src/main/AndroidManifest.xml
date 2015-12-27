@@ -30,7 +30,7 @@
         <service
             android:name=".service.LauncherOverlayService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false" />
 
         <receiver
             android:name=".service.BootReceiver"

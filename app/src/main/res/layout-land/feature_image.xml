@@ -14,7 +14,8 @@
         android:scaleType="fitStart"
         android:maxHeight="100dp"
         android:adjustViewBounds="true"
-        android:src="@mipmap/featuregraphic" />
+        android:src="@mipmap/featuregraphic"
+        android:contentDescription="@string/feature_image_content_description"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

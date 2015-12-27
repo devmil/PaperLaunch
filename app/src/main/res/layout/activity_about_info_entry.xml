@@ -11,6 +11,7 @@
     android:background="@android:color/white">
     <ImageView
         android:id="@+id/activity_license_info_entry_image"
+        android:contentDescription="@string/activity_license_info_entry_image_content_description"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_margin="5dp"

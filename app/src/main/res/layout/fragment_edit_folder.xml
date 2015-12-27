@@ -29,6 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:singleLine="true"
+                android:hint="@string/fragment_edit_folder_editname_text_hint"
                 android:imeOptions="actionDone"/>
         </LinearLayout>
     </LinearLayout>
