@@ -6,16 +6,16 @@
 		android:layout_height="wrap_content">
 		<TextView android:layout_width="fill_parent"
 			android:paddingTop="15dip" android:layout_height="wrap_content"
-			android:paddingLeft="5dip" android:paddingRight="5dip"
-			android:textSize="17dip" android:gravity="center"
-			android:id="@+id/common__intentselectoritem_text" android:text="@string/common__intentselectoritem_text_default"></TextView>
+			android:paddingStart="5dip" android:paddingEnd="5dip"
+			android:textSize="17sp" android:gravity="center"
+			android:id="@+id/common__intentselectoritem_text" android:text="@string/common__intentselectoritem_text_default" />
 	</LinearLayout>
 	<LinearLayout android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
 		<TextView android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:paddingLeft="5dip"
-			android:paddingRight="5dip" android:paddingBottom="10dip"
-			android:textSize="12dip" android:gravity="center"
-			android:id="@+id/common__intentselectoritem_activityName" android:text="@string/common__intentselectorgroup_activityName_default"></TextView>
+			android:layout_height="wrap_content" android:paddingStart="5dip"
+			android:paddingEnd="5dip" android:paddingBottom="10dip"
+			android:textSize="12sp" android:gravity="center"
+			android:id="@+id/common__intentselectoritem_activityName" android:text="@string/common__intentselectorgroup_activityName_default" />
 	</LinearLayout>
 </LinearLayout>

@@ -13,8 +13,8 @@
 		android:layout_height="45dip"
 		android:text="@string/common__intentselectorgroup_text_default"
 		android:gravity="center_vertical|end"
-		android:paddingLeft="5dip"
-		android:paddingRight="5dip"
+		android:paddingStart="5dip"
+		android:paddingEnd="5dip"
 		android:textStyle="bold"
 		android:textSize="17sp" />
 </LinearLayout>

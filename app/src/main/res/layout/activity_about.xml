@@ -7,10 +7,14 @@
     android:orientation="vertical"
     tools:context="de.devmil.paperlaunch.AboutActivity">
 
-    <include
-        android:id="@+id/activity_about_toolbar"
-        layout="@layout/toolbar"
-        />
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include
+            android:id="@+id/activity_about_toolbar"
+            layout="@layout/toolbar"
+            />
+    </android.support.design.widget.AppBarLayout>
 
     <include
         android:id="@+id/activity_about_featuregraphic"
@@ -28,8 +32,8 @@
     <ListView
         android:id="@+id/activity_about_info_listView"
         android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_width="match_parent"

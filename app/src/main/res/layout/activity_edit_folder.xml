@@ -5,14 +5,19 @@
     android:layout_height="match_parent"
     tools:context="de.devmil.paperlaunch.EditFolderActivity">
 
-    <include
-        android:id="@+id/activity_edit_folder_toolbar"
-        layout="@layout/toolbar"
-        />
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/activity_edit_folder_toolbarlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include
+            android:id="@+id/activity_edit_folder_toolbar"
+            layout="@layout/toolbar"
+            />
+    </android.support.design.widget.AppBarLayout>
 
     <FrameLayout
         android:id="@+id/activity_edit_folder_folder_fragment"
-        android:layout_below="@id/activity_edit_folder_toolbar"
+        android:layout_below="@id/activity_edit_folder_toolbarlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
