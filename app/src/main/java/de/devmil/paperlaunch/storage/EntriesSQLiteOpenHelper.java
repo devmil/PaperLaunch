@@ -56,7 +56,7 @@ public class EntriesSQLiteOpenHelper extends SQLiteOpenHelper {
             + " ( "
             + COLUMN_ID                     + " integer primary key autoincrement, "
             + COLUMN_FOLDERS_NAME           + " text, "
-            + COLUMN_FOLDERS_ICON           + " blob "
+            + COLUMN_FOLDERS_ICON           + " blob, "
             + COLUMN_FOLDERS_DEPTH          + " integer "
             + " );";
 
