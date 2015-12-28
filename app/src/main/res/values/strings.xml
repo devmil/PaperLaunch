@@ -58,4 +58,11 @@
     <string name="folder_settings_add_folder_maxdepth_alert_title">Maximal depth reached</string>
     <string name="folder_settings_add_folder_maxdepth_alert_message">The maximal depth has been reached. No more subfolders possible!</string>
     <string name="folder_settings_add_folder_maxdepth_alert_OK">OK</string>
+    <string name="fragment_settings_appearance_gravity_optiontop">Top</string>
+    <string name="fragment_settings_appearance_gravity_optioncenter">Center</string>
+    <string name="fragment_settings_appearance_gravity_optionbottom">Bottom</string>
+    <string name="fragment_settings_appearance_gravity_title">Alignment</string>
+    <string name="fragment_settings_appearance_gravity_optiontop_summary">Entries are top-aligned</string>
+    <string name="fragment_settings_appearance_gravity_optioncenter_summary">Entries are center-aligned</string>
+    <string name="fragment_settings_appearance_gravity_optionbottom_summary">Entries are bottom-aligned</string>
 </resources>

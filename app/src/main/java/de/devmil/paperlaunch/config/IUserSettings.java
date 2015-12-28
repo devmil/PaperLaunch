@@ -8,4 +8,5 @@ public interface IUserSettings {
     boolean isOnRightSide();
     boolean isShowBackground();
     boolean isVibrateOnActivation();
+    LauncherGravity getLauncherGravity();
 }

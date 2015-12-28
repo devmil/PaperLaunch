@@ -52,6 +52,7 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
     private int mLauncherOffsetHeightDip;
     private boolean mShowLauncherBackground;
     private boolean mIsVibrateOnActivation;
+    private LauncherGravity mLauncherGravity;
 
     public List<IEntry> getEntries()
     {
@@ -66,6 +67,7 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
         mLauncherOffsetHeightDip = userSettings.getActivationOffsetHeightDip();
         mShowLauncherBackground = userSettings.isShowBackground();
         mIsVibrateOnActivation = userSettings.isVibrateOnActivation();
+        mLauncherGravity = userSettings.getLauncherGravity();
     }
 
     public void setEntries(List<IEntry> entries)
@@ -183,5 +185,9 @@ public class LaunchConfig implements ILaunchEntryConfig, ILaunchLaneConfig {
 
     public int getMaxFolderDepth() {
         return mMaxFolderDepth;
+    }
+
+    public LauncherGravity getLauncherGravity() {
+        return mLauncherGravity;
     }
 }

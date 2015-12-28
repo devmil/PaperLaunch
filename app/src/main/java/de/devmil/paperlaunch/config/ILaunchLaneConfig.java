@@ -28,4 +28,5 @@ public interface ILaunchLaneConfig {
     float getItemNameTextSizeSP();
     float getLaneIconTopMarginDip();
     float getLaneTextTopMarginDip();
+    LauncherGravity getLauncherGravity();
 }

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.devmil.paperlaunch.config.ILaunchLaneConfig;
+import de.devmil.paperlaunch.config.LauncherGravity;
 
 public class LaunchLaneViewModel {
     private List<LaunchEntryViewModel> mEntryModels;
@@ -99,5 +100,9 @@ public class LaunchLaneViewModel {
         Focusing,
         Selecting,
         Selected
+    }
+
+    public LauncherGravity getLauncherGravity() {
+        return mConfig.getLauncherGravity();
     }
 }

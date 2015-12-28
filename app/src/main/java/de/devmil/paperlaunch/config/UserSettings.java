@@ -15,6 +15,7 @@ public class UserSettings implements IUserSettings {
     private static final String KEY_SHOW_BACKGROUND = "showBackground";
     private static final String KEY_VIBRATE_ON_ACTIVATION = "vibrateOnActivation";
     private static final String KEY_IS_ON_RIGHT_SIDE = "isOnRightSide";
+    private static final String KEY_LAUNCHER_GRAVITY = "launcherGravity";
 
     private static final int DEFAULT_SENSITIVITY_DIP = 15;
     private static final int DEFAULT_ACTIVATION_OFFSET_POSITION_DIP = 0;
@@ -22,6 +23,7 @@ public class UserSettings implements IUserSettings {
     private static final boolean DEFAULT_SHOW_BACKGROUND = false;
     private static final boolean DEFAULT_VIBRATE_ON_ACTIVATION = false;
     private static final boolean DEFAULT_IS_ON_RIGHT_SIDE = true;
+    private static final LauncherGravity DEFAULT_LAUNCHER_GRAVITY = LauncherGravity.Center;
 
 
     private int mSensitivityDip;
@@ -30,6 +32,7 @@ public class UserSettings implements IUserSettings {
     private boolean mShowBackground;
     private boolean mVibrateOnActivation;
     private boolean mIsOnRightSide;
+    private LauncherGravity mLauncherGravity;
 
     public UserSettings(Context context) {
         load(context);
@@ -43,6 +46,7 @@ public class UserSettings implements IUserSettings {
         mShowBackground = prefs.getBoolean(KEY_SHOW_BACKGROUND, DEFAULT_SHOW_BACKGROUND);
         mVibrateOnActivation = prefs.getBoolean(KEY_VIBRATE_ON_ACTIVATION, DEFAULT_VIBRATE_ON_ACTIVATION);
         mIsOnRightSide = prefs.getBoolean(KEY_IS_ON_RIGHT_SIDE, DEFAULT_IS_ON_RIGHT_SIDE);
+        mLauncherGravity = LauncherGravity.fromValue(prefs.getInt(KEY_LAUNCHER_GRAVITY, DEFAULT_LAUNCHER_GRAVITY.getValue()));
     }
 
     public void save(Context context) {
@@ -54,6 +58,7 @@ public class UserSettings implements IUserSettings {
                 .putBoolean(KEY_SHOW_BACKGROUND, mShowBackground)
                 .putBoolean(KEY_VIBRATE_ON_ACTIVATION, mVibrateOnActivation)
                 .putBoolean(KEY_IS_ON_RIGHT_SIDE, mIsOnRightSide)
+                .putInt(KEY_LAUNCHER_GRAVITY, mLauncherGravity.getValue())
                 .apply();
     }
 
@@ -103,5 +108,13 @@ public class UserSettings implements IUserSettings {
 
     public void setVibrateOnActivation(boolean vibrateOnActivation) {
         mVibrateOnActivation = vibrateOnActivation;
+    }
+
+    public LauncherGravity getLauncherGravity() {
+        return mLauncherGravity;
+    }
+
+    public void setLauncherGravity(LauncherGravity launcherGravity) {
+        mLauncherGravity = launcherGravity;
     }
 }

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.devmil.paperlaunch.R;
+import de.devmil.paperlaunch.config.LauncherGravity;
 import de.devmil.paperlaunch.config.UserSettings;
 import de.devmil.paperlaunch.service.LauncherOverlayService;
 import de.devmil.paperlaunch.view.preferences.SeekBarPreference;
@@ -206,11 +207,66 @@ public class SettingsFragment extends PreferenceFragment {
         sidePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                boolean newBooleanValue = Boolean.parseBoolean((String)newValue);
+                boolean newBooleanValue = Boolean.parseBoolean((String) newValue);
                 mUserSettings.load(getActivity());
                 mUserSettings.setIsOnRightSide(newBooleanValue);
                 mUserSettings.save(getActivity());
                 sidePreference.setSummary(context.getString(getSideSummary(mUserSettings.isOnRightSide())));
+                fireActivationParametersChanged();
+                return true;
+            }
+        });
+
+        final ListPreference gravityPreference = new ListPreference(context);
+        apperanceCategory.addPreference(gravityPreference);
+
+        class GravityEntry {
+            GravityEntry(String title, LauncherGravity value) {
+                this.title = title;
+                this.value = value;
+            }
+            String title;
+            LauncherGravity value;
+        }
+
+        GravityEntry[] gravityEntryArray = new GravityEntry[]
+                {
+                        new GravityEntry(
+                                context.getString(R.string.fragment_settings_appearance_gravity_optiontop),
+                                LauncherGravity.Top
+                        ),
+                        new GravityEntry(
+                                context.getString(R.string.fragment_settings_appearance_gravity_optioncenter),
+                                LauncherGravity.Center
+                        ),
+                        new GravityEntry(
+                                context.getString(R.string.fragment_settings_appearance_gravity_optionbottom),
+                                LauncherGravity.Bottom
+                        )
+                };
+
+        List<CharSequence> gravityEntryTitles = new ArrayList<>();
+        List<CharSequence> gravityEntryValues = new ArrayList<>();
+        for(GravityEntry ge : gravityEntryArray) {
+            gravityEntryTitles.add(ge.title);
+            gravityEntryValues.add(Integer.toString(ge.value.getValue()));
+        }
+
+        gravityPreference.setPersistent(false);
+        gravityPreference.setTitle(R.string.fragment_settings_appearance_gravity_title);
+        gravityPreference.setEntries(gravityEntryTitles.toArray(new CharSequence[gravityEntryTitles.size()]));
+        gravityPreference.setEntryValues(gravityEntryValues.toArray(new CharSequence[gravityEntryValues.size()]));
+        gravityPreference.setValue(Integer.toString(mUserSettings.getLauncherGravity().getValue()));
+        gravityPreference.setSummary(context.getString(getGravitySummary(mUserSettings.getLauncherGravity())));
+        gravityPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                int newIntValue = Integer.parseInt((String) newValue);
+                LauncherGravity gravityValue = LauncherGravity.fromValue(newIntValue);
+                mUserSettings.load(getActivity());
+                mUserSettings.setLauncherGravity(gravityValue);
+                mUserSettings.save(getActivity());
+                gravityPreference.setSummary(context.getString(getGravitySummary(mUserSettings.getLauncherGravity())));
                 fireActivationParametersChanged();
                 return true;
             }
@@ -221,5 +277,17 @@ public class SettingsFragment extends PreferenceFragment {
         return isOnRightSide ?
                 R.string.fragment_settings_appearance_side_optionright_summary
                 : R.string.fragment_settings_appearance_side_optionleft_summary;
+    }
+
+    private int getGravitySummary(LauncherGravity gravity) {
+        switch(gravity) {
+            case Top:
+                return R.string.fragment_settings_appearance_gravity_optiontop_summary;
+            case Center:
+                return R.string.fragment_settings_appearance_gravity_optioncenter_summary;
+            case Bottom:
+                return R.string.fragment_settings_appearance_gravity_optionbottom_summary;
+        }
+        return -1;
     }
 }

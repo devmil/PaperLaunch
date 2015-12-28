@@ -166,6 +166,19 @@ public class LaunchLaneView extends RelativeLayout {
         removeAllViews();
         mEntriesContainer = new LinearLayout(getContext());
         mEntriesContainer.setOrientation(LinearLayout.VERTICAL);
+
+        switch(mViewModel.getLauncherGravity()) {
+            case Top:
+                mEntriesContainer.setGravity(Gravity.TOP);
+                break;
+            case Center:
+                mEntriesContainer.setGravity(Gravity.CENTER_VERTICAL);
+                break;
+            case Bottom:
+                mEntriesContainer.setGravity(Gravity.BOTTOM);
+                break;
+        }
+
         RelativeLayout.LayoutParams entriesContainerParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
