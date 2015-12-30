@@ -33,6 +33,7 @@ public class AboutActivity extends Activity {
     private Toolbar mToolbar;
     private LicenseManager mLicenseManager;
     private ListView mLicenseList;
+    private TextView mVersionText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +42,7 @@ public class AboutActivity extends Activity {
 
         mToolbar = (Toolbar)findViewById(R.id.activity_about_toolbar);
         mLicenseList = (ListView)findViewById(R.id.activity_about_info_listView);
+        mVersionText = (TextView)findViewById(R.id.feature_image_versiontext);
 
         setActionBar(mToolbar);
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -50,6 +52,12 @@ public class AboutActivity extends Activity {
         LicenseEntryAdapter adapter = new LicenseEntryAdapter(this, mLicenseManager.getLicenseInfo().getPackages().toArray(new PackageInfo[0]));
 
         mLicenseList.setAdapter(adapter);
+
+        mVersionText.setText(getVersionText());
+    }
+
+    private String getVersionText() {
+        return String.format("%s %s (%d)", getString(R.string.app_name), BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE);
     }
 
     class LicenseEntryAdapter extends ArrayAdapter<PackageInfo>

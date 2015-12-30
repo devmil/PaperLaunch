@@ -16,10 +16,23 @@
         android:adjustViewBounds="true"
         android:src="@mipmap/featuregraphic"
         android:contentDescription="@string/feature_image_content_description"/>
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_marginStart="5dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="@string/activity_about_copyright"/>
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/feature_image_versiontext"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/activity_about_copyright"/>
+    </LinearLayout>
 
 </LinearLayout>
