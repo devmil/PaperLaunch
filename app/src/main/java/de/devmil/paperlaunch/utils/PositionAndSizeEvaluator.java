@@ -23,8 +23,6 @@ import android.widget.LinearLayout;
 import java.io.InvalidClassException;
 
 /**
- * Created by michaellamers on 25.05.15.
- *
  * This class assumes that there is no initial margin and that the target view resides in a LinearLayout (or a derivative of it)
  * and that the endValue is the same as margins == 0
  */

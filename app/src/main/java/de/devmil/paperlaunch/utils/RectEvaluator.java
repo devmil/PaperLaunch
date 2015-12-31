@@ -19,9 +19,6 @@ import android.animation.IntEvaluator;
 import android.animation.TypeEvaluator;
 import android.graphics.Rect;
 
-/**
- * Created by michaellamers on 25.05.15.
- */
 public class RectEvaluator implements TypeEvaluator<Rect> {
     @Override
     public Rect evaluate(float fraction, Rect startValue, Rect endValue) {

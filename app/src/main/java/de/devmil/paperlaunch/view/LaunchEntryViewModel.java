@@ -21,9 +21,6 @@ import android.graphics.drawable.Drawable;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.config.ILaunchEntryConfig;
 
-/**
- * Created by michaellamers on 29.05.15.
- */
 public class LaunchEntryViewModel {
     private Context mContext;
     private IEntry mEntry;
