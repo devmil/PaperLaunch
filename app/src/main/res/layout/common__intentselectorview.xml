@@ -12,6 +12,7 @@
         android:id="@+id/common__intentSelector_llWait"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/common__intentSelector_toolbar"
         android:background="#96000000"
         android:gravity="center"
         android:clickable="true"
@@ -27,7 +28,8 @@
     <TabHost
         android:id="@android:id/tabhost"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:layout_below="@id/common__intentSelector_toolbar" >
 
         <LinearLayout
             android:id="@+id/common__intentSelector_linearLayout1"

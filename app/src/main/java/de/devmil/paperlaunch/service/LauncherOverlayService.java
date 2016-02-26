@@ -22,6 +22,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -529,12 +531,15 @@ public class LauncherOverlayService extends Service {
                 0
         );
 
+        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+
         Notification.Builder builder = new Notification.Builder(this)
                 .setContentTitle("PaperLaunch")
                 .setContentText(getString(mState.getIsActive() ? R.string.notification_content_active : R.string.notification_content_inactive))
                 .setOngoing(true)
                 .setLocalOnly(true)
                 .setSmallIcon(R.mipmap.ic_launcher)
+                //.setLargeIcon(largeIcon)
                 .setPriority(Notification.PRIORITY_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
