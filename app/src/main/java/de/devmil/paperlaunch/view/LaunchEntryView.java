@@ -16,6 +16,7 @@
 package de.devmil.paperlaunch.view;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,11 +24,39 @@ import android.widget.LinearLayout;
 import de.devmil.paperlaunch.model.IEntry;
 import de.devmil.paperlaunch.view.utils.ViewUtils;
 
+class LoadParams {
+    public LoadParams(ImageView target, LaunchEntryViewModel entry, Context context) {
+        this.target = target;
+        this.entry = entry;
+        this.context = context;
+    }
+    ImageView target;
+    LaunchEntryViewModel entry;
+    Context context;
+}
+
+class LoadIconTask extends AsyncTask<LoadParams, Void, Void> {
+
+    @Override
+    protected Void doInBackground(LoadParams... params) {
+        for(final LoadParams p : params) {
+            p.target.post(new Runnable() {
+                @Override
+                public void run() {
+                    p.target.setImageDrawable(p.entry.getAppIcon());
+                }
+            });
+        }
+        return null;
+    }
+}
+
 public class LaunchEntryView extends LinearLayout {
     private LaunchEntryViewModel mViewModel;
 
     private LinearLayout mImgFrame;
     private ImageView mAppIcon;
+    private LoadIconTask mLoadTask;
 
     public LaunchEntryView(Context context) {
         super(context);
@@ -116,7 +145,11 @@ public class LaunchEntryView extends LinearLayout {
         mImgFrame.addView(mAppIcon, imgParams);
         ViewUtils.disableClipping(mAppIcon);
 
-        mAppIcon.setImageDrawable(mViewModel.getAppIcon());
+        if(mLoadTask != null) {
+            mLoadTask.cancel(true);
+        }
+        mLoadTask = new LoadIconTask();
+        mLoadTask.execute(new LoadParams(mAppIcon, mViewModel, getContext()));
 
         mImgFrame.setElevation(ViewUtils.getPxFromDip(getContext(), mViewModel.getImageElevationDip()));
     }
