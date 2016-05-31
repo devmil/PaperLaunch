@@ -16,6 +16,7 @@
 package de.devmil.paperlaunch.view;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.widget.ImageView;
@@ -40,10 +41,11 @@ class LoadIconTask extends AsyncTask<LoadParams, Void, Void> {
     @Override
     protected Void doInBackground(LoadParams... params) {
         for(final LoadParams p : params) {
+            final Drawable icon = p.entry.getAppIcon();
             p.target.post(new Runnable() {
                 @Override
                 public void run() {
-                    p.target.setImageDrawable(p.entry.getAppIcon());
+                    p.target.setImageDrawable(icon);
                 }
             });
         }
