@@ -70,7 +70,7 @@ public abstract class AppMetadataUtils {
             }
 
             if(appName != null) {
-                appName.toString();
+                return appName.toString();
             }
 
             return null;
