@@ -402,7 +402,7 @@ class LauncherView : RelativeLayout {
             anim = ObjectAnimator.ofObject(
                     mNeutralZoneBackground,
                     "margins",
-                    PositionAndSizeEvaluator(mNeutralZoneBackground),
+                    PositionAndSizeEvaluator(mNeutralZoneBackground!!),
                     fromRect,
                     toRect)
             anim!!.addListener(object : Animator.AnimatorListener {
