@@ -158,7 +158,7 @@ public class LaunchLaneView extends RelativeLayout {
 
     private void construct()
     {
-        ViewUtils.disableClipping(this);
+        ViewUtils.INSTANCE.disableClipping(this);
     }
 
     private void createViews()
@@ -192,7 +192,7 @@ public class LaunchLaneView extends RelativeLayout {
         }
 
         addView(mEntriesContainer, entriesContainerParams);
-        ViewUtils.disableClipping(mEntriesContainer);
+        ViewUtils.INSTANCE.disableClipping(mEntriesContainer);
 
 
         mSelectIndicatorContainer = new LinearLayout(getContext());
@@ -205,12 +205,12 @@ public class LaunchLaneView extends RelativeLayout {
         indicatorContainerParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
         addView(mSelectIndicatorContainer, indicatorContainerParams);
-        ViewUtils.disableClipping(mSelectIndicatorContainer);
+        ViewUtils.INSTANCE.disableClipping(mSelectIndicatorContainer);
 
 
         mSelectIndicator = new LinearLayout(getContext());
         mSelectIndicator.setBackgroundColor(mViewModel.getFrameDefaultColor());
-        mSelectIndicator.setElevation(ViewUtils.getPxFromDip(getContext(), mViewModel.getSelectedImageElevationDip()));
+        mSelectIndicator.setElevation(ViewUtils.INSTANCE.getPxFromDip(getContext(), mViewModel.getSelectedImageElevationDip()));
         mSelectIndicator.setVisibility(View.INVISIBLE);
         mSelectIndicator.setGravity(Gravity.CENTER_HORIZONTAL);
         mSelectIndicator.setOrientation(LinearLayout.VERTICAL);
@@ -220,7 +220,7 @@ public class LaunchLaneView extends RelativeLayout {
                 LinearLayout.LayoutParams.MATCH_PARENT);
 
         mSelectIndicatorContainer.addView(mSelectIndicator, selectIndicatorParams);
-        ViewUtils.disableClipping(mSelectIndicator);
+        ViewUtils.INSTANCE.disableClipping(mSelectIndicator);
 
         mSelectedIcon = new ImageView(getContext());
         mSelectedIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
@@ -229,7 +229,7 @@ public class LaunchLaneView extends RelativeLayout {
         LinearLayout.LayoutParams selectIconParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
-        selectIconParams.setMargins(0, (int)ViewUtils.getPxFromDip(getContext(), mViewModel.getLaneIconTopMarginDip()), 0, 0);
+        selectIconParams.setMargins(0, (int) ViewUtils.INSTANCE.getPxFromDip(getContext(), mViewModel.getLaneIconTopMarginDip()), 0, 0);
 
         mSelectIndicator.addView(mSelectedIcon, selectIconParams);
 
@@ -242,7 +242,7 @@ public class LaunchLaneView extends RelativeLayout {
         LinearLayout.LayoutParams selectedItemTextViewParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
-        selectedItemTextViewParams.setMargins(0, (int)ViewUtils.getPxFromDip(getContext(), mViewModel.getLaneTextTopMarginDip()), 0, 0);
+        selectedItemTextViewParams.setMargins(0, (int) ViewUtils.INSTANCE.getPxFromDip(getContext(), mViewModel.getLaneTextTopMarginDip()), 0, 0);
         mSelectIndicator.addView(mSelectedItemTextView, selectedItemTextViewParams);
     }
 
@@ -373,8 +373,8 @@ public class LaunchLaneView extends RelativeLayout {
 
     private void applySizeParameters()
     {
-        mSelectedIcon.setMaxHeight((int) ViewUtils.getPxFromDip(getContext(), mViewModel.getImageWidthDip()));
-        mSelectedIcon.setMaxWidth((int) ViewUtils.getPxFromDip(getContext(), mViewModel.getImageWidthDip()));
+        mSelectedIcon.setMaxHeight((int) ViewUtils.INSTANCE.getPxFromDip(getContext(), mViewModel.getImageWidthDip()));
+        mSelectedIcon.setMaxWidth((int) ViewUtils.INSTANCE.getPxFromDip(getContext(), mViewModel.getImageWidthDip()));
     }
 
     private void showSelectionIndicator()
@@ -399,7 +399,7 @@ public class LaunchLaneView extends RelativeLayout {
                 && bmpResult != null
                 && bmpResult.getBitmap() != null) {
             mSelectIndicator.setBackgroundColor(
-                    ColorUtils.getBackgroundColorFromImage(
+                    ColorUtils.INSTANCE.getBackgroundColorFromImage(
                             bmpResult.getBitmap(),
                             mViewModel.getFrameDefaultColor()));
         } else {

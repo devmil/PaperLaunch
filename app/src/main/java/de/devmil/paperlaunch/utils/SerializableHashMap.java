@@ -22,15 +22,15 @@ import java.util.Map;
 public class SerializableHashMap<K, V> implements Serializable {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private Object[] keyArray;
 	private Object[] valuesArray;
 
 	public SerializableHashMap() {
-		
+
 	}
 
 	public SerializableHashMap(Map<?, ?> map) {
@@ -50,7 +50,7 @@ public class SerializableHashMap<K, V> implements Serializable {
 			}
 		}
 	}
-	
+
 	public Map<K, V> getHashMap() {
 		if(keyArray == null || valuesArray == null)
 			return null;
@@ -58,12 +58,12 @@ public class SerializableHashMap<K, V> implements Serializable {
 		fillHashMap(result);
 		return result;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void fillHashMap(HashMap<K, V> map) {
 		if(keyArray == null || valuesArray == null)
 			return;
 		for(int i=0; i<keyArray.length; i++)
-			map.put((K)keyArray[i], (V)valuesArray[i]);		
+			map.put((K)keyArray[i], (V)valuesArray[i]);
 	}
 }

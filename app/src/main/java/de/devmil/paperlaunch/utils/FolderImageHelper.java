@@ -39,12 +39,12 @@ public class FolderImageHelper {
         int cols = 3;
         int rows = 2;
 
-        int sizePx = (int) ViewUtils.getPxFromDip(context, imgSizeDip);
+        int sizePx = (int) ViewUtils.INSTANCE.getPxFromDip(context, imgSizeDip);
 
-        int offsetTopPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 4);
-        int offsetBottomPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 4.2f);
-        int offsetLeftPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 8);
-        int offsetRightPx = (int)ViewUtils.getPxFromDip(context, imgSizeDip / 8);
+        int offsetTopPx = (int) ViewUtils.INSTANCE.getPxFromDip(context, imgSizeDip / 4);
+        int offsetBottomPx = (int) ViewUtils.INSTANCE.getPxFromDip(context, imgSizeDip / 4.2f);
+        int offsetLeftPx = (int) ViewUtils.INSTANCE.getPxFromDip(context, imgSizeDip / 8);
+        int offsetRightPx = (int) ViewUtils.INSTANCE.getPxFromDip(context, imgSizeDip / 8);
 
         Rect contentRect = new Rect(offsetLeftPx, offsetTopPx, sizePx - offsetRightPx, sizePx - offsetBottomPx);
 
