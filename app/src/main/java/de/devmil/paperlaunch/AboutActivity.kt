@@ -53,7 +53,7 @@ class AboutActivity : Activity() {
 
         mLicenseManager = LicenseManager(this, R.raw.licenseinfo)
 
-        val adapter = LicenseEntryAdapter(this, mLicenseManager!!.licenseInfo.packages.toTypedArray())
+        val adapter = LicenseEntryAdapter(this, mLicenseManager!!.licenseInfo!!.packages.toTypedArray())
 
         mLicenseList!!.adapter = adapter
 
@@ -86,7 +86,7 @@ class AboutActivity : Activity() {
                 localConvertView.tag = vh
             }
 
-            val holder = convertView!!.tag as ViewHolder
+            val holder = localConvertView!!.tag as ViewHolder
 
             val item = getItem(position)
 
@@ -127,7 +127,7 @@ class AboutActivity : Activity() {
                 dlg.show()
             }
 
-            return convertView
+            return localConvertView
         }
     }
 
