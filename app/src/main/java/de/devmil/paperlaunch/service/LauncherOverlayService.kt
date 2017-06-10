@@ -250,13 +250,11 @@ class LauncherOverlayService : Service() {
         val metrics = DisplayMetrics()
         wm.defaultDisplay.getMetrics(metrics)
 
-        val entryHeightDip = mCurrentConfig!!.imageWidthDip
-        +2 * mCurrentConfig!!.imageMarginDip
-        +2 * mCurrentConfig!!.entriesMarginDip
+        val entryHeightDip = mCurrentConfig!!.imageWidthDip + 2 * mCurrentConfig!!.imageMarginDip + 2 * mCurrentConfig!!.entriesMarginDip
 
-        val entryHeightPx = ViewUtils.getPxFromDip(this, entryHeightDip).toInt()
+        val entryHeightPx = ViewUtils.getPxFromDip(this, entryHeightDip)
 
-        val numberOfEntriesPossible = metrics.heightPixels / entryHeightPx
+        val numberOfEntriesPossible = Math.floor(metrics.heightPixels / entryHeightPx.toDouble()).toInt()
 
         if (entries.size > numberOfEntriesPossible) {
             val virtualFolderContent = ArrayList<IEntry>()
@@ -274,8 +272,11 @@ class LauncherOverlayService : Service() {
         entries
                 .filter { it.isFolder }
                 .map { it as IFolder }
-                .filter { it.subEntries != null }
-                .forEach { it.subEntries = prepareEntries(it.subEntries!!.toMutableList()) }
+                .forEach {
+                    if(it.subEntries != null) {
+                        it.subEntries = prepareEntries(it.subEntries!!.toMutableList())
+                    }
+                }
 
         return entries
     }
