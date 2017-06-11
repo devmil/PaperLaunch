@@ -32,7 +32,7 @@ object ColorUtils {
 
     fun getBackgroundColorFromImage(drawable: Drawable, defaultColor: Int): Int {
         val bmpResult = BitmapUtils.drawableToBitmap(drawable)
-        if (bmpResult == null || bmpResult.bitmap == null) {
+        if (bmpResult == null) {
             return defaultColor
         }
         val p = Palette.from(bmpResult.bitmap).generate()

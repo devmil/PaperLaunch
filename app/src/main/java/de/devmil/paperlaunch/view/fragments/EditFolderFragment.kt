@@ -260,7 +260,7 @@ class EditFolderFragment : Fragment() {
                 return
             }
             if(data != null) {
-                addLaunch(data!!)
+                addLaunch(data)
             }
         } else if (REQUEST_EDIT_FOLDER == requestCode) {
             invalidate()

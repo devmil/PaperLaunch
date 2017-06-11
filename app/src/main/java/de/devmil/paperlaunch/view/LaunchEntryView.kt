@@ -166,14 +166,14 @@ class LaunchEntryView : LinearLayout {
         setImageParameters(getTranslateXToApply(state), getAlphaToApply(state), transit, state, delay)
     }
 
-    private fun setImageParameters(translateX: Float, alpha: Float, animate: Boolean, targetState: LaunchEntryViewModel.State?, delay: Int) {
+    private fun setImageParameters(translateX: Float, alpha: Float, animate: Boolean, targetState: LaunchEntryViewModel.State, delay: Int) {
         if (!animate) {
             mImgFrame!!.translationX = translateX
             mImgFrame!!.alpha = alpha
-            mViewModel!!.state = targetState!!
+            mViewModel!!.state = targetState
         } else {
             synchronized(this) {
-                if (targetState!!.hasAnimationState()) {
+                if (targetState.hasAnimationState()) {
                     mViewModel!!.state = targetState.animationState
                 }
                 mImgFrame!!.animate()
@@ -189,8 +189,7 @@ class LaunchEntryView : LinearLayout {
                                                 .setDuration(mViewModel!!.alphaDuration.toLong())
                                                 .withEndAction {
                                                     synchronized(this@LaunchEntryView) {
-                                                        if (targetState != null)
-                                                            mViewModel!!.state = targetState
+                                                        mViewModel!!.state = targetState
                                                     }
                                                 }
                                                 .start()

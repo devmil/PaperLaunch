@@ -20,6 +20,7 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
@@ -136,7 +137,7 @@ class LaunchLaneView : RelativeLayout {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        if (mEntryViews != null && mEntryViews.size > 0) {
+        if (mEntryViews.size > 0) {
             setMeasuredDimension(mEntryViews[0].measuredWidth, measuredHeight)
         }
     }
@@ -211,7 +212,7 @@ class LaunchLaneView : RelativeLayout {
         mSelectedItemTextView!!.visibility = View.GONE
         mSelectedItemTextView!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, mViewModel!!.itemNameTextSizeSP)
         //this is needed because the parts in the system run with another theme than the application parts
-        mSelectedItemTextView!!.setTextColor(resources.getColor(R.color.name_label))
+        mSelectedItemTextView!!.setTextColor(ContextCompat.getColor(context, R.color.name_label))
 
         val selectedItemTextViewParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -355,8 +356,7 @@ class LaunchLaneView : RelativeLayout {
 
         val bmpResult = BitmapUtils.drawableToBitmap(drawable)
         if (useIconColor
-                && bmpResult != null
-                && bmpResult.bitmap != null) {
+                && bmpResult != null) {
             mSelectIndicator!!.setBackgroundColor(
                     ColorUtils.getBackgroundColorFromImage(
                             bmpResult.bitmap,

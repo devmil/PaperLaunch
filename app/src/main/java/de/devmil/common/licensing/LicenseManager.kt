@@ -54,7 +54,7 @@ class LicenseManager(private val _Context: Context, private val _LicenseInfoFile
             return null
         }
 
-        var obj: JSONObject? = null
+        var obj: JSONObject?
         try {
             obj = JSONObject(licenseInfo.toString())
         } catch (e: JSONException) {

@@ -21,7 +21,7 @@ import android.content.Intent
 
 class BootReceiver : BroadcastReceiver() {
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(context: Context, intent: Intent?) {
         LauncherOverlayService.launch(context)
     }
 }

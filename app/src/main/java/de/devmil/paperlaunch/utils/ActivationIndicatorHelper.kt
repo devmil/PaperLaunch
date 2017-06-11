@@ -29,7 +29,7 @@ object ActivationIndicatorHelper {
         var top = availableRect.top
         var left = availableRect.left
         var right = availableRect.right
-        var bottom = availableRect.bottom
+        var bottom: Int
 
         if (isOnRightSide) {
             left = right - sensitivity
@@ -38,7 +38,7 @@ object ActivationIndicatorHelper {
         }
 
         val height = availableRect.height() - offsetSize
-        top = top + offsetPosition + offsetSize / 2
+        top += offsetPosition + offsetSize / 2
         bottom = top + height
 
         val result = Rect(left, top, right, bottom)

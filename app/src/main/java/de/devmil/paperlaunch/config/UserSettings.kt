@@ -55,7 +55,7 @@ class UserSettings(context: Context) : IUserSettings {
                 .putBoolean(KEY_SHOW_BACKGROUND, isShowBackground)
                 .putBoolean(KEY_VIBRATE_ON_ACTIVATION, isVibrateOnActivation)
                 .putBoolean(KEY_IS_ON_RIGHT_SIDE, isOnRightSide)
-                .putInt(KEY_LAUNCHER_GRAVITY, launcherGravity!!.value)
+                .putInt(KEY_LAUNCHER_GRAVITY, launcherGravity.value)
                 .apply()
     }
 

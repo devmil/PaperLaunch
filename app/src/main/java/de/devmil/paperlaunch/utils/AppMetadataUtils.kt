@@ -21,12 +21,13 @@ import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.support.v4.content.ContextCompat
 import de.devmil.paperlaunch.R
 
 object AppMetadataUtils {
 
-    fun getAppName(context: Context, appIntent: Intent): String? {
-        var appIntent = appIntent
+    fun getAppName(context: Context, intent: Intent): String? {
+        var appIntent = intent
 
         if (appIntent.hasExtra(Intent.EXTRA_SHORTCUT_NAME)) {
             return appIntent.getStringExtra(Intent.EXTRA_SHORTCUT_NAME)
@@ -39,7 +40,7 @@ object AppMetadataUtils {
 
         val pm = context.packageManager
 
-        var appInfo: ApplicationInfo? = null
+        var appInfo: ApplicationInfo?
         var activityInfo: ActivityInfo? = null
         try {
             appInfo = pm.getApplicationInfo(componentName.packageName, 0)
@@ -75,8 +76,8 @@ object AppMetadataUtils {
         }
     }
 
-    fun getAppIcon(context: Context, launchIntent: Intent): Drawable {
-        var launchIntent = launchIntent
+    fun getAppIcon(context: Context, intent: Intent): Drawable {
+        var launchIntent = intent
         var result: Drawable? = null
         var isShortcut = false
 
@@ -99,7 +100,7 @@ object AppMetadataUtils {
 
         val pm = context.packageManager
 
-        var appInfo: ApplicationInfo? = null
+        var appInfo: ApplicationInfo?
         try {
             appInfo = pm.getApplicationInfo(launchIntent.component.packageName, 0)
         } catch (e: Exception) {
@@ -124,7 +125,7 @@ object AppMetadataUtils {
             val iconRes = shortcutIntent.getParcelableExtra<Intent.ShortcutIconResource>(Intent.EXTRA_SHORTCUT_ICON_RESOURCE)
             val appRes = context.packageManager.getResourcesForApplication(iconRes.packageName)
             val resId = appRes.getIdentifier(iconRes.resourceName, null, null)
-            return appRes.getDrawable(resId)
+            return ContextCompat.getDrawable(context, resId)
         } catch (e: Exception) {
             e.printStackTrace()
         }

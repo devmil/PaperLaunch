@@ -55,7 +55,7 @@ class LicenseInfo private constructor() : ILicenseAccess {
 
         fun readFromJSON(obj: JSONObject): LicenseInfo? {
             val result = LicenseInfo()
-            var licenses: JSONArray? = null
+            var licenses: JSONArray?
             try {
                 licenses = obj.getJSONArray(LICENSE_ARRAY_IDENTIFIER)
             } catch (e: JSONException) {
@@ -74,7 +74,7 @@ class LicenseInfo private constructor() : ILicenseAccess {
                 }
 
             }
-            var packages: JSONArray? = null
+            var packages: JSONArray?
             try {
                 packages = obj.getJSONArray(PACKAGE_ARRAY_IDENTIFIER)
             } catch (e: JSONException) {

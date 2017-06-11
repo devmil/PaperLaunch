@@ -111,11 +111,10 @@ class LauncherView : RelativeLayout {
 
     fun handleTouchEvent(action: Int, x: Float, y: Float): Boolean {
         var result = false
-        var laneNum = 1
 
         //find the lane to dispatch to
         for (l in mLaneViews) {
-            result = sendIfMatches(l, action, x, y, laneNum++) || result
+            result = sendIfMatches(l, action, x, y) || result
         }
 
         return result
@@ -295,7 +294,7 @@ class LauncherView : RelativeLayout {
         mNeutralZoneBackground!!.addView(mNeutralZoneBackgroundAppNameText, backTextParams)
     }
 
-    private fun sendIfMatches(laneView: LaunchLaneView, action: Int, x: Float, y: Float, laneNumber: Int): Boolean {
+    private fun sendIfMatches(laneView: LaunchLaneView, action: Int, x: Float, y: Float): Boolean {
         val laneX = (x - laneView.x).toInt()
         val laneY = (y - laneView.y).toInt()
         laneView.doHandleTouch(action, laneX, laneY)

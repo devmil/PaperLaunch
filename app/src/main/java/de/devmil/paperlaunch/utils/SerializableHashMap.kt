@@ -57,6 +57,7 @@ class SerializableHashMap<K, V> : Serializable {
     fun fillHashMap(map: HashMap<K, V>) {
         if (keyArray == null || valuesArray == null)
             return
+        @Suppress("UNCHECKED_CAST")
         for (i in keyArray!!.indices)
             map.put(keyArray!![i] as K, valuesArray!![i] as V)
     }

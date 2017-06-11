@@ -15,6 +15,7 @@
  */
 package de.devmil.paperlaunch.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
@@ -27,6 +28,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Rect
+import android.graphics.drawable.Icon
 import android.os.IBinder
 import android.os.Vibrator
 import android.util.DisplayMetrics
@@ -120,7 +122,7 @@ class LauncherOverlayService : Service() {
         super.onDestroy()
     }
 
-    override fun onBind(intent: Intent): IBinder? {
+    override fun onBind(intent: Intent?): IBinder? {
         throw UnsupportedOperationException("Not yet implemented")
     }
 
@@ -348,9 +350,10 @@ class LauncherOverlayService : Service() {
                 mCurrentConfig!!.isOnRightSide,
                 Color.TRANSPARENT)
 
-        avr.activationView!!.setOnTouchListener { v, event -> handleTouch(avr.activationView!!, event) }
+        @Suppress("ClickableViewAccessibility")
+        avr.activationView!!.setOnTouchListener { _, event -> handleTouch(avr.activationView!!, event) }
 
-        avr.activationView!!.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
+        avr.activationView!!.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 finishLauncher()
             }
@@ -405,7 +408,7 @@ class LauncherOverlayService : Service() {
                 0
         )
 
-        val largeIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
+        //val largeIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
 
         val builder = Notification.Builder(this)
                 .setContentTitle("PaperLaunch")
@@ -427,6 +430,7 @@ class LauncherOverlayService : Service() {
                     0,
                     pauseIntent,
                     0)
+            @Suppress("DEPRECATION")
             builder.addAction(Notification.Action(
                     R.mipmap.ic_pause_black_24dp,
                     getString(R.string.notification_pause),
@@ -440,6 +444,7 @@ class LauncherOverlayService : Service() {
                     0,
                     playIntent,
                     0)
+            @Suppress("DEPRECATION")
             builder.addAction(Notification.Action(
                     R.mipmap.ic_play_arrow_black_24dp,
                     getString(R.string.notification_play),
@@ -534,6 +539,7 @@ class LauncherOverlayService : Service() {
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                     PixelFormat.TRANSLUCENT)
 
+            @Suppress("RtlHardcoded")
             params.gravity = if (isOnRightSide) Gravity.RIGHT else Gravity.LEFT
 
             result.container = LinearLayout(context)
