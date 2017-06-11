@@ -97,13 +97,8 @@ constructor(private val context: Context, val packageName: String) : Comparable<
         ensureSubCollections()
         val intentItemComparator = Comparator<IntentItem> { object1, object2 -> object1.compareTo(object2) }
 
-        val mainArray = mainActivityIntentItems!!.toTypedArray()
-        Arrays.sort(mainArray, intentItemComparator)
-        mainActivityIntentItems = ArrayList(Arrays.asList(*mainArray))
-
-        val shortcutArray = shortcutIntentItems!!.toTypedArray()
-        Arrays.sort(shortcutArray, intentItemComparator)
-        shortcutIntentItems = ArrayList(Arrays.asList(*shortcutArray))
+        mainActivityIntentItems!!.sortWith(intentItemComparator)
+        shortcutIntentItems!!.sortWith(intentItemComparator)
     }
 
     fun getMainActivityIntentItems(): List<IntentItem> {
