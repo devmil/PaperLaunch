@@ -17,16 +17,5 @@ package de.devmil.paperlaunch.storage
 
 import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.util.Log
 
-import org.json.JSONException
-import org.json.JSONObject
-
-import java.io.IOException
-
-import de.devmil.paperlaunch.utils.Base64
-import de.devmil.paperlaunch.utils.BitmapUtils
-import de.devmil.paperlaunch.utils.IntentSerializer
-
-class LaunchDTO(var id: Long, var name: String?, var launchIntent: Intent?, var icon: Drawable?) {
-}
+data class LaunchDTO(var id: Long, var name: String?, var launchIntent: Intent?, var icon: Drawable?)

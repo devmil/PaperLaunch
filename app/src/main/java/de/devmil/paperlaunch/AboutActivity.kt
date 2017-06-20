@@ -95,6 +95,7 @@ class AboutActivity : Activity() {
             holder.image!!.setImageResource(drawableId)
             holder.name!!.text = item.name
             holder.copyright!!.text = item.copyright
+            @Suppress("DEPRECATION")
             holder.url!!.text = Html.fromHtml("<a href=\"" + item.url + "\">" + item.url + "</a>")
             holder.url!!.autoLinkMask = Linkify.WEB_URLS
             holder.url!!.tag = item

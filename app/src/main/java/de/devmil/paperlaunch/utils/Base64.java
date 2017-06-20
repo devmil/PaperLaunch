@@ -17,16 +17,16 @@ package de.devmil.paperlaunch.utils;
 /**
  * <p>Encodes and decodes to and from Base64 notation.</p>
  * <p>Homepage: <a href="http://iharder.net/base64">http://iharder.net/base64</a>.</p>
- * 
+ *
  * <p>Example:</p>
- * 
+ *
  * <code>String encoded = Base64.encode( myByteArray );</code>
  * <br />
  * <code>byte[] myByteArray = Base64.decode( encoded );</code>
  *
- * <p>The <tt>options</tt> parameter, which appears in a few places, is used to pass 
- * several pieces of information to the encoder. In the "higher level" methods such as 
- * encodeBytes( bytes, options ) the options parameter can be used to indicate such 
+ * <p>The <tt>options</tt> parameter, which appears in a few places, is used to pass
+ * several pieces of information to the encoder. In the "higher level" methods such as
+ * encodeBytes( bytes, options ) the options parameter can be used to indicate such
  * things as first gzipping the bytes before encoding them, not inserting linefeeds,
  * and encoding using the URL-safe and Ordered dialects.</p>
  *
@@ -35,7 +35,7 @@ package de.devmil.paperlaunch.utils;
  * to do so. I've got Base64 set to this behavior now, although earlier versions
  * broke lines by default.</p>
  *
- * <p>The constants defined in Base64 can be OR-ed together to combine options, so you 
+ * <p>The constants defined in Base64 can be OR-ed together to combine options, so you
  * might make a call like this:</p>
  *
  * <code>String encoded = Base64.encodeBytes( mybytes, Base64.GZIP | Base64.DO_BREAK_LINES );</code>
@@ -1921,8 +1921,8 @@ public class Base64
             this.options      = options;
             this.decodabet    = getDecodabet(options);
         }   // end constructor
-        
-        
+
+
         /**
          * Writes the byte to the output stream after
          * converting to/from Base64 notation.
@@ -1936,19 +1936,19 @@ public class Base64
          * @since 1.3
          */
         @Override
-        public void write(int theByte) 
+        public void write(int theByte)
         throws java.io.IOException {
             // Encoding suspended?
             if( suspendEncoding ) {
                 this.out.write( theByte );
                 return;
             }   // end if: supsended
-            
+
             // Encode?
             if( encode ) {
                 buffer[ position++ ] = (byte)theByte;
                 if( position >= bufferLength ) { // Enough to encode.
-                
+
                     this.out.write( encode3to4( b4, buffer, bufferLength, options ) );
 
                     lineLength += 4;
@@ -1967,7 +1967,7 @@ public class Base64
                 if( decodabet[ theByte & 0x7f ] > WHITE_SPACE_ENC ) {
                     buffer[ position++ ] = (byte)theByte;
                     if( position >= bufferLength ) { // Enough to output.
-                    
+
                         int len = Base64.decode4to3( buffer, 0, b4, 0, options );
                         out.write( b4, 0, len );
                         position = 0;
@@ -1978,11 +1978,11 @@ public class Base64
                 }   // end else: not white space either
             }   // end else: decoding
         }   // end write
-        
-        
-        
+
+
+
         /**
-         * Calls {@link #write(int)} repeatedly until <var>len</var> 
+         * Calls {@link #write(int)} repeatedly until <var>len</var>
          * bytes are written.
          *
          * @param theBytes array from which to read bytes
@@ -1991,22 +1991,22 @@ public class Base64
          * @since 1.3
          */
         @Override
-        public void write( byte[] theBytes, int off, int len ) 
+        public void write( byte[] theBytes, int off, int len )
         throws java.io.IOException {
             // Encoding suspended?
             if( suspendEncoding ) {
                 this.out.write( theBytes, off, len );
                 return;
             }   // end if: supsended
-            
+
             for( int i = 0; i < len; i++ ) {
                 write( theBytes[ off + i ] );
             }   // end for: each byte written
-            
+
         }   // end write
-        
-        
-        
+
+
+
         /**
          * Method added by PHIL. [Thanks, PHIL. -Rob]
          * This pads the buffer without closing the stream.
@@ -2025,9 +2025,9 @@ public class Base64
 
         }   // end flush
 
-        
-        /** 
-         * Flushes and closes (I think, in the superclass) the stream. 
+
+        /**
+         * Flushes and closes (I think, in the superclass) the stream.
          *
          * @since 1.3
          */
@@ -2039,13 +2039,13 @@ public class Base64
             // 2. Actually close the stream
             // Base class both flushes and closes.
             super.close();
-            
+
             buffer = null;
             out    = null;
         }   // end close
-        
-        
-        
+
+
+
         /**
          * Suspends encoding of the stream.
          * May be helpful if you need to embed a piece of
@@ -2058,8 +2058,8 @@ public class Base64
             flushBase64();
             this.suspendEncoding = true;
         }   // end suspendEncoding
-        
-        
+
+
         /**
          * Resumes encoding of the stream.
          * May be helpful if you need to embed a piece of
@@ -2070,10 +2070,10 @@ public class Base64
         public void resumeEncoding() {
             this.suspendEncoding = false;
         }   // end resumeEncoding
-        
-        
-        
+
+
+
     }   // end inner class OutputStream
-    
-    
+
+
 }   // end class Base64

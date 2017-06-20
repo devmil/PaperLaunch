@@ -17,4 +17,4 @@ package de.devmil.paperlaunch.storage
 
 import android.graphics.drawable.Drawable
 
-class FolderDTO(var id: Long, var name: String?, var icon: Drawable?, var depth: Int)
+data class FolderDTO(var id: Long, var name: String?, var icon: Drawable?, var depth: Int)

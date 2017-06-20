@@ -15,4 +15,4 @@
  */
 package de.devmil.paperlaunch.storage
 
-class EntryDTO(var id: Long, var orderIndex: Long, var launchId: Long, var folderId: Long, var parentFolderId: Long)
+data class EntryDTO(var id: Long, var orderIndex: Long, var launchId: Long, var folderId: Long, var parentFolderId: Long)

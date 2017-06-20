@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class IntentSerializer {
-	
+
 	private static final String KEY_ACTION = "Action";
 	private static final String KEY_CATEGORIES = "Categories";
 	private static final String KEY_EXTRAS = "Extras";
@@ -40,8 +40,8 @@ public class IntentSerializer {
 	private static final String KEY_FLAGS = "Flags";
 	private static final String KEY_PACKAGE = "Package";
 	private static final String KEY_CLASS = "Class";
-	
-	
+
+
 	public static String serialize(Intent intent) {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		try {
@@ -49,7 +49,7 @@ public class IntentSerializer {
 					outStream);
 			HashMap<String, ContentDescriptor> contentStorage = new HashMap<String, ContentDescriptor>();
 			addContent(contentStorage, "", intent);
-			
+
 			objectOutStream.writeObject(new SerializableHashMap<String, ContentDescriptor>(contentStorage));
 			objectOutStream.flush();
 		} catch (IOException e) {
@@ -58,7 +58,7 @@ public class IntentSerializer {
 		}
 		return Base64.encodeBytes(outStream.toByteArray());
 	}
-	
+
 	public static Intent deserialize(String input) {
 		if (input == null)
 			return null;
@@ -82,7 +82,7 @@ public class IntentSerializer {
 		}
 		return null;
 	}
-	
+
 	private static void addContent(HashMap<String, ContentDescriptor> content, String key, Object object) {
 		if(object == null)
 			return;
@@ -123,7 +123,7 @@ public class IntentSerializer {
 			//Add special handler?
 		}
 	}
-	
+
 	private static Object getContent(Map<String, ContentDescriptor> content, String key) {
 		if(!content.containsKey(key))
 			return null;
@@ -149,12 +149,12 @@ public class IntentSerializer {
 			}else {
 				intentData = (Map<String, ContentDescriptor>)desc.getContent();
 			}
-			if(intentData.containsKey(KEY_ACTION)) 
+			if(intentData.containsKey(KEY_ACTION))
 				result.setAction((String)intentData.get(KEY_ACTION).getContent());
 			if(intentData.containsKey(KEY_CATEGORIES)) {
 				if(intentData.get(KEY_CATEGORIES).getContent() != null) {
 					for(String c : (String[])intentData.get(KEY_CATEGORIES).getContent())
-						result.addCategory(c);					
+						result.addCategory(c);
 				}
 			}
 			if(intentData.containsKey(KEY_EXTRAS))
@@ -228,6 +228,6 @@ public class IntentSerializer {
 			bundle.putParcelableArray(key, (Parcelable[])value);
 		else if(ArrayList.class.isAssignableFrom(value.getClass()) && Parcelable.class.isAssignableFrom((Class<?>)value.getClass().getGenericInterfaces()[0]))
 			bundle.putParcelableArrayList(key, (ArrayList<Parcelable>)value);
-		
+
 	}
 }
