@@ -29,6 +29,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import de.devmil.paperlaunch.R
+import java.lang.ref.WeakReference
 import java.util.*
 
 class IntentSelector : Activity() {
@@ -42,7 +43,7 @@ class IntentSelector : Activity() {
     private var mToolbar: Toolbar? = null
 
     class SearchTask
-    constructor(private val intentSelector : IntentSelector) : AsyncTask<Unit, Int, Unit>() {
+    constructor(intentSelector : IntentSelector) : AsyncTask<Unit, Int, Unit>() {
 
         private val entries = mutableListOf<IntentApplicationEntry>()
 
@@ -55,7 +56,7 @@ class IntentSelector : Activity() {
             //				List<ResolveInfo> mainResolved = getPackageManager().queryIntentActivities(mainIntent, PackageManager.GET_ACTIVITIES | PackageManager.GET_INTENT_FILTERS);
             //				List<ResolveInfo> launcherResolved = getPackageManager().queryIntentActivities(launcherIntent, PackageManager.GET_ACTIVITIES | PackageManager.GET_INTENT_FILTERS);
 
-            val pm = intentSelector.packageManager
+            val pm = intentSelector.get()!!.packageManager
 
             val shortcutResolved = ArrayList<ResolveInfo>()
             val mainResolved = ArrayList<ResolveInfo>()
@@ -63,7 +64,7 @@ class IntentSelector : Activity() {
 
             val appInfos = pm.getInstalledApplications(PackageManager.GET_META_DATA)
 
-            val showAll = intentSelector.chkShowAllActivities!!.isChecked
+            val showAll = intentSelector.get()!!.chkShowAllActivities!!.isChecked
 
             for (appInfo in appInfos) {
                 if(isCancelled || isObsolete) {
@@ -136,40 +137,46 @@ class IntentSelector : Activity() {
 
         override fun onPreExecute() {
             super.onPreExecute()
-            intentSelector.runOnUiThread { intentSelector.llWait!!.visibility = View.VISIBLE }
+            val localIntentSelector = intentSelector.get()
+            localIntentSelector?.runOnUiThread { localIntentSelector.llWait!!.visibility = View.VISIBLE }
         }
 
         override fun onPostExecute(result: Unit?) {
             super.onPostExecute(result)
-            intentSelector.runOnUiThread {
+            val localIntentSelector = intentSelector.get()
+            localIntentSelector?.runOnUiThread {
                 if(!isCancelled && !isObsolete) {
-                    intentSelector.adapterActivities = IntentSelectorAdapter(intentSelector, entries, IntentApplicationEntry.IntentType.Main)
-                    intentSelector.adapterShortcuts = IntentSelectorAdapter(intentSelector, entries, IntentApplicationEntry.IntentType.Shortcut)
+                    localIntentSelector.adapterActivities = IntentSelectorAdapter(localIntentSelector, entries, IntentApplicationEntry.IntentType.Main)
+                    localIntentSelector.adapterShortcuts = IntentSelectorAdapter(localIntentSelector, entries, IntentApplicationEntry.IntentType.Shortcut)
 
-                    intentSelector.lvActivities!!.setAdapter(intentSelector.adapterActivities)
-                    intentSelector.lvShortcuts!!.setAdapter(intentSelector.adapterShortcuts)
+                    localIntentSelector.lvActivities!!.setAdapter(localIntentSelector.adapterActivities)
+                    localIntentSelector.lvShortcuts!!.setAdapter(localIntentSelector.adapterShortcuts)
                 }
                 if(!isAnotherSearchRunning) {
-                    intentSelector.llWait!!.visibility = View.GONE
+                    localIntentSelector.llWait!!.visibility = View.GONE
                 }
             }
         }
 
         override fun onCancelled() {
             super.onCancelled()
-            intentSelector.runOnUiThread {
+            val localIntentSelector = intentSelector.get()
+            localIntentSelector?.runOnUiThread {
                 if(!isAnotherSearchRunning) {
-                    intentSelector.llWait!!.visibility = View.GONE
+                    localIntentSelector.llWait!!.visibility = View.GONE
                 }
             }
         }
 
         private fun addResolveInfo(ri: ResolveInfo, intentType: IntentApplicationEntry.IntentType, addAll: Boolean, entries : MutableList<IntentApplicationEntry>) {
-            var newEntry: IntentApplicationEntry
+            val localIntentSelector = intentSelector.get()
+            if(localIntentSelector == null) {
+                return
+            }
             try {
                 if (!addAll && !ri.activityInfo.exported)
                     return
-                newEntry = IntentApplicationEntry(intentSelector, ri.activityInfo.packageName)
+                var newEntry = IntentApplicationEntry(localIntentSelector, ri.activityInfo.packageName)
                 if (!entries.contains(newEntry)) {
                     entries.add(newEntry)
                 } else {
@@ -181,6 +188,8 @@ class IntentSelector : Activity() {
             }
 
         }
+
+        private var intentSelector : WeakReference<IntentSelector> = WeakReference<IntentSelector>(intentSelector)
     }
 
     private var mSearchTask : SearchTask? = null

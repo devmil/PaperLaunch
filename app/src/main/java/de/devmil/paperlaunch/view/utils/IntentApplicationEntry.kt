@@ -21,13 +21,14 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
+import java.lang.ref.WeakReference
 
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.Comparator
 
 class IntentApplicationEntry @Throws(NameNotFoundException::class)
-constructor(private val context: Context, val packageName: String) : Comparable<IntentApplicationEntry> {
+constructor(context: Context, val packageName: String) : Comparable<IntentApplicationEntry> {
 
     enum class IntentType {
         Main,
@@ -51,10 +52,11 @@ constructor(private val context: Context, val packageName: String) : Comparable<
 
     fun addResolveInfo(info: ResolveInfo, intentType: IntentType) {
         var newItem = IntentItem(info)
-        if (intentItems.contains(newItem))
+        if (intentItems.contains(newItem)) {
             newItem = intentItems[intentItems.indexOf(newItem)]
-        else
+        } else {
             intentItems.add(newItem)
+        }
         when (intentType) {
             IntentApplicationEntry.IntentType.Main -> newItem.isMainActivity = true
             IntentApplicationEntry.IntentType.Shortcut -> newItem.isShortcut = true
@@ -64,8 +66,9 @@ constructor(private val context: Context, val packageName: String) : Comparable<
     }
 
     fun getAppIcon(): Drawable? {
-        if (appIcon == null)
-            appIcon = context.packageManager.getApplicationIcon(appInfo)
+        val ctx = context.get()
+        if (appIcon == null && ctx != null)
+            appIcon = ctx.packageManager.getApplicationIcon(appInfo)
         return appIcon
     }
 
@@ -114,9 +117,10 @@ constructor(private val context: Context, val packageName: String) : Comparable<
     override fun equals(other: Any?): Boolean {
         if (other == null)
             return false
-        if (other !is IntentApplicationEntry)
+        val castedOther = other as IntentApplicationEntry?
+        if (castedOther == null)
             return false
-        return compareTo((other as IntentApplicationEntry?)!!) == 0
+        return compareTo(castedOther) == 0
     }
 
     override fun hashCode(): Int {
@@ -126,7 +130,7 @@ constructor(private val context: Context, val packageName: String) : Comparable<
     inner class IntentItem(resolveInfo: ResolveInfo) : Comparable<IntentItem> {
         val packageName: String = resolveInfo.activityInfo.packageName
         val activityName: String = resolveInfo.activityInfo.name
-        private val name: CharSequence = resolveInfo.activityInfo.loadLabel(context.packageManager)
+        private val name: CharSequence = resolveInfo.activityInfo.loadLabel(context.get()?.packageManager)
         var isShortcut = false
         var isMainActivity = false
         var isLauncherActivity = false
@@ -141,7 +145,7 @@ constructor(private val context: Context, val packageName: String) : Comparable<
         override fun equals(other: Any?): Boolean {
             if (other == null)
                 return false
-            if (other is IntentItem)
+            if (other !is IntentItem?)
                 return false
             val castedOther = other as IntentItem?
             return castedOther!!.packageName == packageName && castedOther.activityName == activityName
@@ -152,10 +156,6 @@ constructor(private val context: Context, val packageName: String) : Comparable<
 
             result = result or packageName.hashCode()
             result = result or activityName.hashCode()
-            result = result or name.hashCode()
-            result = result or isShortcut.hashCode()
-            result = result or isMainActivity.hashCode()
-            result = result or isLauncherActivity.hashCode()
 
             return result
         }
@@ -169,4 +169,6 @@ constructor(private val context: Context, val packageName: String) : Comparable<
         val displayName: String
             get() = name.toString() + if (isLauncherActivity) " (Launcher)" else ""
     }
+
+    private val context : WeakReference<Context> = WeakReference<Context>(context)
 }
