@@ -60,9 +60,8 @@ class LauncherViewModel(private val mConfig: LaunchConfig) {
     val itemNameTextSizeSP: Float
         get() = mConfig.itemNameTextSizeSP
 
-    internal fun showBackground(): Boolean {
-        return mConfig.showLauncherBackground
-    }
+    val showBackground: Boolean
+        get() = mConfig.showLauncherBackground
 
     val backgroundAlpha: Float
         get() = mConfig.launcherBackgroundAlpha

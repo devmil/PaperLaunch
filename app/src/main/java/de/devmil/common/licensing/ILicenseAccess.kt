@@ -15,9 +15,6 @@
  */
 package de.devmil.common.licensing
 
-/**
- * Created by devmil on 18.04.14.
- */
 interface ILicenseAccess {
 
     fun getLicense(identifier: String): LicenseDefinition

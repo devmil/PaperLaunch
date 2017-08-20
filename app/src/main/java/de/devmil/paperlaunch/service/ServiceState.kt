@@ -25,7 +25,7 @@ class ServiceState(context: Context) {
         load(context)
     }
 
-    fun load(context: Context) {
+    private fun load(context: Context) {
         val prefs = context.getSharedPreferences(SERVICE_PREFS_NAME, Context.MODE_PRIVATE)
         isActive = prefs.getBoolean(KEY_IS_ACTIVE, DEFAULT_IS_ACTIVE)
     }

@@ -29,24 +29,24 @@ import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
 
-class SettingsActivity : Activity(), SettingsFragment.IActivationParametersChangedListener {
+class SettingsActivity : Activity() {
 
-    private var mToolbar: Toolbar? = null
-    private var mActivationIndicatorContainer: LinearLayout? = null
-    private var mFragment: SettingsFragment? = null
+    private var toolbar: Toolbar? = null
+    private var activationIndicatorContainer: LinearLayout? = null
+    private var fragment: SettingsFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        mToolbar = findViewById(R.id.activity_settings_toolbar) as Toolbar
+        toolbar = findViewById(R.id.activity_settings_toolbar) as Toolbar
 
-        setActionBar(mToolbar)
+        setActionBar(toolbar)
 
         actionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        mFragment = SettingsFragment()
-        fragmentManager.beginTransaction().replace(R.id.activity_settings_fragment_placeholder, mFragment).commit()
+        fragment = SettingsFragment()
+        fragmentManager.beginTransaction().replace(R.id.activity_settings_fragment_placeholder, fragment).commit()
 
         updateActivationIndicator()
 
@@ -62,7 +62,7 @@ class SettingsActivity : Activity(), SettingsFragment.IActivationParametersChang
         val us = UserSettings(this)
 
         val avr = LauncherOverlayService.addActivationViewToWindow(
-                mActivationIndicatorContainer,
+                activationIndicatorContainer,
                 this,
                 ViewUtils.getPxFromDip(this, us.sensitivityDip.toFloat()).toInt(),
                 ViewUtils.getPxFromDip(this, us.activationOffsetPositionDip.toFloat()).toInt(),
@@ -71,7 +71,7 @@ class SettingsActivity : Activity(), SettingsFragment.IActivationParametersChang
                 ContextCompat.getColor(this, R.color.theme_accent)
         )
 
-        mActivationIndicatorContainer = avr.container
+        activationIndicatorContainer = avr.container
 
         avr.activationView!!.elevation = ViewUtils.getPxFromDip(this, 3f)
 
@@ -81,20 +81,16 @@ class SettingsActivity : Activity(), SettingsFragment.IActivationParametersChang
     private var mSubscription: Subscription? = null
 
     private fun subscribeToParametersChangedEvent() {
-        mSubscription = Observable.create(Observable.OnSubscribe<Boolean> { subscriber -> mFragment!!.setOnActivationParametersChangedListener { subscriber.onNext(true) } })
+        mSubscription = Observable.create(Observable.OnSubscribe<Boolean> { subscriber -> fragment!!.setOnActivationParametersChangedListener { subscriber.onNext(true) } })
                 .debounce(100, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { updateActivationIndicator() }
     }
 
-    override fun onActivationParametersChanged() {
-        updateActivationIndicator()
-    }
-
     override fun onPause() {
         super.onPause()
-        LauncherOverlayService.removeTouchReceiver(this, mActivationIndicatorContainer)
-        mActivationIndicatorContainer = null
+        LauncherOverlayService.removeTouchReceiver(this, activationIndicatorContainer)
+        activationIndicatorContainer = null
     }
 
     override fun onResume() {

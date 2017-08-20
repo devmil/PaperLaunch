@@ -18,7 +18,7 @@ package de.devmil.paperlaunch.model
 import android.content.Context
 import android.graphics.drawable.Drawable
 
-class VirtualFolder(private val mName: String, private val mIcon: Drawable, subEntries: List<IEntry>) : IFolder {
+class VirtualFolder(private val name: String, private val icon: Drawable, subEntries: List<IEntry>) : IFolder {
     override var subEntries: List<IEntry>? = null
         get() = field
 
@@ -36,15 +36,15 @@ class VirtualFolder(private val mName: String, private val mIcon: Drawable, subE
         get() = -1
 
     override fun getName(context: Context): String? {
-        return mName
+        return name
     }
 
     override fun getIcon(context: Context): Drawable? {
-        return mIcon
+        return icon
     }
 
     override fun getFolderSummaryIcon(context: Context): Drawable? {
-        return mIcon
+        return icon
     }
 
     override val isFolder: Boolean

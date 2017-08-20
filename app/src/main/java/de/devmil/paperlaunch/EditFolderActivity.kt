@@ -10,15 +10,15 @@ import de.devmil.paperlaunch.view.fragments.EditFolderFragment
 
 class EditFolderActivity : Activity() {
 
-    private var mToolbar: Toolbar? = null
+    private var toolbar: Toolbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_folder)
 
-        mToolbar = findViewById(R.id.activity_edit_folder_toolbar) as Toolbar
+        toolbar = findViewById(R.id.activity_edit_folder_toolbar) as Toolbar
 
-        setActionBar(mToolbar)
+        setActionBar(toolbar)
         actionBar!!.setDisplayHomeAsUpEnabled(true)
         actionBar!!.setDisplayShowHomeEnabled(true)
 

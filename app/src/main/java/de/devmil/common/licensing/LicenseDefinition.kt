@@ -20,10 +20,7 @@ import android.util.Log
 import org.json.JSONException
 import org.json.JSONObject
 
-/**
- * Created by devmil on 18.04.14.
- */
-class LicenseDefinition private constructor(val id: String, val name: String, val url: String, val content: String) {
+class LicenseDefinition private constructor(val id: String, val name: String, @Suppress("UNUSED_PARAMETER") url: String, val content: String) {
     companion object {
 
         private val ID_IDENTIFIER = "id"
@@ -32,17 +29,18 @@ class LicenseDefinition private constructor(val id: String, val name: String, va
         private val CONTENT_IDENTIFIER = "content"
 
         fun readFromJSON(obj: JSONObject): LicenseDefinition? {
-            try {
+            return try {
                 val id = obj.getString(ID_IDENTIFIER)
                 val name = obj.getString(NAME_IDENTIFIER)
                 val url = obj.getString(URL_IDENTIFIER)
                 val content = obj.getString(CONTENT_IDENTIFIER)
                 val result = LicenseDefinition(id, name, url, content)
 
-                return result
+                result
             } catch (e: JSONException) {
+
                 Log.w(LicenseDefinition::class.java.simpleName, "Error reading LicenseDefinition", e)
-                return null
+                null
             }
 
         }

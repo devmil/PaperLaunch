@@ -23,10 +23,10 @@ import android.database.sqlite.SQLiteDatabase
 import de.devmil.paperlaunch.utils.BitmapUtils
 import de.devmil.paperlaunch.utils.IntentSerializer
 
-class LaunchesAccess(private val mContext: Context, private val mDatabase: SQLiteDatabase) {
+class LaunchesAccess(private val context: Context, private val database: SQLiteDatabase) {
 
     fun queryLaunch(launchId: Long): LaunchDTO? {
-        val c = mDatabase.query(
+        val c = database.query(
                 EntriesSQLiteOpenHelper.TABLE_LAUNCHES,
                 launchesColumns,
                 EntriesSQLiteOpenHelper.COLUMN_ID + " = " + launchId,
@@ -45,7 +45,7 @@ class LaunchesAccess(private val mContext: Context, private val mDatabase: SQLit
         val values = ContentValues()
         values.put(EntriesSQLiteOpenHelper.COLUMN_LAUNCHES_NAME, null as String?)
 
-        val id = mDatabase.insert(
+        val id = database.insert(
                 EntriesSQLiteOpenHelper.TABLE_LAUNCHES, null,
                 values)
 
@@ -57,19 +57,20 @@ class LaunchesAccess(private val mContext: Context, private val mDatabase: SQLit
 
         launchToValues(launch, values)
 
-        mDatabase.update(
+        database.update(
                 EntriesSQLiteOpenHelper.TABLE_LAUNCHES,
                 values,
                 EntriesSQLiteOpenHelper.COLUMN_ID + " = " + launch.id, null
         )
     }
 
+    @Suppress("unused")
     fun delete(launch: LaunchDTO) {
         delete(launch.id)
     }
 
     fun delete(launchId: Long) {
-        mDatabase.delete(
+        database.delete(
                 EntriesSQLiteOpenHelper.TABLE_LAUNCHES,
                 EntriesSQLiteOpenHelper.COLUMN_ID + " = " + launchId, null
         )
@@ -80,7 +81,7 @@ class LaunchesAccess(private val mContext: Context, private val mDatabase: SQLit
                 cursor.getInt(INDEX_COLUMN_ID).toLong(),
                 cursor.getString(INDEX_COLUMN_NAME),
                 IntentSerializer.deserialize(cursor.getString(INDEX_COLUMN_LAUNCHINTENT)),
-                BitmapUtils.getIcon(mContext, cursor.getBlob(INDEX_COLUMN_ICON))
+                BitmapUtils.getIcon(context, cursor.getBlob(INDEX_COLUMN_ICON))
         )
     }
 

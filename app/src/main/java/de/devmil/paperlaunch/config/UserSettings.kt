@@ -16,9 +16,6 @@
 package de.devmil.paperlaunch.config
 
 import android.content.Context
-import android.content.SharedPreferences
-
-import de.devmil.paperlaunch.config.IUserSettings
 
 class UserSettings(context: Context) : IUserSettings {
 

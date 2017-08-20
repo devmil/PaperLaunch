@@ -61,34 +61,30 @@ import java.util.concurrent.TimeUnit
  */
 class EditFolderFragment : Fragment() {
 
-    private var mAdapter: EntriesAdapter? = null
-    private var mRecyclerView: RecyclerView? = null
-    private var mEmptyListView: View? = null
-    private var mAddButton: FloatingActionButton? = null
-    private var mEditNameLayout: LinearLayout? = null
-    private var mFolderNameEditText: EditText? = null
-    private var mFolderId: Long = -1
-    private var mFolder: Folder? = null
-    internal var mConfig: LaunchConfig? = null
+    private var adapter: EntriesAdapter? = null
+    private var recyclerView: RecyclerView? = null
+    private var emptyListView: View? = null
+    private var addButton: FloatingActionButton? = null
+    private var editNameLayout: LinearLayout? = null
+    private var folderNameEditText: EditText? = null
+    private var folderId: Long = -1
+    private var folder: Folder? = null
+    internal var config: LaunchConfig? = null
 
-    internal var mFolderNameChangedCallback: ((String) -> Unit)? = null
-
-    interface IEditFolderFragmentListener {
-        fun onFolderNameChanged(newName: String)
-    }
+    internal var folderNameChangedCallback: ((String) -> Unit)? = null
 
     fun setListener(listener: (String) -> Unit) {
-        mFolderNameChangedCallback = listener
-        if (mFolderNameChangedCallback != null && mFolder != null) {
-            mFolderNameChangedCallback!!(mFolder!!.dto.name!!)
+        folderNameChangedCallback = listener
+        if (folderNameChangedCallback != null && folder != null) {
+            folderNameChangedCallback!!(folder!!.dto.name!!)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mConfig = LaunchConfig(UserSettings(activity))
+        config = LaunchConfig(UserSettings(activity))
         if (arguments != null) {
-            mFolderId = arguments.getLong(ARG_PARAM_FOLDERID, -1)
+            folderId = arguments.getLong(ARG_PARAM_FOLDERID, -1)
         }
     }
 
@@ -96,42 +92,42 @@ class EditFolderFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         val result = inflater.inflate(R.layout.fragment_edit_folder, container, false)
 
-        mRecyclerView = result.findViewById(R.id.fragment_edit_folder_entrieslist) as RecyclerView
-        mEmptyListView = result.findViewById(R.id.fragment_edit_folder_emptyentries)
-        mAddButton = result.findViewById(R.id.fragment_edit_folder_fab) as FloatingActionButton
-        mEditNameLayout = result.findViewById(R.id.fragment_edit_folder_editname_layout) as LinearLayout
-        mFolderNameEditText = result.findViewById(R.id.fragment_edit_folder_editname_text) as EditText
+        recyclerView = result.findViewById(R.id.fragment_edit_folder_entrieslist) as RecyclerView
+        emptyListView = result.findViewById(R.id.fragment_edit_folder_emptyentries)
+        addButton = result.findViewById(R.id.fragment_edit_folder_fab) as FloatingActionButton
+        editNameLayout = result.findViewById(R.id.fragment_edit_folder_editname_layout) as LinearLayout
+        folderNameEditText = result.findViewById(R.id.fragment_edit_folder_editname_text) as EditText
 
-        mEditNameLayout!!.visibility = if (mFolderId >= 0) View.VISIBLE else View.GONE
+        editNameLayout!!.visibility = if (folderId >= 0) View.VISIBLE else View.GONE
 
-        mRecyclerView!!.layoutManager = LinearLayoutManager(activity, LinearLayout.VERTICAL, false)
-        mRecyclerView!!.itemAnimator = EntriesItemAnimator()
+        recyclerView!!.layoutManager = LinearLayoutManager(activity, LinearLayout.VERTICAL, false)
+        recyclerView!!.itemAnimator = EntriesItemAnimator()
 
         loadData()
 
-        mFolderNameEditText!!.addTextChangedListener(object : TextWatcher {
+        folderNameEditText!!.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable) {
-                if (mFolder == null) {
+                if (folder == null) {
                     return
                 }
-                mFolder!!.dto.name = mFolderNameEditText!!.text.toString()
+                folder!!.dto.name = folderNameEditText!!.text.toString()
                 EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
                     override fun execute(transactionContext: ITransactionContext) {
-                        transactionContext.updateFolderData(mFolder!!)
+                        transactionContext.updateFolderData(folder!!)
                     }
                 })
-                if (mFolderNameChangedCallback != null) {
-                    mFolderNameChangedCallback!!(mFolder!!.dto.name!!)
+                if (folderNameChangedCallback != null) {
+                    folderNameChangedCallback!!(folder!!.dto.name!!)
                 }
                 notifyDataChanged()
             }
         })
 
-        mAddButton!!.setOnClickListener {
+        addButton!!.setOnClickListener {
             BottomSheet.Builder(activity)
                     .title(R.string.folder_settings_add_title)
                     .grid()
@@ -154,14 +150,14 @@ class EditFolderFragment : Fragment() {
         return result
     }
 
-    fun invalidate() {
+    private fun invalidate() {
         loadData()
     }
 
     private fun loadData() {
-        mAdapter = EntriesAdapter(mRecyclerView!!, loadEntries())
-        mRecyclerView!!.setAdapter(mAdapter)
-        mAdapter!!.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        adapter = EntriesAdapter(recyclerView!!, loadEntries())
+        recyclerView!!.adapter = adapter
+        adapter!!.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
                 super.onChanged()
                 checkEntryViewStates()
@@ -192,20 +188,20 @@ class EditFolderFragment : Fragment() {
                 checkEntryViewStates()
             }
         })
-        if (mFolder != null) {
-            mFolderNameEditText!!.setText(mFolder!!.dto.name)
-            if (mFolderNameChangedCallback != null) {
-                mFolderNameChangedCallback!!(mFolder!!.dto.name!!)
+        if (folder != null) {
+            folderNameEditText!!.setText(folder!!.dto.name)
+            if (folderNameChangedCallback != null) {
+                folderNameChangedCallback!!(folder!!.dto.name!!)
             }
         }
         checkEntryViewStates()
     }
 
     private fun checkEntryViewStates() {
-        val isEmpty = mAdapter == null || mAdapter!!.itemCount <= 0
+        val isEmpty = adapter == null || adapter!!.itemCount <= 0
 
-        mEmptyListView!!.visibility = if (isEmpty) View.VISIBLE else View.GONE
-        mRecyclerView!!.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        emptyListView!!.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        recyclerView!!.visibility = if (isEmpty) View.GONE else View.VISIBLE
     }
 
     private fun loadEntries(): MutableList<IEntry> {
@@ -217,11 +213,11 @@ class EditFolderFragment : Fragment() {
         val local = Local()
         EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
             override fun execute(transactionContext: ITransactionContext) {
-                if (mFolderId == -1L) {
+                if (folderId == -1L) {
                     local.result = transactionContext.loadRootContent()
                 } else {
-                    mFolder = transactionContext.loadFolder(mFolderId)
-                    local.result = mFolder!!.subEntries
+                    folder = transactionContext.loadFolder(folderId)
+                    local.result = folder!!.subEntries
                 }
             }
         })
@@ -230,7 +226,7 @@ class EditFolderFragment : Fragment() {
     }
 
     private fun initiateCreateFolder() {
-        if (mFolder != null && mFolder!!.dto.depth >= mConfig!!.maxFolderDepth) {
+        if (folder != null && folder!!.dto.depth >= config!!.maxFolderDepth) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.folder_settings_add_folder_maxdepth_alert_title)
                     .setMessage(R.string.folder_settings_add_folder_maxdepth_alert_message)
@@ -270,26 +266,22 @@ class EditFolderFragment : Fragment() {
     private fun addLaunch(launchIntent: Intent) {
         EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
             override fun execute(transactionContext: ITransactionContext) {
-                val l = transactionContext.createLaunch(mFolderId)
+                val l = transactionContext.createLaunch(folderId)
                 l.dto.launchIntent = launchIntent
                 transactionContext.updateLaunchData(l)
 
-                mAdapter!!.addEntry(l)
+                adapter!!.addEntry(l)
 
-                if (mFolder != null) {
-                    updateFolderImage(mFolder!!.dto, mAdapter!!.entries)
+                if (folder != null) {
+                    updateFolderImage(folder!!.dto, adapter!!.entries)
                 }
             }
         })
         notifyDataChanged()
     }
 
-    private fun updateFolderImage(folder: Folder) {
-        updateFolderImage(folder.dto, folder.subEntries.orEmpty())
-    }
-
     private fun updateFolderImage(folderDto: FolderDTO, entries: List<IEntry>) {
-        val imgWidth = mConfig!!.imageWidthDip
+        val imgWidth = config!!.imageWidthDip
         val bmp = FolderImageHelper.createImageFromEntries(activity, entries, imgWidth)
         val newIcon = BitmapDrawable(resources, bmp)
         folderDto.icon = newIcon
@@ -310,13 +302,13 @@ class EditFolderFragment : Fragment() {
         val local = Local()
         EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
             override fun execute(transactionContext: ITransactionContext) {
-                local.folder = transactionContext.createFolder(mFolderId, -1, if (mFolder == null) 0 else mFolder!!.dto.depth)
+                local.folder = transactionContext.createFolder(folderId, -1, if (folder == null) 0 else folder!!.dto.depth)
                 local.folder!!.dto.name = initialName
                 transactionContext.updateFolderData(local.folder!!)
             }
         })
 
-        mAdapter!!.addEntry(local.folder!!)
+        adapter!!.addEntry(local.folder!!)
 
         notifyDataChanged()
 
@@ -362,21 +354,11 @@ class EditFolderFragment : Fragment() {
         }
 
         override fun getPositionForId(entryId: Long): Int {
-            for (i in mEntries.indices) {
-                if (mEntries[i].entryId == entryId) {
-                    return i
-                }
-            }
-            return -1
+            return mEntries.indices.firstOrNull { mEntries[it].entryId == entryId }  ?: -1
         }
 
         private fun getEntryById(entryId: Long): IEntry? {
-            for (entry in mEntries) {
-                if (entry.entryId == entryId) {
-                    return entry
-                }
-            }
-            return null
+            return mEntries.firstOrNull { it.entryId == entryId }
         }
 
         override fun getItemId(position: Int): Long {
@@ -389,8 +371,8 @@ class EditFolderFragment : Fragment() {
             }
             mEntries.add(toPosition, mEntries.removeAt(fromPosition))
             saveOrder()
-            if (mFolder != null) {
-                updateFolderImage(mFolder!!.dto, mEntries)
+            if (folder != null) {
+                updateFolderImage(folder!!.dto, mEntries)
             }
             notifyDataChanged()
             return true
@@ -398,8 +380,7 @@ class EditFolderFragment : Fragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(activity).inflate(R.layout.fragment_edit_folder_entries, parent, false)
-            val vh = ViewHolder(this, view)
-            return vh
+            return ViewHolder(this, view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -459,8 +440,8 @@ class EditFolderFragment : Fragment() {
 
                             val pos = getPositionForId(itemId)
                             mEntries.removeAt(pos)
-                            if (mFolder != null) {
-                                updateFolderImage(mFolder!!.dto, mEntries)
+                            if (folder != null) {
+                                updateFolderImage(folder!!.dto, mEntries)
                             }
                             notifyItemRemoved(pos)
                         }

@@ -25,18 +25,18 @@ import de.devmil.paperlaunch.view.fragments.EditFolderFragment
 
 class MainActivity : Activity() {
 
-    private var mToolbar: Toolbar? = null
-    private var mFragment: EditFolderFragment? = null
+    private var toolbar: Toolbar? = null
+    private var fragment: EditFolderFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         LauncherOverlayService.launch(this)
         setContentView(R.layout.activity_main)
 
-        mToolbar = findViewById(R.id.activity_main_toolbar) as Toolbar
-        mFragment = fragmentManager.findFragmentById(R.id.activity_main_editfolder_fragment) as EditFolderFragment
+        toolbar = findViewById(R.id.activity_main_toolbar) as Toolbar
+        fragment = fragmentManager.findFragmentById(R.id.activity_main_editfolder_fragment) as EditFolderFragment
 
-        setActionBar(mToolbar)
+        setActionBar(toolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

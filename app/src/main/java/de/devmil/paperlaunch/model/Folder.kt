@@ -16,23 +16,22 @@
 package de.devmil.paperlaunch.model
 
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.drawable.Drawable
 
 import de.devmil.paperlaunch.R
 import de.devmil.paperlaunch.storage.EntryDTO
 import de.devmil.paperlaunch.storage.FolderDTO
 
-class Folder(val dto: FolderDTO, private val mEntryDto: EntryDTO, private var mSubEntries: List<IEntry>?) : IFolder {
+class Folder(val dto: FolderDTO, private val entryDto: EntryDTO, var subEntriesList: List<IEntry>?) : IFolder {
 
     override val id: Long
         get() = dto.id
 
     override val entryId: Long
-        get() = mEntryDto.id
+        get() = entryDto.id
 
     override val orderIndex: Long
-        get() = mEntryDto.orderIndex
+        get() = entryDto.orderIndex
 
     override fun getName(context: Context): String? {
         return dto.name
@@ -58,6 +57,6 @@ class Folder(val dto: FolderDTO, private val mEntryDto: EntryDTO, private var mS
     }
 
     override var subEntries: List<IEntry>?
-        get() = mSubEntries
-        set(value) { mSubEntries = value }
+        get() = subEntriesList
+        set(value) { subEntriesList = value }
 }

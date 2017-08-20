@@ -16,28 +16,17 @@
 package de.devmil.common.licensing
 
 import android.content.Context
-import android.util.Log
-
 import org.json.JSONException
 import org.json.JSONObject
-
 import java.io.BufferedReader
 import java.io.IOException
-import java.io.InputStream
 import java.io.InputStreamReader
 
-/**
- * Created by devmil on 18.04.14.
- */
-class LicenseManager(private val _Context: Context, private val _LicenseInfoFileId: Int) {
-    val licenseInfo: LicenseInfo?
-
-    init {
-        licenseInfo = loadLicenseInfo()
-    }
+class LicenseManager(private val context: Context, private val licenseInfoFileId: Int) {
+    val licenseInfo by lazy { loadLicenseInfo() }
 
     private fun loadLicenseInfo(): LicenseInfo? {
-        val stream = _Context.resources.openRawResource(_LicenseInfoFileId)
+        val stream = context.resources.openRawResource(licenseInfoFileId)
 
         val sr = InputStreamReader(stream)
         val br = BufferedReader(sr)
@@ -54,19 +43,11 @@ class LicenseManager(private val _Context: Context, private val _LicenseInfoFile
             return null
         }
 
-        var obj: JSONObject?
-        try {
-            obj = JSONObject(licenseInfo.toString())
-        } catch (e: JSONException) {
-            Log.w(TAG, "Error reading LicenseInfo", e)
-            return null
+        return try {
+            LicenseInfo.readFromJSON(JSONObject(licenseInfo.toString()))
+        } catch(e: JSONException) {
+            null
         }
-
-        return LicenseInfo.readFromJSON(obj)
     }
 
-    companion object {
-
-        private val TAG = LicenseManager::class.java.simpleName
-    }
 }

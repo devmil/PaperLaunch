@@ -15,7 +15,7 @@
  */
 package de.devmil.paperlaunch.config
 
-enum class LauncherGravity private constructor(val value: Int) {
+enum class LauncherGravity(val value: Int) {
     Top(0),
     Center(1),
     Bottom(2);

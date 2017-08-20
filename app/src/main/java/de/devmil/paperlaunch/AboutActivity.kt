@@ -35,29 +35,29 @@ import de.devmil.common.licensing.PackageInfo
 
 class AboutActivity : Activity() {
 
-    private var mToolbar: Toolbar? = null
-    private var mLicenseManager: LicenseManager? = null
-    private var mLicenseList: ListView? = null
-    private var mVersionText: TextView? = null
+    private var toolbar: Toolbar? = null
+    private var licenseManager: LicenseManager? = null
+    private var licenseList: ListView? = null
+    private var txtVersionText: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
 
-        mToolbar = findViewById(R.id.activity_about_toolbar) as Toolbar
-        mLicenseList = findViewById(R.id.activity_about_info_listView) as ListView
-        mVersionText = findViewById(R.id.feature_image_versiontext) as TextView
+        toolbar = findViewById(R.id.activity_about_toolbar) as Toolbar
+        licenseList = findViewById(R.id.activity_about_info_listView) as ListView
+        txtVersionText = findViewById(R.id.feature_image_versiontext) as TextView
 
-        setActionBar(mToolbar)
+        setActionBar(toolbar)
         actionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        mLicenseManager = LicenseManager(this, R.raw.licenseinfo)
+        licenseManager = LicenseManager(this, R.raw.licenseinfo)
 
-        val adapter = LicenseEntryAdapter(this, mLicenseManager!!.licenseInfo!!.packages.toTypedArray())
+        val adapter = LicenseEntryAdapter(this, licenseManager!!.licenseInfo!!.packages.toTypedArray())
 
-        mLicenseList!!.adapter = adapter
+        licenseList!!.adapter = adapter
 
-        mVersionText!!.text = versionText
+        txtVersionText!!.text = versionText
     }
 
     private val versionText: String

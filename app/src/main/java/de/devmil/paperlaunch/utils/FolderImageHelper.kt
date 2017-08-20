@@ -50,11 +50,11 @@ object FolderImageHelper {
 
         var idx = 0
 
-        for (r in 0..rows - 1) {
+        for (r in 0 until rows) {
             if (entries.size <= idx) {
                 break
             }
-            for (c in 0..cols - 1) {
+            for (c in 0 until cols) {
                 if (entries.size <= idx) {
                     break
                 }

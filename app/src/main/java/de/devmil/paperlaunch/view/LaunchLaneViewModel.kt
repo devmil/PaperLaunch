@@ -31,6 +31,7 @@ class LaunchLaneViewModel(entryModels: List<LaunchEntryViewModel>, private val m
     val imageWidthDip: Float
         get() = mConfig.imageWidthDip
 
+    @Suppress("unused")
     val highElevationDip: Float
         get() = mConfig.highElevationDip
 

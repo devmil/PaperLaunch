@@ -17,6 +17,7 @@ package de.devmil.paperlaunch.view
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
@@ -46,17 +47,17 @@ import de.devmil.paperlaunch.view.widgets.VerticalTextView
 
 class LauncherView : RelativeLayout {
 
-    private var mViewModel: LauncherViewModel? = null
-    private val mLaneViews = ArrayList<LaunchLaneView>()
-    private var mBackground: RelativeLayout? = null
-    private var mNeutralZone: LinearLayout? = null
-    private var mNeutralZoneBackground: LinearLayout? = null
-    private var mNeutralZoneBackgroundImage: ImageView? = null
-    private var mNeutralZoneBackgroundAppNameText: VerticalTextView? = null
-    private var mListener: ILauncherViewListener? = null
-    private var mAutoStartMotionEvent: MotionEvent? = null
+    private var viewModel: LauncherViewModel? = null
+    private val laneViews = ArrayList<LaunchLaneView>()
+    private var background: RelativeLayout? = null
+    private var neutralZone: LinearLayout? = null
+    private var neutralZoneBackground: LinearLayout? = null
+    private var neutralZoneBackgroundImage: ImageView? = null
+    private var neutralZoneBackgroundAppNameText: VerticalTextView? = null
+    private var listener: ILauncherViewListener? = null
+    private var autoStartMotionEvent: MotionEvent? = null
 
-    private var mCurrentlySelectedItem: IEntry? = null
+    private var currentlySelectedItem: IEntry? = null
 
     interface ILauncherViewListener {
         fun onFinished()
@@ -74,33 +75,30 @@ class LauncherView : RelativeLayout {
         construct()
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-        construct()
-    }
-
     fun doInitialize(config: LaunchConfig) {
         buildViewModel(config)
     }
 
-    fun start() {
+    private fun start() {
         buildViews()
         transitToState(LauncherViewModel.State.Init)
         transitToState(LauncherViewModel.State.Initializing)
     }
 
     fun setListener(listener: ILauncherViewListener) {
-        mListener = listener
+        this.listener = listener
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
-        if (mAutoStartMotionEvent != null) {
+        if (autoStartMotionEvent != null) {
             start()
-            onTouchEvent(mAutoStartMotionEvent!!)
-            mAutoStartMotionEvent = null
+            onTouchEvent(autoStartMotionEvent!!)
+            autoStartMotionEvent = null
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         var result = super.onTouchEvent(event)
 
@@ -113,7 +111,7 @@ class LauncherView : RelativeLayout {
         var result = false
 
         //find the lane to dispatch to
-        for (l in mLaneViews) {
+        for (l in laneViews) {
             result = sendIfMatches(l, action, x, y) || result
         }
 
@@ -121,7 +119,7 @@ class LauncherView : RelativeLayout {
     }
 
     fun doAutoStart(firstMotionEvent: MotionEvent) {
-        mAutoStartMotionEvent = firstMotionEvent
+        autoStartMotionEvent = firstMotionEvent
     }
 
     private fun construct() {
@@ -129,7 +127,7 @@ class LauncherView : RelativeLayout {
     }
 
     private fun buildViewModel(config: LaunchConfig) {
-        mViewModel = LauncherViewModel(config)
+        viewModel = LauncherViewModel(config)
     }
 
     private val laneIds: IntArray
@@ -137,23 +135,23 @@ class LauncherView : RelativeLayout {
 
     private fun buildViews() {
         removeAllViews()
-        mLaneViews.clear()
+        laneViews.clear()
         addBackground()
         addNeutralZone()
-        var currentAnchor = mNeutralZone!!.id
+        var currentAnchor = neutralZone!!.id
         val laneIds = laneIds
 
         for (i in laneIds.indices) {
             currentAnchor = addLaneView(i, currentAnchor).id
         }
 
-        setEntriesToLane(mLaneViews[0], mViewModel!!.entries)
+        setEntriesToLane(laneViews[0], viewModel!!.entries)
 
-        for (i in mLaneViews.indices.reversed()) {
-            mLaneViews[i].bringToFront()
+        for (i in laneViews.indices.reversed()) {
+            laneViews[i].bringToFront()
         }
-        mNeutralZone!!.bringToFront()
-        mNeutralZoneBackground!!.bringToFront()
+        neutralZone!!.bringToFront()
+        neutralZoneBackground!!.bringToFront()
     }
 
     private fun addLaneView(laneIndex: Int, anchorId: Int): LaunchLaneView {
@@ -166,39 +164,39 @@ class LauncherView : RelativeLayout {
         val params = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-        if (mViewModel!!.isOnRightSide)
+        if (viewModel!!.isOnRightSide)
             params.addRule(RelativeLayout.LEFT_OF, anchorId)
         else
             params.addRule(RelativeLayout.RIGHT_OF, anchorId)
 
         addView(llv, params)
-        mLaneViews.add(llv)
+        laneViews.add(llv)
 
         llv.setLaneListener(object : LaunchLaneView.ILaneListener {
             override fun onItemSelected(selectedItem: IEntry?) {
-                mCurrentlySelectedItem = selectedItem
+                currentlySelectedItem = selectedItem
                 if (selectedItem == null) {
                     return
                 }
                 if (selectedItem.isFolder) {
                     val f = selectedItem as IFolder?
-                    if (mLaneViews.size <= laneIndex + 1) {
+                    if (laneViews.size <= laneIndex + 1) {
                         return
                     }
-                    val nextLaneView = mLaneViews[laneIndex + 1]
+                    val nextLaneView = laneViews[laneIndex + 1]
                     setEntriesToLane(nextLaneView, f!!.subEntries.orEmpty())
                     nextLaneView.start()
                 }
             }
 
             override fun onItemSelecting(selectedItem: IEntry?) {
-                mCurrentlySelectedItem = selectedItem
+                currentlySelectedItem = selectedItem
             }
 
             override fun onStateChanged(oldState: LaunchLaneViewModel.State, newState: LaunchLaneViewModel.State) {
                 if (newState === LaunchLaneViewModel.State.Focusing) {
-                    for (idx in laneIndex + 1..mLaneViews.size - 1) {
-                        mLaneViews[idx].stop()
+                    for (idx in laneIndex + 1 until laneViews.size) {
+                        laneViews[idx].stop()
                     }
                 }
             }
@@ -208,16 +206,16 @@ class LauncherView : RelativeLayout {
     }
 
     private fun setEntriesToLane(laneView: LaunchLaneView, entries: List<IEntry>) {
-        val entryModels = entries.map { LaunchEntryViewModel.createFrom(context, it, mViewModel!!.entryConfig) }
+        val entryModels = entries.map { LaunchEntryViewModel.createFrom(context, it, viewModel!!.entryConfig) }
 
-        val vm = LaunchLaneViewModel(entryModels, mViewModel!!.laneConfig)
+        val vm = LaunchLaneViewModel(entryModels, viewModel!!.laneConfig)
         laneView.doInitializeData(vm)
     }
 
     private fun addBackground() {
-        mBackground = RelativeLayout(context)
-        mBackground!!.setBackgroundColor(mViewModel!!.backgroundColor)
-        mBackground!!.alpha = 0f
+        background = RelativeLayout(context)
+        background!!.setBackgroundColor(viewModel!!.backgroundColor)
+        background!!.alpha = 0f
 
         val params = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP)
@@ -225,73 +223,73 @@ class LauncherView : RelativeLayout {
         params.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
 
-        addView(mBackground, params)
+        addView(background, params)
     }
 
     private fun addNeutralZone() {
-        mNeutralZone = LinearLayout(context)
-        mNeutralZone!!.id = R.id.id_launchview_neutralzone
-        mNeutralZone!!.minimumWidth = ViewUtils.getPxFromDip(context, mViewModel!!.neutralZoneWidthDip).toInt()
-        mNeutralZone!!.isClickable = false
+        neutralZone = LinearLayout(context)
+        neutralZone!!.id = R.id.id_launchview_neutralzone
+        neutralZone!!.minimumWidth = ViewUtils.getPxFromDip(context, viewModel!!.neutralZoneWidthDip).toInt()
+        neutralZone!!.isClickable = false
 
         val params = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-        if (mViewModel!!.isOnRightSide)
+        if (viewModel!!.isOnRightSide)
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
         else
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
 
-        addView(mNeutralZone, params)
+        addView(neutralZone, params)
 
-        mNeutralZoneBackground = LinearLayout(context)
-        mNeutralZoneBackground!!.setBackgroundColor(mViewModel!!.designConfig.frameDefaultColor)
-        mNeutralZoneBackground!!.elevation = ViewUtils.getPxFromDip(context, mViewModel!!.highElevationDip)
-        mNeutralZoneBackground!!.isClickable = false
-        mNeutralZoneBackground!!.orientation = LinearLayout.VERTICAL
-        mNeutralZoneBackground!!.setGravity(Gravity.CENTER_HORIZONTAL)
+        neutralZoneBackground = LinearLayout(context)
+        neutralZoneBackground!!.setBackgroundColor(viewModel!!.designConfig.frameDefaultColor)
+        neutralZoneBackground!!.elevation = ViewUtils.getPxFromDip(context, viewModel!!.highElevationDip)
+        neutralZoneBackground!!.isClickable = false
+        neutralZoneBackground!!.orientation = LinearLayout.VERTICAL
+        neutralZoneBackground!!.gravity = Gravity.CENTER_HORIZONTAL
 
         val backParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT
         )
-        mNeutralZone!!.addView(mNeutralZoneBackground, backParams)
+        neutralZone!!.addView(neutralZoneBackground, backParams)
 
-        mNeutralZoneBackgroundImage = ImageView(context)
-        mNeutralZoneBackgroundImage!!.setImageResource(R.mipmap.ic_launcher)
-        mNeutralZoneBackgroundImage!!.isClickable = false
-        mNeutralZoneBackgroundImage!!.visibility = View.GONE
+        neutralZoneBackgroundImage = ImageView(context)
+        neutralZoneBackgroundImage!!.setImageResource(R.mipmap.ic_launcher)
+        neutralZoneBackgroundImage!!.isClickable = false
+        neutralZoneBackgroundImage!!.visibility = View.GONE
 
         val backImageParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        backImageParams.setMargins(0, ViewUtils.getPxFromDip(context, mViewModel!!.laneConfig.laneIconTopMarginDip).toInt(), 0, 0)
-        mNeutralZoneBackground!!.addView(mNeutralZoneBackgroundImage, backImageParams)
+        backImageParams.setMargins(0, ViewUtils.getPxFromDip(context, viewModel!!.laneConfig.laneIconTopMarginDip).toInt(), 0, 0)
+        neutralZoneBackground!!.addView(neutralZoneBackgroundImage, backImageParams)
 
-        mNeutralZoneBackground!!.setBackgroundColor(
+        neutralZoneBackground!!.setBackgroundColor(
                 ColorUtils.getBackgroundColorFromImage(
                         resources.getDrawable(
                                 R.mipmap.ic_launcher,
                                 context.theme
                         ),
-                        mViewModel!!.frameDefaultColor))
+                        viewModel!!.frameDefaultColor))
 
-        mNeutralZoneBackgroundAppNameText = VerticalTextView(context)
-        mNeutralZoneBackgroundAppNameText!!.visibility = View.GONE
-        mNeutralZoneBackgroundAppNameText!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, mViewModel!!.itemNameTextSizeSP)
+        neutralZoneBackgroundAppNameText = VerticalTextView(context)
+        neutralZoneBackgroundAppNameText!!.visibility = View.GONE
+        neutralZoneBackgroundAppNameText!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, viewModel!!.itemNameTextSizeSP)
         //this is needed because the parts in the system run with another theme than the application parts
-        mNeutralZoneBackgroundAppNameText!!.setTextColor(ContextCompat.getColor(context, R.color.name_label))
-        mNeutralZoneBackgroundAppNameText!!.setText(R.string.app_name)
-        mNeutralZoneBackgroundAppNameText!!.visibility = View.GONE
+        neutralZoneBackgroundAppNameText!!.setTextColor(ContextCompat.getColor(context, R.color.name_label))
+        neutralZoneBackgroundAppNameText!!.setText(R.string.app_name)
+        neutralZoneBackgroundAppNameText!!.visibility = View.GONE
 
         val backTextParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        backTextParams.setMargins(0, ViewUtils.getPxFromDip(context, mViewModel!!.laneConfig.laneTextTopMarginDip).toInt(), 0, 0)
+        backTextParams.setMargins(0, ViewUtils.getPxFromDip(context, viewModel!!.laneConfig.laneTextTopMarginDip).toInt(), 0, 0)
 
-        mNeutralZoneBackground!!.addView(mNeutralZoneBackgroundAppNameText, backTextParams)
+        neutralZoneBackground!!.addView(neutralZoneBackgroundAppNameText, backTextParams)
     }
 
     private fun sendIfMatches(laneView: LaunchLaneView, action: Int, x: Float, y: Float): Boolean {
@@ -300,21 +298,21 @@ class LauncherView : RelativeLayout {
         laneView.doHandleTouch(action, laneX, laneY)
         if (action == MotionEvent.ACTION_UP) {
             launchAppIfSelected()
-            if (mListener != null) {
-                mListener!!.onFinished()
+            if (listener != null) {
+                listener!!.onFinished()
             }
         }
         return true
     }
 
     private fun launchAppIfSelected() {
-        if (mCurrentlySelectedItem == null) {
+        if (currentlySelectedItem == null) {
             return
         }
-        if (mCurrentlySelectedItem!!.isFolder) {
+        if (currentlySelectedItem!!.isFolder) {
             return
         }
-        val l = mCurrentlySelectedItem as Launch?
+        val l = currentlySelectedItem as Launch?
         val intent = l!!.launchIntent
         if (intent != null) {
             intent.flags = intent.flags or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -339,44 +337,44 @@ class LauncherView : RelativeLayout {
             }
             LauncherViewModel.State.Ready -> startLane()
         }
-        mViewModel!!.state = newState
+        viewModel!!.state = newState
     }
 
     private fun startLane() {
-        mLaneViews[0].start()
+        laneViews[0].start()
     }
 
     private fun hideBackground() {
-        mBackground!!.alpha = 0f
+        background?.alpha = 0f
     }
 
     private fun hideNeutralZone() {
-        mNeutralZoneBackground!!.visibility = View.INVISIBLE
+        neutralZoneBackground?.visibility = View.INVISIBLE
     }
 
     private fun animateBackground() {
-        if (mViewModel!!.showBackground()) {
-            mBackground!!.visibility = View.VISIBLE
-            mBackground!!
+        if (viewModel?.showBackground == true) {
+            background!!.visibility = View.VISIBLE
+            background!!
                     .animate()
-                    .alpha(mViewModel!!.backgroundAlpha)
-                    .setDuration(mViewModel!!.backgroundAnimationDurationMS.toLong())
+                    .alpha(viewModel!!.backgroundAlpha)
+                    .setDuration(viewModel!!.backgroundAnimationDurationMS.toLong())
                     .start()
         } else {
-            mBackground!!.visibility = View.GONE
+            background?.visibility = View.GONE
         }
     }
 
     private fun animateNeutralZone() {
-        val size = mViewModel!!.neutralZoneWidthDip
+        val size = viewModel!!.neutralZoneWidthDip
 
-        val fromLeft = if (mViewModel!!.isOnRightSide) width - size.toInt() else 0
+        val fromLeft = if (viewModel!!.isOnRightSide) width - size.toInt() else 0
         var fromTop = (height - size.toInt()) / 2
 
-        if (mAutoStartMotionEvent != null) {
+        if (autoStartMotionEvent != null) {
             fromTop = Math.min(
                     height - size.toInt(),
-                    mAutoStartMotionEvent!!.y.toInt()
+                    autoStartMotionEvent!!.y.toInt()
             )
         }
 
@@ -399,14 +397,14 @@ class LauncherView : RelativeLayout {
         val anim: ObjectAnimator?
         try {
             anim = ObjectAnimator.ofObject(
-                    mNeutralZoneBackground,
+                    neutralZoneBackground,
                     "margins",
-                    PositionAndSizeEvaluator(mNeutralZoneBackground!!),
+                    PositionAndSizeEvaluator(neutralZoneBackground!!),
                     fromRect,
                     toRect)
             anim!!.addListener(object : Animator.AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
-                    mNeutralZoneBackground!!.visibility = View.VISIBLE
+                    neutralZoneBackground!!.visibility = View.VISIBLE
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
@@ -416,7 +414,7 @@ class LauncherView : RelativeLayout {
                         } catch (e: InterruptedException) {
                         }
 
-                        mNeutralZoneBackground!!.post { transitToState(LauncherViewModel.State.Ready) }
+                        neutralZoneBackground!!.post { transitToState(LauncherViewModel.State.Ready) }
                     }).start()
                 }
 
@@ -424,15 +422,15 @@ class LauncherView : RelativeLayout {
 
                 override fun onAnimationRepeat(animation: Animator) {}
             })
-            anim.duration = mViewModel!!.launcherInitAnimationDurationMS.toLong()
+            anim.duration = viewModel!!.launcherInitAnimationDurationMS.toLong()
             anim.start()
 
             Thread(Runnable {
                 try {
-                    Thread.sleep((mViewModel!!.launcherInitAnimationDurationMS / 2).toLong())
-                    mNeutralZoneBackgroundImage!!.post {
-                        mNeutralZoneBackgroundImage!!.visibility = View.VISIBLE
-                        mNeutralZoneBackgroundAppNameText!!.visibility = View.VISIBLE
+                    Thread.sleep((viewModel!!.launcherInitAnimationDurationMS / 2).toLong())
+                    neutralZoneBackgroundImage!!.post {
+                        neutralZoneBackgroundImage!!.visibility = View.VISIBLE
+                        neutralZoneBackgroundAppNameText!!.visibility = View.VISIBLE
                     }
                 } catch (e: InterruptedException) {
                 }

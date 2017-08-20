@@ -18,29 +18,19 @@ package de.devmil.paperlaunch.utils
 import java.io.Serializable
 import java.util.HashMap
 
-class SerializableHashMap<K, V> : Serializable {
+class SerializableHashMap<K, out V>(map: Map<*, *>) : Serializable {
 
     private var keyArray: Array<Any?>? = null
     private var valuesArray: Array<Any?>? = null
 
-    constructor() {
-
-    }
-
-    constructor(map: Map<*, *>) {
-        populateFromhashMap(map)
-    }
-
-    fun populateFromhashMap(map: Map<*, *>?) {
+    private fun populateFromhashMap(map: Map<*, *>?) {
         val size = map?.size ?: 0
-        keyArray = arrayOfNulls<Any>(size)
-        valuesArray = arrayOfNulls<Any>(size)
+        keyArray = arrayOfNulls(size)
+        valuesArray = arrayOfNulls(size)
         if (map != null) {
-            var idx = 0
-            for (k in map.keys) {
+            for ((idx, k) in map.keys.withIndex()) {
                 keyArray!![idx] = k
                 valuesArray!![idx] = map[k]
-                idx++
             }
         }
     }
@@ -54,7 +44,7 @@ class SerializableHashMap<K, V> : Serializable {
             return result
         }
 
-    fun fillHashMap(map: HashMap<K, V>) {
+    private fun fillHashMap(map: HashMap<K, V>) {
         if (keyArray == null || valuesArray == null)
             return
         @Suppress("UNCHECKED_CAST")
@@ -68,5 +58,9 @@ class SerializableHashMap<K, V> : Serializable {
 
          */
         private const val serialVersionUID = 1L
+    }
+
+    init {
+        populateFromhashMap(map)
     }
 }

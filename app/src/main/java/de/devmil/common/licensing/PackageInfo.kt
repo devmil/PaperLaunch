@@ -20,15 +20,8 @@ import android.util.Log
 import org.json.JSONException
 import org.json.JSONObject
 
-/**
- * Created by devmil on 18.04.14.
- */
-class PackageInfo private constructor(val name: String, val vendor: String, val licenseId: String, val url: String, val copyright: String, val iconName: String, licenseAccess: ILicenseAccess) {
-    val license: LicenseDefinition
-
-    init {
-        license = licenseAccess.getLicense(licenseId)
-    }
+class PackageInfo private constructor(val name: String, @Suppress("UNUSED_PARAMETER") vendor: String, private val licenseId: String, val url: String, val copyright: String, val iconName: String, licenseAccess: ILicenseAccess) {
+    val license by lazy { licenseAccess.getLicense(licenseId) }
 
     companion object {
 
@@ -40,7 +33,7 @@ class PackageInfo private constructor(val name: String, val vendor: String, val 
         private val ICON_IDENTIFIER = "icon"
 
         fun readFromJSON(obj: JSONObject, licenseAccess: ILicenseAccess): PackageInfo? {
-            try {
+            return try {
                 val name = obj.getString(NAME_IDENTIFIER)
                 val vendor = obj.getString(VENDOR_IDENTIFIER)
                 val licenseId = obj.getString(LICENSE_IDENTIFIER)
@@ -49,10 +42,10 @@ class PackageInfo private constructor(val name: String, val vendor: String, val 
                 val iconName = obj.getString(ICON_IDENTIFIER)
                 val result = PackageInfo(name, vendor, licenseId, url, copyright, iconName, licenseAccess)
 
-                return result
+                result
             } catch (e: JSONException) {
                 Log.w(PackageInfo::class.java.simpleName, "Error reading LicenseDefinition", e)
-                return null
+                null
             }
 
         }

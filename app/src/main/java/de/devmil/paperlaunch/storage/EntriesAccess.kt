@@ -21,12 +21,12 @@ import android.database.sqlite.SQLiteDatabase
 
 import java.util.ArrayList
 
-class EntriesAccess(private val mDatabase: SQLiteDatabase) {
+class EntriesAccess(private val database: SQLiteDatabase) {
 
     fun queryAllEntries(parentFolderId: Long): List<EntryDTO> {
         val selection = EntriesSQLiteOpenHelper.COLUMN_ENTRIES_PARENTFOLDERID + " = " + parentFolderId
 
-        val c = mDatabase.query(
+        val c = database.query(
                 EntriesSQLiteOpenHelper.TABLE_ENTRIES,
                 entriesColumns,
                 selection,
@@ -49,7 +49,7 @@ class EntriesAccess(private val mDatabase: SQLiteDatabase) {
     }
 
     fun queryEntry(entryId: Long): EntryDTO? {
-        val c = mDatabase.query(
+        val c = database.query(
                 EntriesSQLiteOpenHelper.TABLE_ENTRIES,
                 entriesColumns,
                 EntriesSQLiteOpenHelper.COLUMN_ID + " = " + entryId, null, null, null, null
@@ -65,7 +65,7 @@ class EntriesAccess(private val mDatabase: SQLiteDatabase) {
     }
 
     fun queryEntryForFolder(folderId: Long): EntryDTO? {
-        val c = mDatabase.query(
+        val c = database.query(
                 EntriesSQLiteOpenHelper.TABLE_ENTRIES,
                 entriesColumns,
                 EntriesSQLiteOpenHelper.COLUMN_ENTRIES_FOLDERID + " = " + folderId, null, null, null, null
@@ -81,7 +81,7 @@ class EntriesAccess(private val mDatabase: SQLiteDatabase) {
     }
 
     fun queryEntryForLaunch(launchId: Long): EntryDTO? {
-        val c = mDatabase.query(
+        val c = database.query(
                 EntriesSQLiteOpenHelper.TABLE_ENTRIES,
                 entriesColumns,
                 EntriesSQLiteOpenHelper.COLUMN_ENTRIES_LAUNCHID + " = " + launchId, null, null, null, null
@@ -98,7 +98,7 @@ class EntriesAccess(private val mDatabase: SQLiteDatabase) {
     fun createNew(orderIndex: Int): EntryDTO? {
         val values = ContentValues()
         values.put(EntriesSQLiteOpenHelper.COLUMN_ENTRIES_ORDERINDEX, orderIndex)
-        val id = mDatabase.insert(
+        val id = database.insert(
                 EntriesSQLiteOpenHelper.TABLE_ENTRIES, null,
                 values)
 
@@ -110,7 +110,7 @@ class EntriesAccess(private val mDatabase: SQLiteDatabase) {
 
         entryToValues(entry, values)
 
-        mDatabase.update(
+        database.update(
                 EntriesSQLiteOpenHelper.TABLE_ENTRIES,
                 values,
                 EntriesSQLiteOpenHelper.COLUMN_ID + " = " + entry.id, null
@@ -118,7 +118,7 @@ class EntriesAccess(private val mDatabase: SQLiteDatabase) {
     }
 
     fun delete(entry: EntryDTO) {
-        mDatabase.delete(
+        database.delete(
                 EntriesSQLiteOpenHelper.TABLE_ENTRIES,
                 EntriesSQLiteOpenHelper.COLUMN_ID + " = " + entry.id, null
         )

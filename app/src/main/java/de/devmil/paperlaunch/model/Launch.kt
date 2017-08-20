@@ -15,7 +15,6 @@
  */
 package de.devmil.paperlaunch.model
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
@@ -24,43 +23,43 @@ import de.devmil.paperlaunch.storage.EntryDTO
 import de.devmil.paperlaunch.storage.LaunchDTO
 import de.devmil.paperlaunch.utils.AppMetadataUtils
 
-class Launch(val dto: LaunchDTO, private val mEntryDto: EntryDTO) : IEntry {
+class Launch(val dto: LaunchDTO, private val entryDto: EntryDTO) : IEntry {
 
-    private var mDefaultAppName: String? = null
-    private var mDefaultAppIcon: Drawable? = null
+    private var defaultAppName: String? = null
+    private var defaultAppIcon: Drawable? = null
 
     override val id: Long
         get() = dto.id
 
     override val entryId: Long
-        get() = mEntryDto.id
+        get() = entryDto.id
 
     override val orderIndex: Long
-        get() = mEntryDto.orderIndex
+        get() = entryDto.orderIndex
 
     override fun getName(context: Context): String? {
         if (dto.name != null) {
             return dto.name
         }
-        if (mDefaultAppName == null) {
+        if (defaultAppName == null) {
             val launchIntent = launchIntent ?: return null
 
-            mDefaultAppName = AppMetadataUtils.getAppName(context, launchIntent)
+            defaultAppName = AppMetadataUtils.getAppName(context, launchIntent)
         }
-        return mDefaultAppName
+        return defaultAppName
     }
 
     override fun getIcon(context: Context): Drawable? {
         if (dto.icon != null) {
             return dto.icon
         }
-        if (mDefaultAppIcon == null) {
+        if (defaultAppIcon == null) {
             val launchIntent = launchIntent
             if (launchIntent != null) {
-                mDefaultAppIcon = AppMetadataUtils.getAppIcon(context, launchIntent)
+                defaultAppIcon = AppMetadataUtils.getAppIcon(context, launchIntent)
             }
         }
-        return mDefaultAppIcon
+        return defaultAppIcon
     }
 
     override fun getFolderSummaryIcon(context: Context): Drawable? {

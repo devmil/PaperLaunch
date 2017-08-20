@@ -26,14 +26,14 @@ import de.devmil.paperlaunch.model.IEntry
 import de.devmil.paperlaunch.model.Launch
 
 class EntriesDataSource private constructor() {
-    private var mHelper: EntriesSQLiteOpenHelper? = null
-    private var mDatabase: SQLiteDatabase? = null
-    private var mEntriesAccess: EntriesAccess? = null
-    private var mFoldersAccess: FoldersAccess? = null
-    private var mLaunchesAccess: LaunchesAccess? = null
+    private var helper: EntriesSQLiteOpenHelper? = null
+    private var database: SQLiteDatabase? = null
+    private var entriesAccess: EntriesAccess? = null
+    private var foldersAccess: FoldersAccess? = null
+    private var launchesAccess: LaunchesAccess? = null
 
     @Synchronized fun accessData(context: Context, action: ITransactionAction) {
-        val opened = mDatabase == null
+        val opened = database == null
         if (opened) {
             open(context)
         }
@@ -46,25 +46,25 @@ class EntriesDataSource private constructor() {
 
     private inner class TransactionContext : ITransactionContext {
         override fun startTransaction() {
-            mDatabase!!.beginTransaction()
+            database!!.beginTransaction()
         }
 
         override fun commitTransaction() {
-            if (mDatabase != null && mDatabase!!.inTransaction()) {
-                mDatabase!!.setTransactionSuccessful()
-                mDatabase!!.endTransaction()
+            if (database != null && database!!.inTransaction()) {
+                database!!.setTransactionSuccessful()
+                database!!.endTransaction()
             }
         }
 
         override fun rollbackTransaction() {
-            if (mDatabase != null && mDatabase!!.inTransaction()) {
-                mDatabase!!.endTransaction()
+            if (database != null && database!!.inTransaction()) {
+                database!!.endTransaction()
             }
         }
 
         override fun clear() {
             startTransaction()
-            mHelper!!.clear(mDatabase!!)
+            helper!!.clear(database!!)
             commitTransaction()
         }
 
@@ -74,43 +74,43 @@ class EntriesDataSource private constructor() {
 
         override fun createLaunch(parentFolderId: Long, orderIndex: Int): Launch {
             //create Entry
-            val entry = mEntriesAccess!!.createNew(orderIndex)
+            val entry = entriesAccess!!.createNew(orderIndex)
             entry!!.parentFolderId = parentFolderId
             //create Launch
-            val launch = mLaunchesAccess!!.createNew()
+            val launch = launchesAccess!!.createNew()
             //relate them
             entry.launchId = launch!!.id
 
-            mEntriesAccess!!.update(entry)
+            entriesAccess!!.update(entry)
 
             return loadLaunch(launch.id)
         }
 
         override fun createFolder(parentFolderId: Long, orderIndex: Int, parentFolderDepth: Int): Folder {
             //create Entry
-            val entry = mEntriesAccess!!.createNew(orderIndex)
+            val entry = entriesAccess!!.createNew(orderIndex)
             entry!!.parentFolderId = parentFolderId
             //create folder
-            val folder = mFoldersAccess!!.createNew()
+            val folder = foldersAccess!!.createNew()
             folder!!.depth = parentFolderDepth + 1
-            mFoldersAccess!!.update(folder)
+            foldersAccess!!.update(folder)
             //relate them
             entry.folderId = folder.id
 
-            mEntriesAccess!!.update(entry)
+            entriesAccess!!.update(entry)
 
             return loadFolder(folder.id)
         }
 
         override fun loadLaunch(launchId: Long): Launch {
-            val launch = mLaunchesAccess!!.queryLaunch(launchId)
-            val entry = mEntriesAccess!!.queryEntryForLaunch(launchId)
+            val launch = launchesAccess!!.queryLaunch(launchId)
+            val entry = entriesAccess!!.queryEntryForLaunch(launchId)
 
             return createLaunchFromDTO(launch!!, entry!!)
         }
 
         override fun loadRootContent(): List<IEntry> {
-            val entryDTOs = mEntriesAccess!!.queryAllEntries(-1)
+            val entryDTOs = entriesAccess!!.queryAllEntries(-1)
 
             val entries = ArrayList<IEntry>()
             for (entryDto in entryDTOs) {
@@ -125,24 +125,24 @@ class EntriesDataSource private constructor() {
         }
 
         override fun loadFolder(folderId: Long): Folder {
-            val folder = mFoldersAccess!!.queryFolder(folderId)
-            val entry = mEntriesAccess!!.queryEntryForFolder(folderId)
+            val folder = foldersAccess!!.queryFolder(folderId)
+            val entry = entriesAccess!!.queryEntryForFolder(folderId)
 
-            val subEntryDTOs = mEntriesAccess!!.queryAllEntries(folder!!.id)
+            val subEntryDTOs = entriesAccess!!.queryAllEntries(folder!!.id)
 
             return createFolderFromDTO(folder, entry!!, subEntryDTOs)
         }
 
         override fun deleteEntry(entryId: Long) {
-            val entryDto = mEntriesAccess!!.queryEntry(entryId)
+            val entryDto = entriesAccess!!.queryEntry(entryId)
             if (entryDto != null) {
                 if (entryDto.folderId > 0) {
                     deleteFolderContent(entryDto.folderId)
-                    mFoldersAccess!!.delete(entryDto.folderId)
+                    foldersAccess!!.delete(entryDto.folderId)
                 } else if (entryDto.launchId > 0) {
-                    mLaunchesAccess!!.delete(entryDto.launchId)
+                    launchesAccess!!.delete(entryDto.launchId)
                 }
-                mEntriesAccess!!.delete(entryDto)
+                entriesAccess!!.delete(entryDto)
             }
         }
 
@@ -174,7 +174,7 @@ class EntriesDataSource private constructor() {
         override fun updateLaunchData(launch: Launch) {
             val launchDto = launch.dto
 
-            mLaunchesAccess!!.update(launchDto)
+            launchesAccess!!.update(launchDto)
         }
 
         override fun updateFolderData(folder: Folder) {
@@ -182,7 +182,7 @@ class EntriesDataSource private constructor() {
         }
 
         override fun updateFolderData(folderDto: FolderDTO) {
-            mFoldersAccess!!.update(folderDto)
+            foldersAccess!!.update(folderDto)
         }
 
         override fun updateOrders(folder: Folder) {
@@ -196,32 +196,32 @@ class EntriesDataSource private constructor() {
         }
 
         override fun updateOrder(entry: IEntry, orderIndex: Int) {
-            val entryDTO = mEntriesAccess!!.queryEntry(entry.entryId)
+            val entryDTO = entriesAccess!!.queryEntry(entry.entryId)
 
             if (entryDTO != null) {
                 entryDTO.orderIndex = orderIndex.toLong()
-                mEntriesAccess!!.update(entryDTO)
+                entriesAccess!!.update(entryDTO)
             }
         }
     }
 
     @Throws(SQLiteException::class)
     private fun open(context: Context) {
-        mHelper = EntriesSQLiteOpenHelper(context)
-        mDatabase = mHelper!!.writableDatabase
-        mEntriesAccess = EntriesAccess(mDatabase!!)
-        mFoldersAccess = FoldersAccess(context, mDatabase!!)
-        mLaunchesAccess = LaunchesAccess(context, mDatabase!!)
+        helper = EntriesSQLiteOpenHelper(context)
+        database = helper!!.writableDatabase
+        entriesAccess = EntriesAccess(database!!)
+        foldersAccess = FoldersAccess(context, database!!)
+        launchesAccess = LaunchesAccess(context, database!!)
     }
 
     private fun close(context: ITransactionContext) {
         context.rollbackTransaction()
-        mDatabase!!.close()
-        mDatabase = null
-        mEntriesAccess = null
-        mFoldersAccess = null
-        mLaunchesAccess = null
-        mHelper!!.close()
+        database!!.close()
+        database = null
+        entriesAccess = null
+        foldersAccess = null
+        launchesAccess = null
+        helper!!.close()
     }
 
     companion object {

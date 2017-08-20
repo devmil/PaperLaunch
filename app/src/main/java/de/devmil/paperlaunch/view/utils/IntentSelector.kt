@@ -40,7 +40,7 @@ class IntentSelector : Activity() {
     private var lvShortcuts: ExpandableListView? = null
     private var txtShortcuts: TextView? = null
 
-    private var mToolbar: Toolbar? = null
+    private var toolbar: Toolbar? = null
 
     class SearchTask
     constructor(intentSelector : IntentSelector) : AsyncTask<Unit, Int, Unit>() {
@@ -169,10 +169,7 @@ class IntentSelector : Activity() {
         }
 
         private fun addResolveInfo(ri: ResolveInfo, intentType: IntentApplicationEntry.IntentType, addAll: Boolean, entries : MutableList<IntentApplicationEntry>) {
-            val localIntentSelector = intentSelector.get()
-            if(localIntentSelector == null) {
-                return
-            }
+            val localIntentSelector = intentSelector.get() ?: return
             try {
                 if (!addAll && !ri.activityInfo.exported)
                     return
@@ -189,7 +186,7 @@ class IntentSelector : Activity() {
 
         }
 
-        private var intentSelector : WeakReference<IntentSelector> = WeakReference<IntentSelector>(intentSelector)
+        private var intentSelector : WeakReference<IntentSelector> = WeakReference(intentSelector)
     }
 
     private var mSearchTask : SearchTask? = null
@@ -224,9 +221,9 @@ class IntentSelector : Activity() {
         chkShowAllActivities = findViewById(R.id.common__intentSelector_chkShowAllActivities) as CheckBox
         lvShortcuts = findViewById(R.id.common__intentSelector_lvShortcuts) as ExpandableListView
         txtShortcuts = findViewById(R.id.common__intentSelector_txtShortcuts) as TextView
-        mToolbar = findViewById(R.id.common__intentSelector_toolbar) as Toolbar
+        toolbar = findViewById(R.id.common__intentSelector_toolbar) as Toolbar
 
-        setActionBar(mToolbar)
+        setActionBar(toolbar)
 
         txtShortcuts!!.text = shortcutText
 
@@ -270,8 +267,8 @@ class IntentSelector : Activity() {
 
     private fun startSearch() {
         if (mSearchTask != null) {
-            mSearchTask!!.isAnotherSearchRunning = true;
-            mSearchTask!!.isObsolete = true;
+            mSearchTask!!.isAnotherSearchRunning = true
+            mSearchTask!!.isObsolete = true
             mSearchTask!!.cancel(true)
             mSearchTask = null
         }

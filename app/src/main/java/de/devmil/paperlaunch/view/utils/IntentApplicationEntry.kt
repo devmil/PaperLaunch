@@ -22,13 +22,10 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 import java.lang.ref.WeakReference
-
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.Comparator
+import java.util.*
 
 class IntentApplicationEntry @Throws(NameNotFoundException::class)
-constructor(context: Context, val packageName: String) : Comparable<IntentApplicationEntry> {
+constructor(context: Context, packageName: String) : Comparable<IntentApplicationEntry> {
 
     enum class IntentType {
         Main,
@@ -86,8 +83,8 @@ constructor(context: Context, val packageName: String) : Comparable<IntentApplic
     private fun ensureSubCollections() {
         if (mainActivityIntentItems != null)
             return
-        mainActivityIntentItems = ArrayList<IntentItem>()
-        shortcutIntentItems = ArrayList<IntentItem>()
+        mainActivityIntentItems = ArrayList()
+        shortcutIntentItems = ArrayList()
         for (ii in intentItems) {
             if (ii.isMainActivity)
                 mainActivityIntentItems!!.add(ii)
@@ -117,10 +114,10 @@ constructor(context: Context, val packageName: String) : Comparable<IntentApplic
     override fun equals(other: Any?): Boolean {
         if (other == null)
             return false
-        val castedOther = other as IntentApplicationEntry?
-        if (castedOther == null)
-            return false
-        return compareTo(castedOther) == 0
+        return when(other) {
+            is IntentApplicationEntry? -> compareTo(other) == 0
+            else -> false
+        }
     }
 
     override fun hashCode(): Int {
@@ -133,8 +130,8 @@ constructor(context: Context, val packageName: String) : Comparable<IntentApplic
         private val name: CharSequence = resolveInfo.activityInfo.loadLabel(context.get()?.packageManager)
         var isShortcut = false
         var isMainActivity = false
-        var isLauncherActivity = false
-            internal set
+        private var isLauncherActivity = false
+            set
 
         fun setIsLauncher(isLauncher: Boolean) {
             this.isLauncherActivity = isLauncher
@@ -170,5 +167,5 @@ constructor(context: Context, val packageName: String) : Comparable<IntentApplic
             get() = name.toString() + if (isLauncherActivity) " (Launcher)" else ""
     }
 
-    private val context : WeakReference<Context> = WeakReference<Context>(context)
+    private val context : WeakReference<Context> = WeakReference(context)
 }

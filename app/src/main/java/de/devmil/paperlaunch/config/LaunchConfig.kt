@@ -45,6 +45,7 @@ class LaunchConfig(userSettings: IUserSettings) : ILaunchEntryConfig, ILaunchLan
     val maxFolderDepth = 9
 
     //UserSettings
+    @Suppress("JoinDeclarationAndAssignment")
     val launcherSensitivityDip: Int
     override val isOnRightSide: Boolean
     val launcherOffsetPositionDip: Int

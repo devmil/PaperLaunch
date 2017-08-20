@@ -15,8 +15,6 @@
  */
 package de.devmil.paperlaunch.config
 
-import de.devmil.paperlaunch.config.IDesignConfig
-
 interface ILaunchLaneConfig {
     val imageWidthDip: Float
     val isOnRightSide: Boolean

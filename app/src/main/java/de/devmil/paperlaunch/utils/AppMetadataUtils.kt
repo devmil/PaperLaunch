@@ -34,18 +34,18 @@ object AppMetadataUtils {
         }
 
         if (appIntent.hasExtra(Intent.EXTRA_SHORTCUT_INTENT)) {
-            appIntent = appIntent.getParcelableExtra<Intent>(Intent.EXTRA_SHORTCUT_INTENT)
+            appIntent = appIntent.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT)
         }
         val componentName = appIntent.component
 
         val pm = context.packageManager
 
-        var appInfo: ApplicationInfo?
+        val appInfo: ApplicationInfo?
         var activityInfo: ActivityInfo? = null
-        try {
-            appInfo = pm.getApplicationInfo(componentName.packageName, 0)
+        appInfo = try {
+            pm.getApplicationInfo(componentName.packageName, 0)
         } catch (e: PackageManager.NameNotFoundException) {
-            appInfo = null
+            null
         }
 
         try {
@@ -95,16 +95,16 @@ object AppMetadataUtils {
         }
 
         if (launchIntent.hasExtra(Intent.EXTRA_SHORTCUT_INTENT)) {
-            launchIntent = launchIntent.getParcelableExtra<Intent>(Intent.EXTRA_SHORTCUT_INTENT)
+            launchIntent = launchIntent.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT)
         }
 
         val pm = context.packageManager
 
-        var appInfo: ApplicationInfo?
-        try {
-            appInfo = pm.getApplicationInfo(launchIntent.component.packageName, 0)
+        val appInfo: ApplicationInfo?
+        appInfo = try {
+            pm.getApplicationInfo(launchIntent.component.packageName, 0)
         } catch (e: Exception) {
-            appInfo = null
+            null
         }
 
         if (appInfo == null) {

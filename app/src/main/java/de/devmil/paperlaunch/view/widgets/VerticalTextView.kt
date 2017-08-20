@@ -22,7 +22,7 @@ import android.view.Gravity
 import android.widget.TextView
 
 class VerticalTextView : TextView {
-    internal var topDown: Boolean = false
+    private var topDown: Boolean = false
 
     constructor(context: Context) : super(context) {
         construct()

@@ -37,11 +37,11 @@ internal class LoadIconTask : AsyncTask<LoadParams, Void, Void>() {
 }
 
 class LaunchEntryView : LinearLayout {
-    private var mViewModel: LaunchEntryViewModel? = null
+    private var viewModel: LaunchEntryViewModel? = null
 
-    private var mImgFrame: LinearLayout? = null
-    private var mAppIcon: ImageView? = null
-    private var mLoadTask: LoadIconTask? = null
+    private var imgFrame: LinearLayout? = null
+    private var appIcon: ImageView? = null
+    private var loadTask: LoadIconTask? = null
 
     constructor(context: Context) : super(context) {
         construct()
@@ -60,22 +60,22 @@ class LaunchEntryView : LinearLayout {
     }
 
     fun doInitialize(viewModel: LaunchEntryViewModel) {
-        mViewModel = viewModel
+        this.viewModel = viewModel
 
         adaptModelState()
     }
 
     val entry: IEntry
-        get() = mViewModel!!.entry
+        get() = viewModel!!.entry
 
     fun setState(state: LaunchEntryViewModel.State) {
         setImageParameters(state, false, 0)
     }
 
     @JvmOverloads fun gotoState(state: LaunchEntryViewModel.State, delay: Int = 0) {
-        if (mViewModel!!.state === state)
+        if (viewModel!!.state === state)
             return
-        if (mViewModel!!.state.isAnimationStateFor(state))
+        if (viewModel!!.state.isAnimationStateFor(state))
             return
         setImageParameters(state, true, delay)
     }
@@ -87,55 +87,55 @@ class LaunchEntryView : LinearLayout {
     private fun adaptModelState() {
         applyParameters()
 
-        setImageParameters(mViewModel!!.state, false, 0)
+        setImageParameters(viewModel!!.state, false, 0)
     }
 
     private fun applyParameters() {
         removeAllViews()
-        mImgFrame = LinearLayout(context)
-        mImgFrame!!.setBackgroundColor(mViewModel!!.frameDefaultColor)
+        imgFrame = LinearLayout(context)
+        imgFrame!!.setBackgroundColor(viewModel!!.frameDefaultColor)
         val imgFrameParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        val marginsFramePx = ViewUtils.getPxFromDip(context, mViewModel!!.entriesMarginDip).toInt()
+        val marginsFramePx = ViewUtils.getPxFromDip(context, viewModel!!.entriesMarginDip).toInt()
         imgFrameParams.setMargins(marginsFramePx, marginsFramePx, marginsFramePx, marginsFramePx)
 
-        addView(mImgFrame, imgFrameParams)
-        ViewUtils.disableClipping(mImgFrame!!)
+        addView(imgFrame, imgFrameParams)
+        ViewUtils.disableClipping(imgFrame!!)
 
-        mImgFrame!!.removeAllViews()
-        mAppIcon = ImageView(context)
-        mAppIcon!!.scaleType = ImageView.ScaleType.CENTER_INSIDE
-        val imgWidth = ViewUtils.getPxFromDip(context, mViewModel!!.imageWidthDip).toInt()
-        val imgHeight = ViewUtils.getPxFromDip(context, mViewModel!!.imageWidthDip).toInt()
+        imgFrame!!.removeAllViews()
+        appIcon = ImageView(context)
+        appIcon!!.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        val imgWidth = ViewUtils.getPxFromDip(context, viewModel!!.imageWidthDip).toInt()
+        val imgHeight = ViewUtils.getPxFromDip(context, viewModel!!.imageWidthDip).toInt()
 
         val imgParams = LinearLayout.LayoutParams(imgWidth, imgHeight)
-        val marginsImgPx = ViewUtils.getPxFromDip(context, mViewModel!!.imageMarginDip).toInt()
+        val marginsImgPx = ViewUtils.getPxFromDip(context, viewModel!!.imageMarginDip).toInt()
         imgParams.setMargins(marginsImgPx, marginsImgPx, marginsImgPx, marginsImgPx)
 
-        mImgFrame!!.addView(mAppIcon, imgParams)
-        ViewUtils.disableClipping(mAppIcon!!)
+        imgFrame!!.addView(appIcon, imgParams)
+        ViewUtils.disableClipping(appIcon!!)
 
-        if (mLoadTask != null) {
-            mLoadTask!!.cancel(true)
+        if (loadTask != null) {
+            loadTask!!.cancel(true)
         }
-        mLoadTask = LoadIconTask()
-        mLoadTask!!.execute(LoadParams(mAppIcon!!, mViewModel!!, context))
+        loadTask = LoadIconTask()
+        loadTask!!.execute(LoadParams(appIcon!!, viewModel!!, context))
 
-        mImgFrame!!.elevation = ViewUtils.getPxFromDip(context, mViewModel!!.imageElevationDip)
+        imgFrame!!.elevation = ViewUtils.getPxFromDip(context, viewModel!!.imageElevationDip)
     }
 
     private fun getTranslateXToApply(state: LaunchEntryViewModel.State): Float {
-        val imgWidthPx = Math.max(mImgFrame!!.width.toFloat(), ViewUtils.getPxFromDip(context, mViewModel!!.imageWidthDip))
-        val offset = ViewUtils.getPxFromDip(context, mViewModel!!.imageOffsetDip)
+        val imgWidthPx = Math.max(imgFrame!!.width.toFloat(), ViewUtils.getPxFromDip(context, viewModel!!.imageWidthDip))
+        val offset = ViewUtils.getPxFromDip(context, viewModel!!.imageOffsetDip)
         when (state) {
             LaunchEntryViewModel.State.Inactive -> {
-                if (mViewModel!!.isOnRightSide) {
+                if (viewModel!!.isOnRightSide) {
                     return imgWidthPx + 2 * offset
                 } else {
                     return -(imgWidthPx + 2 * offset)
                 }
             }
             LaunchEntryViewModel.State.Active, LaunchEntryViewModel.State.Activating -> {
-                if (mViewModel!!.isOnRightSide) {
+                if (viewModel!!.isOnRightSide) {
                     return imgWidthPx / 2.0f + offset
                 } else {
                     return -(imgWidthPx / 2.0f + offset)
@@ -168,33 +168,33 @@ class LaunchEntryView : LinearLayout {
 
     private fun setImageParameters(translateX: Float, alpha: Float, animate: Boolean, targetState: LaunchEntryViewModel.State, delay: Int) {
         if (!animate) {
-            mImgFrame!!.translationX = translateX
-            mImgFrame!!.alpha = alpha
-            mViewModel!!.state = targetState
+            imgFrame!!.translationX = translateX
+            imgFrame!!.alpha = alpha
+            viewModel!!.state = targetState
         } else {
             synchronized(this) {
                 if (targetState.hasAnimationState()) {
-                    mViewModel!!.state = targetState.animationState
+                    viewModel!!.state = targetState.animationState
                 }
-                mImgFrame!!.animate()
+                imgFrame!!.animate()
                         .translationX(translateX)
-                        .setDuration(mViewModel!!.moveDuration.toLong())
+                        .setDuration(viewModel!!.moveDuration.toLong())
                         .setStartDelay(delay.toLong())
                         .withEndAction(object : Runnable {
                             override fun run() {
                                 synchronized(this) {
-                                    if (alpha != mImgFrame!!.alpha) {
-                                        mImgFrame!!.animate()
+                                    if (alpha != imgFrame!!.alpha) {
+                                        imgFrame!!.animate()
                                                 .alpha(alpha)
-                                                .setDuration(mViewModel!!.alphaDuration.toLong())
+                                                .setDuration(viewModel!!.alphaDuration.toLong())
                                                 .withEndAction {
                                                     synchronized(this@LaunchEntryView) {
-                                                        mViewModel!!.state = targetState
+                                                        viewModel!!.state = targetState
                                                     }
                                                 }
                                                 .start()
                                     } else {
-                                        mViewModel!!.state = targetState
+                                        viewModel!!.state = targetState
                                     }
 
                                 }

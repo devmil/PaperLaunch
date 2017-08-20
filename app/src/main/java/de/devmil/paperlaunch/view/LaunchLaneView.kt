@@ -19,7 +19,6 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Rect
-import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -48,17 +47,17 @@ class LaunchLaneView : RelativeLayout {
         fun onStateChanged(oldState: LaunchLaneViewModel.State, newState: LaunchLaneViewModel.State)
     }
 
-    private var mViewModel: LaunchLaneViewModel? = null
-    private var mLaneListener: ILaneListener? = null
+    private var viewModel: LaunchLaneViewModel? = null
+    private var laneListener: ILaneListener? = null
 
     //view components
-    private var mSelectIndicatorContainer: LinearLayout? = null
-    private var mSelectIndicator: LinearLayout? = null
-    private var mEntriesContainer: LinearLayout? = null
-    private var mSelectedIcon: ImageView? = null
-    private var mSelectedItemTextView: VerticalTextView? = null
-    private val mEntryViews = ArrayList<LaunchEntryView>()
-    private var mFocusedEntryView: LaunchEntryView? = null
+    private var selectIndicatorContainer: LinearLayout? = null
+    private var selectIndicator: LinearLayout? = null
+    private var entriesContainer: LinearLayout? = null
+    private var selectedIcon: ImageView? = null
+    private var selectedItemTextView: VerticalTextView? = null
+    private val entryViews = ArrayList<LaunchEntryView>()
+    private var focusedEntryView: LaunchEntryView? = null
 
     constructor(context: Context) : super(context) {
         construct()
@@ -72,12 +71,13 @@ class LaunchLaneView : RelativeLayout {
         construct()
     }
 
+    @Suppress("unused")
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
         construct()
     }
 
     fun doInitializeData(viewModel: LaunchLaneViewModel) {
-        mViewModel = viewModel
+        this.viewModel = viewModel
 
         createViews()
         createEntryViews()
@@ -85,7 +85,7 @@ class LaunchLaneView : RelativeLayout {
     }
 
     fun setLaneListener(listener: ILaneListener) {
-        mLaneListener = listener
+        laneListener = listener
     }
 
     fun start() {
@@ -96,23 +96,23 @@ class LaunchLaneView : RelativeLayout {
         removeAllViews()
     }
 
-    fun gotoState(state: LaunchLaneViewModel.State) {
+    private fun gotoState(state: LaunchLaneViewModel.State) {
         transitToState(state)
     }
 
     fun doHandleTouch(action: Int, x: Int, y: Int) {
         val focusSelectionBorder = width
-        if (mViewModel == null) {
+        if (viewModel == null) {
             return
         }
-        if (mViewModel!!.state === LaunchLaneViewModel.State.Focusing) {
+        if (viewModel!!.state === LaunchLaneViewModel.State.Focusing) {
             if (action == MotionEvent.ACTION_UP) {
                 sendAllEntriesToState(LaunchEntryViewModel.State.Active)
-                mFocusedEntryView = null
+                focusedEntryView = null
             } else {
                 ensureFocusedEntryAt(y)
-                if (mFocusedEntryView != null) {
-                    if (mViewModel!!.isOnRightSide) {
+                if (focusedEntryView != null) {
+                    if (viewModel!!.isOnRightSide) {
                         if (x < focusSelectionBorder) {
                             transitToState(LaunchLaneViewModel.State.Selecting)
                         }
@@ -123,8 +123,8 @@ class LaunchLaneView : RelativeLayout {
                     }
                 }
             }
-        } else if (mViewModel!!.state === LaunchLaneViewModel.State.Selected) {
-            if (mViewModel!!.isOnRightSide) {
+        } else if (viewModel!!.state === LaunchLaneViewModel.State.Selected) {
+            if (viewModel!!.isOnRightSide) {
                 if (x > focusSelectionBorder)
                     transitToState(LaunchLaneViewModel.State.Focusing)
             } else {
@@ -137,8 +137,8 @@ class LaunchLaneView : RelativeLayout {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        if (mEntryViews.size > 0) {
-            setMeasuredDimension(mEntryViews[0].measuredWidth, measuredHeight)
+        if (entryViews.size > 0) {
+            setMeasuredDimension(entryViews[0].measuredWidth, measuredHeight)
         }
     }
 
@@ -148,30 +148,30 @@ class LaunchLaneView : RelativeLayout {
 
     private fun createViews() {
         removeAllViews()
-        mEntriesContainer = LinearLayout(context)
-        mEntriesContainer!!.orientation = LinearLayout.VERTICAL
+        entriesContainer = LinearLayout(context)
+        entriesContainer!!.orientation = LinearLayout.VERTICAL
 
-        when (mViewModel!!.launcherGravity) {
-            LauncherGravity.Top -> mEntriesContainer!!.setGravity(Gravity.TOP)
-            LauncherGravity.Center -> mEntriesContainer!!.setGravity(Gravity.CENTER_VERTICAL)
-            LauncherGravity.Bottom -> mEntriesContainer!!.setGravity(Gravity.BOTTOM)
+        when (viewModel!!.launcherGravity) {
+            LauncherGravity.Top -> entriesContainer!!.gravity = Gravity.TOP
+            LauncherGravity.Center -> entriesContainer!!.gravity = Gravity.CENTER_VERTICAL
+            LauncherGravity.Bottom -> entriesContainer!!.gravity = Gravity.BOTTOM
         }
 
         val entriesContainerParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
         entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-        if (mViewModel!!.isOnRightSide) {
+        if (viewModel!!.isOnRightSide) {
             entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
         } else {
             entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
         }
 
-        addView(mEntriesContainer, entriesContainerParams)
-        ViewUtils.disableClipping(mEntriesContainer!!)
+        addView(entriesContainer, entriesContainerParams)
+        ViewUtils.disableClipping(entriesContainer!!)
 
 
-        mSelectIndicatorContainer = LinearLayout(context)
-        mSelectIndicatorContainer!!.orientation = LinearLayout.VERTICAL
+        selectIndicatorContainer = LinearLayout(context)
+        selectIndicatorContainer!!.orientation = LinearLayout.VERTICAL
 
         val indicatorContainerParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
         indicatorContainerParams.addRule(RelativeLayout.ALIGN_PARENT_TOP)
@@ -179,59 +179,59 @@ class LaunchLaneView : RelativeLayout {
         indicatorContainerParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
         indicatorContainerParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
 
-        addView(mSelectIndicatorContainer, indicatorContainerParams)
-        ViewUtils.disableClipping(mSelectIndicatorContainer!!)
+        addView(selectIndicatorContainer, indicatorContainerParams)
+        ViewUtils.disableClipping(selectIndicatorContainer!!)
 
 
-        mSelectIndicator = LinearLayout(context)
-        mSelectIndicator!!.setBackgroundColor(mViewModel!!.frameDefaultColor)
-        mSelectIndicator!!.elevation = ViewUtils.getPxFromDip(context, mViewModel!!.selectedImageElevationDip)
-        mSelectIndicator!!.visibility = View.INVISIBLE
-        mSelectIndicator!!.setGravity(Gravity.CENTER_HORIZONTAL)
-        mSelectIndicator!!.orientation = LinearLayout.VERTICAL
+        selectIndicator = LinearLayout(context)
+        selectIndicator!!.setBackgroundColor(viewModel!!.frameDefaultColor)
+        selectIndicator!!.elevation = ViewUtils.getPxFromDip(context, viewModel!!.selectedImageElevationDip)
+        selectIndicator!!.visibility = View.INVISIBLE
+        selectIndicator!!.gravity = Gravity.CENTER_HORIZONTAL
+        selectIndicator!!.orientation = LinearLayout.VERTICAL
 
         val selectIndicatorParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT)
 
-        mSelectIndicatorContainer!!.addView(mSelectIndicator, selectIndicatorParams)
-        ViewUtils.disableClipping(mSelectIndicator!!)
+        selectIndicatorContainer!!.addView(selectIndicator, selectIndicatorParams)
+        ViewUtils.disableClipping(selectIndicator!!)
 
-        mSelectedIcon = ImageView(context)
-        mSelectedIcon!!.scaleType = ImageView.ScaleType.CENTER_INSIDE
-        mSelectedIcon!!.setImageResource(mViewModel!!.unknownAppImageId)
+        selectedIcon = ImageView(context)
+        selectedIcon!!.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        selectedIcon!!.setImageResource(viewModel!!.unknownAppImageId)
 
         val selectIconParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT)
-        selectIconParams.setMargins(0, ViewUtils.getPxFromDip(context, mViewModel!!.laneIconTopMarginDip).toInt(), 0, 0)
+        selectIconParams.setMargins(0, ViewUtils.getPxFromDip(context, viewModel!!.laneIconTopMarginDip).toInt(), 0, 0)
 
-        mSelectIndicator!!.addView(mSelectedIcon, selectIconParams)
+        selectIndicator!!.addView(selectedIcon, selectIconParams)
 
-        mSelectedItemTextView = VerticalTextView(context)
-        mSelectedItemTextView!!.visibility = View.GONE
-        mSelectedItemTextView!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, mViewModel!!.itemNameTextSizeSP)
+        selectedItemTextView = VerticalTextView(context)
+        selectedItemTextView!!.visibility = View.GONE
+        selectedItemTextView!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, viewModel!!.itemNameTextSizeSP)
         //this is needed because the parts in the system run with another theme than the application parts
-        mSelectedItemTextView!!.setTextColor(ContextCompat.getColor(context, R.color.name_label))
+        selectedItemTextView!!.setTextColor(ContextCompat.getColor(context, R.color.name_label))
 
         val selectedItemTextViewParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT)
-        selectedItemTextViewParams.setMargins(0, ViewUtils.getPxFromDip(context, mViewModel!!.laneTextTopMarginDip).toInt(), 0, 0)
-        mSelectIndicator!!.addView(mSelectedItemTextView, selectedItemTextViewParams)
+        selectedItemTextViewParams.setMargins(0, ViewUtils.getPxFromDip(context, viewModel!!.laneTextTopMarginDip).toInt(), 0, 0)
+        selectIndicator!!.addView(selectedItemTextView, selectedItemTextViewParams)
     }
 
     private fun createEntryViews() {
-        mEntriesContainer!!.removeAllViews()
-        mEntryViews.clear()
+        entriesContainer!!.removeAllViews()
+        entryViews.clear()
 
-        for (e in mViewModel!!.entries) {
+        for (e in viewModel!!.entries) {
             val ev = LaunchEntryView(context)
-            mEntryViews.add(ev)
+            entryViews.add(ev)
             val params = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT)
-            mEntriesContainer!!.addView(ev, params)
+            entriesContainer!!.addView(ev, params)
 
             ev.doInitialize(e)
         }
@@ -253,51 +253,50 @@ class LaunchLaneView : RelativeLayout {
             }
             LaunchLaneViewModel.State.Selecting -> {
                 showSelectionIndicator()
-                sendAllEntriesToState(LaunchEntryViewModel.State.Inactive, mFocusedEntryView)
+                sendAllEntriesToState(LaunchEntryViewModel.State.Inactive, focusedEntryView)
                 fireSelectingEvent()
             }
             LaunchLaneViewModel.State.Selected -> fireSelectedEvent()
         }
-        if (mViewModel != null) {
-            val oldState = mViewModel!!.state
-            val newState = state
-            mViewModel!!.state = newState
-            fireStateChangedEvent(oldState, newState)
+        if (viewModel != null) {
+            val oldState = viewModel!!.state
+            viewModel!!.state = state
+            fireStateChangedEvent(oldState, state)
         }
     }
 
     private fun fireStateChangedEvent(oldState: LaunchLaneViewModel.State, newState: LaunchLaneViewModel.State) {
-        if (mLaneListener != null) {
-            mLaneListener!!.onStateChanged(oldState, newState)
+        if (laneListener != null) {
+            laneListener!!.onStateChanged(oldState, newState)
         }
     }
 
     private fun fireSelectedEvent() {
-        if (mLaneListener != null) {
-            mLaneListener!!.onItemSelected(mFocusedEntryView!!.entry)
+        if (laneListener != null) {
+            laneListener!!.onItemSelected(focusedEntryView!!.entry)
         }
     }
 
     private fun fireSelectingEvent() {
-        if (mLaneListener != null) {
-            mLaneListener!!.onItemSelecting(mFocusedEntryView!!.entry)
+        if (laneListener != null) {
+            laneListener!!.onItemSelecting(focusedEntryView!!.entry)
         }
     }
 
     private fun fireNotSelectedEvents() {
-        if (mLaneListener != null) {
-            mLaneListener!!.onItemSelected(null)
-            mLaneListener!!.onItemSelecting(null)
+        if (laneListener != null) {
+            laneListener!!.onItemSelected(null)
+            laneListener!!.onItemSelecting(null)
         }
     }
 
     private fun adaptModelState() {
-        transitToState(mViewModel!!.state)
+        transitToState(viewModel!!.state)
         applySizeParameters()
     }
 
     private fun initEntryState(state: LaunchEntryViewModel.State) {
-        for (ev in mEntryViews) {
+        for (ev in entryViews) {
             ev.setState(state)
         }
     }
@@ -305,65 +304,66 @@ class LaunchLaneView : RelativeLayout {
     private fun sendAllEntriesToState(state: LaunchEntryViewModel.State, except: LaunchEntryView? = null) {
         var delay = 0
 
-        val entryCount = mEntryViews.size
+        val entryCount = entryViews.size
         val count = entryCount / 2
         var centerIndex = -1
-        if (mEntryViews.size % 2 != 0) {
+        if (entryViews.size % 2 != 0) {
             centerIndex = count
         }
 
         if (centerIndex >= 0) {
-            if (mEntryViews[centerIndex] != except) {
-                mEntryViews[centerIndex].gotoState(state, delay)
+            if (entryViews[centerIndex] != except) {
+                entryViews[centerIndex].gotoState(state, delay)
             }
-            delay += mViewModel!!.entryMoveDiffMS
+            delay += viewModel!!.entryMoveDiffMS
         }
 
         for (i in count - 1 downTo 0) {
+            @Suppress("UnnecessaryVariable")
             val upperIdx = i
             val lowerIdx = entryCount - 1 - i
-            if (mEntryViews[upperIdx] != except) {
-                mEntryViews[upperIdx].gotoState(state, delay)
+            if (entryViews[upperIdx] != except) {
+                entryViews[upperIdx].gotoState(state, delay)
             }
-            if (mEntryViews[lowerIdx] != except) {
-                mEntryViews[lowerIdx].gotoState(state, delay)
+            if (entryViews[lowerIdx] != except) {
+                entryViews[lowerIdx].gotoState(state, delay)
             }
 
-            delay += mViewModel!!.entryMoveDiffMS
+            delay += viewModel!!.entryMoveDiffMS
         }
     }
 
     private fun applySizeParameters() {
-        mSelectedIcon!!.maxHeight = ViewUtils.getPxFromDip(context, mViewModel!!.imageWidthDip).toInt()
-        mSelectedIcon!!.maxWidth = ViewUtils.getPxFromDip(context, mViewModel!!.imageWidthDip).toInt()
+        selectedIcon!!.maxHeight = ViewUtils.getPxFromDip(context, viewModel!!.imageWidthDip).toInt()
+        selectedIcon!!.maxWidth = ViewUtils.getPxFromDip(context, viewModel!!.imageWidthDip).toInt()
     }
 
     private fun showSelectionIndicator() {
-        if (mFocusedEntryView == null) {
+        if (focusedEntryView == null) {
             return
         }
         val fromRect = Rect()
-        mFocusedEntryView!!.getHitRect(fromRect)
+        focusedEntryView!!.getHitRect(fromRect)
         val toRect = Rect()
-        mSelectIndicatorContainer!!.getHitRect(toRect)
+        selectIndicatorContainer!!.getHitRect(toRect)
 
-        val drawable = mFocusedEntryView!!.entry.getIcon(context)
-        mSelectedIcon!!.setImageDrawable(drawable)
+        val drawable = focusedEntryView!!.entry.getIcon(context)
+        selectedIcon!!.setImageDrawable(drawable)
 
-        val useIconColor = mFocusedEntryView!!.entry.useIconColor()
+        val useIconColor = focusedEntryView!!.entry.useIconColor()
 
-        mSelectedItemTextView!!.text = mFocusedEntryView!!.entry.getName(context)
+        selectedItemTextView!!.text = focusedEntryView!!.entry.getName(context)
 
         val bmpResult = BitmapUtils.drawableToBitmap(drawable)
         if (useIconColor
                 && bmpResult != null) {
-            mSelectIndicator!!.setBackgroundColor(
+            selectIndicator!!.setBackgroundColor(
                     ColorUtils.getBackgroundColorFromImage(
                             bmpResult.bitmap,
-                            mViewModel!!.frameDefaultColor))
+                            viewModel!!.frameDefaultColor))
         } else {
-            mSelectIndicator!!.setBackgroundColor(
-                    mViewModel!!.frameDefaultColor)
+            selectIndicator!!.setBackgroundColor(
+                    viewModel!!.frameDefaultColor)
         }
 
         if (bmpResult != null && bmpResult.isNew) {
@@ -372,9 +372,9 @@ class LaunchLaneView : RelativeLayout {
 
         try {
             val anim = ObjectAnimator.ofObject(
-                    mSelectIndicator,
+                    selectIndicator,
                     "margins",
-                    PositionAndSizeEvaluator(mSelectIndicator!!),
+                    PositionAndSizeEvaluator(selectIndicator!!),
                     fromRect,
                     toRect)
             anim.addListener(object : Animator.AnimatorListener {
@@ -388,51 +388,51 @@ class LaunchLaneView : RelativeLayout {
 
                 override fun onAnimationRepeat(animation: Animator) {}
             })
-            anim.duration = mViewModel!!.selectingAnimationDurationMS.toLong()
+            anim.duration = viewModel!!.selectingAnimationDurationMS.toLong()
             anim.start()
 
             Thread(Runnable {
                 try {
-                    Thread.sleep((mViewModel!!.selectingAnimationDurationMS / 2).toLong())
-                    mSelectedItemTextView!!.post { mSelectedItemTextView!!.visibility = View.VISIBLE }
+                    Thread.sleep((viewModel!!.selectingAnimationDurationMS / 2).toLong())
+                    selectedItemTextView!!.post { selectedItemTextView!!.visibility = View.VISIBLE }
                 } catch (e: InterruptedException) {
                 }
             }).start()
         } catch (e: Exception) {
         }
 
-        mSelectIndicator!!.visibility = View.VISIBLE
+        selectIndicator!!.visibility = View.VISIBLE
     }
 
     private fun hideSelectionIndicator() {
-        if (mSelectIndicator != null) {
-            mSelectIndicator!!.visibility = View.INVISIBLE
+        if (selectIndicator != null) {
+            selectIndicator!!.visibility = View.INVISIBLE
         }
-        if (mSelectedItemTextView != null) {
-            mSelectedItemTextView!!.visibility = View.GONE
+        if (selectedItemTextView != null) {
+            selectedItemTextView!!.visibility = View.GONE
         }
     }
 
     private fun hideEntries() {
-        for (ev in mEntryViews) {
+        for (ev in entryViews) {
             ev.visibility = View.INVISIBLE
         }
     }
 
     private fun showEntries() {
-        for (ev in mEntryViews) {
+        for (ev in entryViews) {
             ev.visibility = View.VISIBLE
         }
     }
 
     private fun ensureFocusedEntryAt(y: Int) {
-        mFocusedEntryView = null
-        for (ev in mEntryViews) {
+        focusedEntryView = null
+        for (ev in entryViews) {
             val hit = isEntryAt(ev, y)
             var desiredState: LaunchEntryViewModel.State = LaunchEntryViewModel.State.Active
             if (hit) {
                 desiredState = LaunchEntryViewModel.State.Focused
-                mFocusedEntryView = ev
+                focusedEntryView = ev
             }
             ev.gotoState(desiredState)
         }

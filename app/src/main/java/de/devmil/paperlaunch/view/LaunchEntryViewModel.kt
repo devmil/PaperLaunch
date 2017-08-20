@@ -24,6 +24,7 @@ import de.devmil.paperlaunch.config.ILaunchEntryConfig
 class LaunchEntryViewModel(private val mContext: Context, val entry: IEntry, private val mConfig: ILaunchEntryConfig) {
     var state = State.Inactive
 
+    @Suppress("unused")
     val appName: String
         get() = entry.getName(mContext).orEmpty()
 

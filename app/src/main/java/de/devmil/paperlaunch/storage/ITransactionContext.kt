@@ -15,8 +15,6 @@
  */
 package de.devmil.paperlaunch.storage
 
-import java.util.ArrayList
-
 import de.devmil.paperlaunch.model.Folder
 import de.devmil.paperlaunch.model.IEntry
 import de.devmil.paperlaunch.model.Launch

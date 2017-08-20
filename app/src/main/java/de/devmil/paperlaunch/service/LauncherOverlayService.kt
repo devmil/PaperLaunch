@@ -15,7 +15,6 @@
  */
 package de.devmil.paperlaunch.service
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
@@ -23,12 +22,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Rect
-import android.graphics.drawable.Icon
 import android.os.IBinder
 import android.os.Vibrator
 import android.util.DisplayMetrics
@@ -57,20 +53,22 @@ import de.devmil.paperlaunch.view.LauncherView
 
 class LauncherOverlayService : Service() {
 
-    private var mNotification: Notification? = null
-    private var mAlreadyRegistered = false
+    private var notification: Notification? = null
+    private var alreadyRegistered = false
     //private LinearLayout mTouchReceiver = null;
-    private var mTouchReceiverContainer: LinearLayout? = null
-    private var mLauncherView: LauncherView? = null
-    private var mIsLauncherActive = false
-    private var mCurrentConfig: LaunchConfig? = null
-    private var mEntriesLoaded = false
+    private var touchReceiverContainer: LinearLayout? = null
+    private var launcherView: LauncherView? = null
+    private var isLauncherActive = false
+    private var currentConfig: LaunchConfig? = null
+    private var entriesLoaded = false
 
     //receivers
-    private var mScreenOnOffReceiver: ScreenOnOffReceiver? = null
-    private var mOrientationChangeReceiver: OrientationChangeReceiver? = null
+    private var screenOnOffReceiver: ScreenOnOffReceiver? = null
+    private var orientationChangeReceiver: OrientationChangeReceiver? = null
 
-    private var mState: ServiceState? = null
+    private val state: ServiceState by lazy {
+        ServiceState(this)
+    }
 
     internal inner class ScreenOnOffReceiver : BroadcastReceiver() {
 
@@ -86,10 +84,10 @@ class LauncherOverlayService : Service() {
 
     internal inner class OrientationChangeReceiver(context: Context) : BroadcastReceiver() {
 
-        private var mLastConfiguration: Int = 0
+        private var lastConfiguration: Int = 0
 
         init {
-            mLastConfiguration = context.resources.configuration.orientation
+            lastConfiguration = context.resources.configuration.orientation
         }
 
         override fun onReceive(context: Context, intent: Intent?) {
@@ -98,8 +96,8 @@ class LauncherOverlayService : Service() {
             }
             if (intent.action == Intent.ACTION_CONFIGURATION_CHANGED) {
                 val newOrientation = context.resources.configuration.orientation
-                if (mLastConfiguration != newOrientation) {
-                    mLastConfiguration = newOrientation
+                if (lastConfiguration != newOrientation) {
+                    lastConfiguration = newOrientation
                     finishLauncher()
                     ensureData(true)
                 }
@@ -109,8 +107,6 @@ class LauncherOverlayService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-
-        mState = ServiceState(this)
 
         registerScreenOnReceiver()
         registerOrientationChangeReceiver()
@@ -135,12 +131,12 @@ class LauncherOverlayService : Service() {
             reloadConfigMetadata()
             reloadTouchReceiver()
         } else if (intent != null && ACTION_PAUSE == intent.action) {
-            mState!!.isActive = false
-            mState!!.save(this)
+            state.isActive = false
+            state.save(this)
             adaptState(false)
         } else if (intent != null && ACTION_PLAY == intent.action) {
-            mState!!.isActive = true
-            mState!!.save(this)
+            state.isActive = true
+            state.save(this)
             adaptState(false)
         } else if (intent != null && ACTION_ENSUREACTIVATIONTAPPABLE == intent.action) {
             reloadTouchReceiver()
@@ -149,7 +145,7 @@ class LauncherOverlayService : Service() {
     }
 
     private fun adaptState(forceReload: Boolean) {
-        if (mState!!.isActive) {
+        if (state.isActive) {
             ensureOverlayActive(forceReload)
         } else {
             ensureOverlayInActive()
@@ -161,14 +157,14 @@ class LauncherOverlayService : Service() {
         unregisterOrientationChangeReceiver()
         val filter = IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED)
 
-        mOrientationChangeReceiver = OrientationChangeReceiver(this)
-        registerReceiver(mOrientationChangeReceiver, filter)
+        orientationChangeReceiver = OrientationChangeReceiver(this)
+        registerReceiver(orientationChangeReceiver, filter)
     }
 
     private fun unregisterOrientationChangeReceiver() {
-        if (mOrientationChangeReceiver != null) {
-            unregisterReceiver(mOrientationChangeReceiver)
-            mOrientationChangeReceiver = null
+        if (orientationChangeReceiver != null) {
+            unregisterReceiver(orientationChangeReceiver)
+            orientationChangeReceiver = null
         }
     }
 
@@ -176,19 +172,19 @@ class LauncherOverlayService : Service() {
         unregisterScreenOnOffReceiver()
         val filter = IntentFilter(Intent.ACTION_SCREEN_ON)
         filter.addAction(Intent.ACTION_SCREEN_OFF)
-        mScreenOnOffReceiver = ScreenOnOffReceiver()
-        registerReceiver(mScreenOnOffReceiver, filter)
+        screenOnOffReceiver = ScreenOnOffReceiver()
+        registerReceiver(screenOnOffReceiver, filter)
     }
 
     private fun unregisterScreenOnOffReceiver() {
-        if (mScreenOnOffReceiver != null) {
-            unregisterReceiver(mScreenOnOffReceiver)
-            mScreenOnOffReceiver = null
+        if (screenOnOffReceiver != null) {
+            unregisterReceiver(screenOnOffReceiver)
+            screenOnOffReceiver = null
         }
     }
 
     private fun ensureOverlayActive(forceReload: Boolean) {
-        val alreadyRegistered = mAlreadyRegistered
+        val alreadyRegistered = alreadyRegistered
 
         if (!forceReload && alreadyRegistered) {
             return
@@ -208,27 +204,27 @@ class LauncherOverlayService : Service() {
 
     private fun ensureConfig(forceReload: Boolean) {
         if (forceReload) {
-            mCurrentConfig = null
+            currentConfig = null
         }
-        if (mCurrentConfig == null) {
-            mCurrentConfig = LaunchConfig(UserSettings(this))
+        if (currentConfig == null) {
+            currentConfig = LaunchConfig(UserSettings(this))
         }
     }
 
     private fun reloadConfigMetadata() {
         ensureConfig(false)
 
-        val entries = mCurrentConfig!!.entries
-        mCurrentConfig = LaunchConfig(UserSettings(this))
-        mCurrentConfig!!.entries = entries
+        val entries = currentConfig!!.entries
+        currentConfig = LaunchConfig(UserSettings(this))
+        currentConfig!!.entries = entries
     }
 
     private fun ensureData(forceReload: Boolean) {
         ensureConfig(forceReload)
         if (forceReload) {
-            mEntriesLoaded = false
+            entriesLoaded = false
         }
-        if (!mEntriesLoaded) {
+        if (!entriesLoaded) {
             class Local {
                 var entries: MutableList<IEntry>? = null
             }
@@ -240,8 +236,8 @@ class LauncherOverlayService : Service() {
                 }
             })
 
-            mCurrentConfig!!.entries = prepareEntries(local.entries!!)
-            mEntriesLoaded = true
+            currentConfig!!.entries = prepareEntries(local.entries!!)
+            entriesLoaded = true
         }
     }
 
@@ -252,7 +248,7 @@ class LauncherOverlayService : Service() {
         val metrics = DisplayMetrics()
         wm.defaultDisplay.getMetrics(metrics)
 
-        val entryHeightDip = mCurrentConfig!!.imageWidthDip + 2 * mCurrentConfig!!.imageMarginDip + 2 * mCurrentConfig!!.entriesMarginDip
+        val entryHeightDip = currentConfig!!.imageWidthDip + 2 * currentConfig!!.imageMarginDip + 2 * currentConfig!!.entriesMarginDip
 
         val entryHeightPx = ViewUtils.getPxFromDip(this, entryHeightDip)
 
@@ -286,15 +282,15 @@ class LauncherOverlayService : Service() {
     private fun createLauncherView(event: MotionEvent): LauncherView {
         val result = LauncherView(this)
         ensureData(false)
-        result.doInitialize(mCurrentConfig!!)
+        result.doInitialize(currentConfig!!)
         result.doAutoStart(event)
 
         return result
     }
 
     @Synchronized private fun handleTouch(touchReceiver: LinearLayout, event: MotionEvent): Boolean {
-        if (!mIsLauncherActive) {
-            mLauncherView = createLauncherView(event)
+        if (!isLauncherActive) {
+            launcherView = createLauncherView(event)
             //            Rect hitRect = new Rect();
             //            touchReceiver.getHitRect(hitRect);
             //            if(!hitRect.contains((int)event.getX(), (int)event.getY()))
@@ -309,8 +305,8 @@ class LauncherOverlayService : Service() {
 
             val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
-            wm.addView(mLauncherView, params)
-            if (mCurrentConfig!!.isVibrateOnActivation) {
+            wm.addView(launcherView, params)
+            if (currentConfig!!.isVibrateOnActivation) {
                 try {
                     val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
                     v.vibrate(60)
@@ -319,35 +315,35 @@ class LauncherOverlayService : Service() {
                 }
 
             }
-            mIsLauncherActive = true
-            mLauncherView!!.setListener(object : LauncherView.ILauncherViewListener {
+            isLauncherActive = true
+            launcherView!!.setListener(object : LauncherView.ILauncherViewListener {
                 override fun onFinished() {
                     finishLauncher()
                 }
             })
 
         } else {
-            transferMotionEvent(touchReceiver, mLauncherView!!, event)
+            transferMotionEvent(touchReceiver, launcherView!!, event)
         }
 
         return true
     }
 
     @Synchronized private fun removeTouchReceiver() {
-        removeTouchReceiver(this, mTouchReceiverContainer)
-        mTouchReceiverContainer = null
-        mAlreadyRegistered = false
+        removeTouchReceiver(this, touchReceiverContainer)
+        touchReceiverContainer = null
+        alreadyRegistered = false
     }
 
     @Synchronized private fun reloadTouchReceiver() {
 
         val avr = addActivationViewToWindow(
-                mTouchReceiverContainer,
+                touchReceiverContainer,
                 this,
-                ViewUtils.getPxFromDip(this, mCurrentConfig!!.launcherSensitivityDip.toFloat()).toInt(),
-                ViewUtils.getPxFromDip(this, mCurrentConfig!!.launcherOffsetPositionDip.toFloat()).toInt(),
-                ViewUtils.getPxFromDip(this, mCurrentConfig!!.launcherOffsetHeightDip.toFloat()).toInt(),
-                mCurrentConfig!!.isOnRightSide,
+                ViewUtils.getPxFromDip(this, currentConfig!!.launcherSensitivityDip.toFloat()).toInt(),
+                ViewUtils.getPxFromDip(this, currentConfig!!.launcherOffsetPositionDip.toFloat()).toInt(),
+                ViewUtils.getPxFromDip(this, currentConfig!!.launcherOffsetHeightDip.toFloat()).toInt(),
+                currentConfig!!.isOnRightSide,
                 Color.TRANSPARENT)
 
         @Suppress("ClickableViewAccessibility")
@@ -359,9 +355,9 @@ class LauncherOverlayService : Service() {
             }
         }
 
-        mTouchReceiverContainer = avr.container
+        touchReceiverContainer = avr.container
 
-        mAlreadyRegistered = true
+        alreadyRegistered = true
     }
 
     class ActivationViewResult {
@@ -371,15 +367,15 @@ class LauncherOverlayService : Service() {
 
     @Synchronized private fun finishLauncher() {
         val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        if (mLauncherView != null) {
+        if (launcherView != null) {
             try {
-                wm.removeView(mLauncherView)
+                wm.removeView(launcherView)
             } catch (e: Exception) {
             }
 
-            mLauncherView = null
+            launcherView = null
         }
-        mIsLauncherActive = false
+        isLauncherActive = false
     }
 
     private fun transferMotionEvent(from: View, to: LauncherView, event: MotionEvent) {
@@ -398,7 +394,7 @@ class LauncherOverlayService : Service() {
     }
 
     private fun ensureNotification(force: Boolean = false) {
-        if (!force && mNotification != null) {
+        if (!force && notification != null) {
             return
         }
         val settingsPendingIntent = PendingIntent.getActivity(
@@ -412,7 +408,7 @@ class LauncherOverlayService : Service() {
 
         val builder = Notification.Builder(this)
                 .setContentTitle("PaperLaunch")
-                .setContentText(getString(if (mState!!.isActive) R.string.notification_content_active else R.string.notification_content_inactive))
+                .setContentText(getString(if (state.isActive) R.string.notification_content_active else R.string.notification_content_inactive))
                 .setOngoing(true)
                 .setLocalOnly(true)
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -422,7 +418,7 @@ class LauncherOverlayService : Service() {
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setContentIntent(settingsPendingIntent)
 
-        if (mState!!.isActive) {
+        if (state.isActive) {
             val pauseIntent = Intent(ACTION_PAUSE)
             pauseIntent.setClass(this, LauncherOverlayService::class.java)
             val pendingPauseIntent = PendingIntent.getService(
@@ -453,10 +449,10 @@ class LauncherOverlayService : Service() {
         }
 
         val n = builder.build()
-        if (mNotification != null) {
-            n.`when` = mNotification!!.`when`
+        if (notification != null) {
+            n.`when` = notification!!.`when`
         }
-        mNotification = n
+        notification = n
 
         startForeground(NOTIFICATION_ID, n)
 
@@ -492,6 +488,7 @@ class LauncherOverlayService : Service() {
             context.startService(launchServiceIntent)
         }
 
+        @Suppress("unused")
         fun ensureActivationTappable(context: Context) {
             val launchServiceIntent = Intent(context, LauncherOverlayService::class.java)
             launchServiceIntent.action = ACTION_ENSUREACTIVATIONTAPPABLE

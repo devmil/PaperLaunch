@@ -29,7 +29,7 @@ object ActivationIndicatorHelper {
         var top = availableRect.top
         var left = availableRect.left
         var right = availableRect.right
-        var bottom: Int
+        val bottom: Int
 
         if (isOnRightSide) {
             left = right - sensitivity

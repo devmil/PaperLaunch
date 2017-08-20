@@ -25,25 +25,22 @@ import java.util.ArrayList
 import java.util.Dictionary
 import java.util.Hashtable
 
-/**
- * Created by devmil on 18.04.14.
- */
 class LicenseInfo private constructor() : ILicenseAccess {
 
-    private val _Licenses: Dictionary<String, LicenseDefinition>
-    private val _Packages: MutableList<PackageInfo>
+    private val licenses: Dictionary<String, LicenseDefinition>
+    private val packagesMutableList: MutableList<PackageInfo>
 
     init {
-        _Licenses = Hashtable<String, LicenseDefinition>()
-        _Packages = ArrayList<PackageInfo>()
+        licenses = Hashtable<String, LicenseDefinition>()
+        packagesMutableList = ArrayList()
     }
 
     val packages: List<PackageInfo>
-        get() = _Packages
+        get() = packagesMutableList
 
 
     override fun getLicense(identifier: String): LicenseDefinition {
-        return _Licenses.get(identifier)
+        return licenses.get(identifier)
     }
 
     companion object {
@@ -55,7 +52,7 @@ class LicenseInfo private constructor() : ILicenseAccess {
 
         fun readFromJSON(obj: JSONObject): LicenseInfo? {
             val result = LicenseInfo()
-            var licenses: JSONArray?
+            val licenses: JSONArray?
             try {
                 licenses = obj.getJSONArray(LICENSE_ARRAY_IDENTIFIER)
             } catch (e: JSONException) {
@@ -63,18 +60,18 @@ class LicenseInfo private constructor() : ILicenseAccess {
                 return null
             }
 
-            for (i in 0..licenses!!.length() - 1) {
+            for (i in 0 until licenses!!.length()) {
                 try {
                     val licenseObj = licenses.getJSONObject(i)
                     val ld = LicenseDefinition.readFromJSON(licenseObj)
                     if (ld != null)
-                        result._Licenses.put(ld.id, ld)
+                        result.licenses.put(ld.id, ld)
                 } catch (e: JSONException) {
                     Log.w(TAG, "Error reading LicenseInfo", e)
                 }
 
             }
-            var packages: JSONArray?
+            val packages: JSONArray?
             try {
                 packages = obj.getJSONArray(PACKAGE_ARRAY_IDENTIFIER)
             } catch (e: JSONException) {
@@ -82,12 +79,12 @@ class LicenseInfo private constructor() : ILicenseAccess {
                 return null
             }
 
-            for (i in 0..packages!!.length() - 1) {
+            for (i in 0 until packages!!.length()) {
                 try {
                     val packageObj = packages.getJSONObject(i)
                     val pi = PackageInfo.readFromJSON(packageObj, result)
                     if (pi != null)
-                        result._Packages.add(pi)
+                        result.packagesMutableList.add(pi)
                 } catch (e: JSONException) {
                     Log.w(TAG, "Error reading LicenseInfo", e)
                 }

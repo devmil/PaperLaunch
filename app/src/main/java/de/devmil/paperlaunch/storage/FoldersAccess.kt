@@ -22,10 +22,10 @@ import android.database.sqlite.SQLiteDatabase
 
 import de.devmil.paperlaunch.utils.BitmapUtils
 
-class FoldersAccess(private val mContext: Context, private val mDatabase: SQLiteDatabase) {
+class FoldersAccess(private val context: Context, private val database: SQLiteDatabase) {
 
     fun queryFolder(folderId: Long): FolderDTO? {
-        val c = mDatabase.query(
+        val c = database.query(
                 EntriesSQLiteOpenHelper.TABLE_FOLDERS,
                 foldersColumns,
                 EntriesSQLiteOpenHelper.COLUMN_ID + " = " + folderId,
@@ -44,7 +44,7 @@ class FoldersAccess(private val mContext: Context, private val mDatabase: SQLite
         val values = ContentValues()
         values.put(EntriesSQLiteOpenHelper.COLUMN_FOLDERS_NAME, null as String?)
 
-        val id = mDatabase.insert(
+        val id = database.insert(
                 EntriesSQLiteOpenHelper.TABLE_FOLDERS, null,
                 values)
 
@@ -56,19 +56,20 @@ class FoldersAccess(private val mContext: Context, private val mDatabase: SQLite
 
         folderToValues(folder, values)
 
-        mDatabase.update(
+        database.update(
                 EntriesSQLiteOpenHelper.TABLE_FOLDERS,
                 values,
                 EntriesSQLiteOpenHelper.COLUMN_ID + " = " + folder.id, null
         )
     }
 
+    @Suppress("unused")
     fun delete(folder: FolderDTO) {
         delete(folder.id)
     }
 
     fun delete(folderId: Long) {
-        mDatabase.delete(
+        database.delete(
                 EntriesSQLiteOpenHelper.TABLE_FOLDERS,
                 EntriesSQLiteOpenHelper.COLUMN_ID + " = " + folderId, null
         )
@@ -78,7 +79,7 @@ class FoldersAccess(private val mContext: Context, private val mDatabase: SQLite
         return FolderDTO(
                 cursor.getInt(INDEX_COLUMN_ID).toLong(),
                 cursor.getString(INDEX_COLUMN_NAME),
-                BitmapUtils.getIcon(mContext, cursor.getBlob(INDEX_COLUMN_ICON)),
+                BitmapUtils.getIcon(context, cursor.getBlob(INDEX_COLUMN_ICON)),
                 cursor.getInt(INDEX_COLUMN_DEPTH)
         )
     }

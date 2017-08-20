@@ -35,19 +35,15 @@ import de.devmil.paperlaunch.view.preferences.SeekBarPreference
 
 class SettingsFragment : PreferenceFragment() {
 
-    private var mUserSettings: UserSettings? = null
-    private var mActivationParametersChangedListener: (() -> Unit)? = null
-
-    interface IActivationParametersChangedListener {
-        fun onActivationParametersChanged()
-    }
+    private var userSettings: UserSettings? = null
+    private var activationParametersChangedListener: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val context = activity
 
-        mUserSettings = UserSettings(context)
+        userSettings = UserSettings(context)
 
         val screen = preferenceManager.createPreferenceScreen(context)
         preferenceScreen = screen
@@ -57,12 +53,12 @@ class SettingsFragment : PreferenceFragment() {
     }
 
     fun setOnActivationParametersChangedListener(listener: () -> Unit) {
-        mActivationParametersChangedListener = listener
+        activationParametersChangedListener = listener
     }
 
     private fun fireActivationParametersChanged() {
-        if (mActivationParametersChangedListener != null) {
-            mActivationParametersChangedListener!!()
+        if (activationParametersChangedListener != null) {
+            activationParametersChangedListener!!()
         }
     }
 
@@ -78,13 +74,13 @@ class SettingsFragment : PreferenceFragment() {
         val sensitivityPreference = SeekBarPreference(context, 5, 40)
         activationCategory.addPreference(sensitivityPreference)
 
-        sensitivityPreference.setValue(mUserSettings!!.sensitivityDip)
+        sensitivityPreference.setValue(userSettings!!.sensitivityDip)
         sensitivityPreference.setTitle(R.string.fragment_settings_activation_sensitivity_title)
         sensitivityPreference.isPersistent = false
         sensitivityPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-            mUserSettings!!.load(activity)
-            mUserSettings!!.sensitivityDip = newValue as Int
-            mUserSettings!!.save(activity)
+            userSettings!!.load(activity)
+            userSettings!!.sensitivityDip = newValue as Int
+            userSettings!!.save(activity)
             fireActivationParametersChanged()
             true
         }
@@ -97,13 +93,13 @@ class SettingsFragment : PreferenceFragment() {
         val offsetHeightPreference = SeekBarPreference(context, 0, heightDpi.toInt())
         activationCategory.addPreference(offsetHeightPreference)
 
-        offsetHeightPreference.setValue(heightDpi.toInt() - mUserSettings!!.activationOffsetHeightDip)
+        offsetHeightPreference.setValue(heightDpi.toInt() - userSettings!!.activationOffsetHeightDip)
         offsetHeightPreference.setTitle(R.string.fragment_settings_activation_offset_height_title)
         offsetHeightPreference.isPersistent = false
         offsetHeightPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-            mUserSettings!!.load(activity)
-            mUserSettings!!.activationOffsetHeightDip = heightDpi.toInt() - newValue as Int
-            mUserSettings!!.save(activity)
+            userSettings!!.load(activity)
+            userSettings!!.activationOffsetHeightDip = heightDpi.toInt() - newValue as Int
+            userSettings!!.save(activity)
             fireActivationParametersChanged()
             true
         }
@@ -114,13 +110,13 @@ class SettingsFragment : PreferenceFragment() {
         val offsetPositionPreference = SeekBarPreference(context, offsetMin, offsetMax)
         activationCategory.addPreference(offsetPositionPreference)
 
-        offsetPositionPreference.setValue(mUserSettings!!.activationOffsetPositionDip)
+        offsetPositionPreference.setValue(userSettings!!.activationOffsetPositionDip)
         offsetPositionPreference.setTitle(R.string.fragment_settings_activation_offset_position_title)
         offsetPositionPreference.isPersistent = false
         offsetPositionPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-            mUserSettings!!.load(activity)
-            mUserSettings!!.activationOffsetPositionDip = newValue as Int
-            mUserSettings!!.save(activity)
+            userSettings!!.load(activity)
+            userSettings!!.activationOffsetPositionDip = newValue as Int
+            userSettings!!.save(activity)
             fireActivationParametersChanged()
             true
         }
@@ -128,15 +124,15 @@ class SettingsFragment : PreferenceFragment() {
         val vibrateOnActivationPreference = CheckBoxPreference(context)
         activationCategory.addPreference(vibrateOnActivationPreference)
 
-        vibrateOnActivationPreference.isChecked = mUserSettings!!.isVibrateOnActivation
+        vibrateOnActivationPreference.isChecked = userSettings!!.isVibrateOnActivation
         vibrateOnActivationPreference.setTitle(R.string.fragment_settings_activation_vibrate_on_activation_title)
         vibrateOnActivationPreference.setSummaryOn(R.string.fragment_settings_activation_vibrate_on_activation_summary_on)
         vibrateOnActivationPreference.setSummaryOff(R.string.fragment_settings_activation_vibrate_on_activation_summary_off)
         vibrateOnActivationPreference.isPersistent = false
         vibrateOnActivationPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-            mUserSettings!!.load(activity)
-            mUserSettings!!.isVibrateOnActivation = newValue as Boolean
-            mUserSettings!!.save(activity)
+            userSettings!!.load(activity)
+            userSettings!!.isVibrateOnActivation = newValue as Boolean
+            userSettings!!.save(activity)
             LauncherOverlayService.notifyConfigChanged(activity)
             true
         }
@@ -156,11 +152,11 @@ class SettingsFragment : PreferenceFragment() {
         showBackgroundPreference.setTitle(R.string.fragment_settings_appearance_background_title)
         showBackgroundPreference.setSummaryOn(R.string.fragment_settings_appearance_background_summary_on)
         showBackgroundPreference.setSummaryOff(R.string.fragment_settings_appearance_background_summary_off)
-        showBackgroundPreference.isChecked = mUserSettings!!.isShowBackground
+        showBackgroundPreference.isChecked = userSettings!!.isShowBackground
         showBackgroundPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-            mUserSettings!!.load(activity)
-            mUserSettings!!.isShowBackground = newValue as Boolean
-            mUserSettings!!.save(activity)
+            userSettings!!.load(activity)
+            userSettings!!.isShowBackground = newValue as Boolean
+            userSettings!!.save(activity)
             LauncherOverlayService.notifyConfigChanged(activity)
             true
         }
@@ -189,14 +185,14 @@ class SettingsFragment : PreferenceFragment() {
         sidePreference.setTitle(R.string.fragment_settings_appearance_side_title)
         sidePreference.entries = sideEntryTitles.toTypedArray()
         sidePreference.entryValues = sideEntryValues.toTypedArray()
-        sidePreference.value = java.lang.Boolean.toString(mUserSettings!!.isOnRightSide)
-        sidePreference.summary = context.getString(getSideSummary(mUserSettings!!.isOnRightSide))
+        sidePreference.value = java.lang.Boolean.toString(userSettings!!.isOnRightSide)
+        sidePreference.summary = context.getString(getSideSummary(userSettings!!.isOnRightSide))
         sidePreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
             val newBooleanValue = java.lang.Boolean.parseBoolean(newValue as String)
-            mUserSettings!!.load(activity)
-            mUserSettings!!.isOnRightSide = newBooleanValue
-            mUserSettings!!.save(activity)
-            sidePreference.summary = context.getString(getSideSummary(mUserSettings!!.isOnRightSide))
+            userSettings!!.load(activity)
+            userSettings!!.isOnRightSide = newBooleanValue
+            userSettings!!.save(activity)
+            sidePreference.summary = context.getString(getSideSummary(userSettings!!.isOnRightSide))
             fireActivationParametersChanged()
             true
         }
@@ -228,15 +224,15 @@ class SettingsFragment : PreferenceFragment() {
         gravityPreference.setTitle(R.string.fragment_settings_appearance_gravity_title)
         gravityPreference.entries = gravityEntryTitles.toTypedArray()
         gravityPreference.entryValues = gravityEntryValues.toTypedArray()
-        gravityPreference.value = Integer.toString(mUserSettings!!.launcherGravity.value)
-        gravityPreference.summary = context.getString(getGravitySummary(mUserSettings!!.launcherGravity))
+        gravityPreference.value = Integer.toString(userSettings!!.launcherGravity.value)
+        gravityPreference.summary = context.getString(getGravitySummary(userSettings!!.launcherGravity))
         gravityPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
             val newIntValue = Integer.parseInt(newValue as String)
             val gravityValue = LauncherGravity.fromValue(newIntValue)
-            mUserSettings!!.load(activity)
-            mUserSettings!!.launcherGravity = gravityValue
-            mUserSettings!!.save(activity)
-            gravityPreference.summary = context.getString(getGravitySummary(mUserSettings!!.launcherGravity))
+            userSettings!!.load(activity)
+            userSettings!!.launcherGravity = gravityValue
+            userSettings!!.save(activity)
+            gravityPreference.summary = context.getString(getGravitySummary(userSettings!!.launcherGravity))
             fireActivationParametersChanged()
             true
         }

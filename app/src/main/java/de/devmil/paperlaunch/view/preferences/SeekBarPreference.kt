@@ -25,11 +25,11 @@ import de.devmil.paperlaunch.R
 
 class SeekBarPreference(context: Context, min: Int, max: Int) : Preference(context), SeekBar.OnSeekBarChangeListener {
 
-    private var mCurrentValue = 0
-    private var mMin = 0
-    private var mMax = 1
-    private var mIsRangeInitialized = false
-    private var mValueSet = false
+    private var currentValue = 0
+    private var min = 0
+    private var max = 1
+    private var isRangeInitialized = false
+    private var valueSet = false
 
     init {
         construct()
@@ -43,15 +43,15 @@ class SeekBarPreference(context: Context, min: Int, max: Int) : Preference(conte
     override fun onBindView(view: View) {
         super.onBindView(view)
 
-        if (!mIsRangeInitialized || !mValueSet) {
+        if (!isRangeInitialized || !valueSet) {
             return
         }
 
         val seekbar = view.findViewById(R.id.preference_seekbar_seek) as SeekBar
         val labelText = view.findViewById(R.id.preference_seekbar_label) as TextView
 
-        seekbar.max = mMax - mMin
-        seekbar.progress = mCurrentValue - mMin
+        seekbar.max = max - min
+        seekbar.progress = currentValue - min
         seekbar.setOnSeekBarChangeListener(this)
         seekbar.isEnabled = isEnabled
 
@@ -63,33 +63,33 @@ class SeekBarPreference(context: Context, min: Int, max: Int) : Preference(conte
     }
 
     override fun onSetInitialValue(restorePersistedValue: Boolean, defaultValue: Any) {
-        setValue(if (restorePersistedValue) getPersistedInt(mCurrentValue) else defaultValue as Int)
+        setValue(if (restorePersistedValue) getPersistedInt(currentValue) else defaultValue as Int)
     }
 
     fun setRange(min: Int, max: Int) {
-        mMin = min
-        mMax = max
-        mIsRangeInitialized = true
-        if (!mValueSet) {
-            mCurrentValue = mMin
+        this.min = min
+        this.max = max
+        isRangeInitialized = true
+        if (!valueSet) {
+            currentValue = this.min
         }
         notifyChanged()
     }
 
     fun setValue(value: Int) {
-        if (mValueSet && mCurrentValue == value) {
+        if (valueSet && currentValue == value) {
             return
         }
-        mCurrentValue = value
+        currentValue = value
         persistInt(value)
-        mValueSet = true
+        valueSet = true
         notifyChanged()
         callChangeListener(value)
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-        if (fromUser && mIsRangeInitialized) {
-            setValue(seekBar.progress + mMin)
+        if (fromUser && isRangeInitialized) {
+            setValue(seekBar.progress + min)
         }
     }
 

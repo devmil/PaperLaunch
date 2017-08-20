@@ -17,7 +17,6 @@ package de.devmil.paperlaunch.utils
 
 import android.graphics.Rect
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 
 import java.io.InvalidClassException
@@ -26,18 +25,18 @@ import java.io.InvalidClassException
  * This class assumes that there is no initial margin and that the target view resides in a LinearLayout (or a derivative of it)
  * and that the endValue is the same as margins == 0
  */
-class PositionAndSizeEvaluator @Throws(InvalidClassException::class)
-constructor(private val mTargetView: View) : RectEvaluator() {
+class PositionAndSizeEvaluator
+constructor(private val targetView: View) : RectEvaluator() {
 
     init {
-        mTargetView.layoutParams as? LinearLayout.LayoutParams ?: throw InvalidClassException("Only Views in a derivative of LinearLayout are supported!")
+        targetView.layoutParams as? LinearLayout.LayoutParams ?: throw InvalidClassException("Only Views in a derivative of LinearLayout are supported!")
 
     }
 
     override fun evaluate(fraction: Float, startValue: Rect, endValue: Rect): Rect {
         val result = super.evaluate(fraction, startValue, endValue)
 
-        val p = mTargetView.layoutParams as LinearLayout.LayoutParams
+        val p = targetView.layoutParams as LinearLayout.LayoutParams
 
         val leftMargin = result.left - endValue.left
         val topMargin = result.top - endValue.top
@@ -45,7 +44,7 @@ constructor(private val mTargetView: View) : RectEvaluator() {
         val bottomMargin = endValue.bottom - result.bottom
         p.setMargins(leftMargin, topMargin, rightMargin, bottomMargin)
 
-        mTargetView.layoutParams = p
+        targetView.layoutParams = p
 
         return result
     }

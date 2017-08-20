@@ -41,6 +41,7 @@ object ViewUtils {
         viewGroup.clipChildren = false
     }
 
+    @Suppress("unused")
     fun drawableToBitmap(drawable: Drawable): Bitmap {
         if (drawable is BitmapDrawable) {
             return drawable.bitmap
