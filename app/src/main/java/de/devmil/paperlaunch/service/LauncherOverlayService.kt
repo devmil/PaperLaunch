@@ -157,6 +157,7 @@ class LauncherOverlayService : Service() {
                     NotificationManager.IMPORTANCE_MIN)
             notificationChannel.enableLights(false)
             notificationChannel.enableVibration(false)
+            notificationChannel.setShowBadge(false)
             notificationManager.createNotificationChannel(notificationChannel)
         }
     }
@@ -437,12 +438,12 @@ class LauncherOverlayService : Service() {
                .setContentText(getString(if (state.isActive) R.string.notification_content_active else R.string.notification_content_inactive))
                .setSmallIcon(R.mipmap.ic_launcher)
                .setContentIntent(settingsPendingIntent)
+               .setOngoing(true)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
+            builder.setBadgeIconType(Notification.BADGE_ICON_NONE)
         } else {
-            builder.setOngoing(true)
-                   .setLocalOnly(true)
+            builder.setLocalOnly(true)
                    //.setLargeIcon(largeIcon)
                    .setPriority(Notification.PRIORITY_MIN)
                    .setCategory(Notification.CATEGORY_SERVICE)

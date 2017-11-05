@@ -67,6 +67,6 @@
     <string name="fragment_settings_appearance_gravity_optionbottom_summary">Entries are bottom-aligned</string>
 
     <string name="permission_request_title">Permission request</string>
-    <string name="permission_request_description">PaperLaunch needs the permission to draw over system UI in order to function properly.</string>
+    <string name="permission_request_description">PaperLaunch needs the permission to draw over system UI in order to function properly. If you see this message even after setting this permission please try to restart PaperLaunch (this can happen due to an Android Oreo bug)</string>
     <string name="permission_request_button_ok">OK</string>
 </resources>
