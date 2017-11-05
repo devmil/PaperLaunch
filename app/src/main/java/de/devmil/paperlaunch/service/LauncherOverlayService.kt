@@ -15,22 +15,17 @@
  */
 package de.devmil.paperlaunch.service
 
-import android.Manifest
-import android.app.Notification
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.os.Build
 import android.os.IBinder
 import android.os.Vibrator
-import android.support.v4.content.ContextCompat
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
@@ -113,6 +108,8 @@ class LauncherOverlayService : Service() {
     override fun onCreate() {
         super.onCreate()
 
+        createNotificationChannel()
+
         registerScreenOnReceiver()
         registerOrientationChangeReceiver()
     }
@@ -149,6 +146,19 @@ class LauncherOverlayService : Service() {
             reloadTouchReceiver()
         }
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationChannel = NotificationChannel(
+                    NOTIFICATION_CHANNEL_ID,
+                    NOTIFICATION_CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_MIN)
+            notificationChannel.enableLights(false)
+            notificationChannel.enableVibration(false)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
     }
 
     private fun adaptState(forceReload: Boolean) {
@@ -418,17 +428,26 @@ class LauncherOverlayService : Service() {
 
         //val largeIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
 
-        val builder = Notification.Builder(this)
-                .setContentTitle("PaperLaunch")
-                .setContentText(getString(if (state.isActive) R.string.notification_content_active else R.string.notification_content_inactive))
-                .setOngoing(true)
-                .setLocalOnly(true)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                //.setLargeIcon(largeIcon)
-                .setPriority(Notification.PRIORITY_MIN)
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setContentIntent(settingsPendingIntent)
+        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
+        } else {
+            Notification.Builder(this)
+        }
+        builder.setContentTitle("PaperLaunch")
+               .setContentText(getString(if (state.isActive) R.string.notification_content_active else R.string.notification_content_inactive))
+               .setSmallIcon(R.mipmap.ic_launcher)
+               .setContentIntent(settingsPendingIntent)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+        } else {
+            builder.setOngoing(true)
+                   .setLocalOnly(true)
+                   //.setLargeIcon(largeIcon)
+                   .setPriority(Notification.PRIORITY_MIN)
+                   .setCategory(Notification.CATEGORY_SERVICE)
+                   .setVisibility(Notification.VISIBILITY_PUBLIC)
+        }
 
         if (state.isActive) {
             val pauseIntent = Intent(ACTION_PAUSE)
@@ -482,6 +501,8 @@ class LauncherOverlayService : Service() {
         private val ACTION_PAUSE = "ACTION_PAUSE"
         private val ACTION_PLAY = "ACTION_PLAY"
         private val NOTIFICATION_ID = 2000
+        private val NOTIFICATION_CHANNEL_ID = "paperlaunch_main"
+        private val NOTIFICATION_CHANNEL_NAME = "Paperlaunch Main"
 
         fun launch(context: Context) {
             val launchServiceIntent = Intent(context, LauncherOverlayService::class.java)
