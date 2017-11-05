@@ -15,6 +15,7 @@
  */
 package de.devmil.paperlaunch.service
 
+import android.Manifest
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
@@ -22,11 +23,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.os.IBinder
 import android.os.Vibrator
+import android.support.v4.content.ContextCompat
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
@@ -48,6 +51,7 @@ import de.devmil.paperlaunch.storage.ITransactionAction
 import de.devmil.paperlaunch.storage.ITransactionContext
 import de.devmil.paperlaunch.config.UserSettings
 import de.devmil.paperlaunch.utils.ActivationIndicatorHelper
+import de.devmil.paperlaunch.utils.PermissionUtils
 import de.devmil.paperlaunch.view.utils.ViewUtils
 import de.devmil.paperlaunch.view.LauncherView
 
@@ -139,6 +143,8 @@ class LauncherOverlayService : Service() {
             state.save(this)
             adaptState(false)
         } else if (intent != null && ACTION_ENSUREACTIVATIONTAPPABLE == intent.action) {
+            reloadTouchReceiver()
+        } else if(intent != null && ACTION_NOTIFYPERMISSIONCHANGED == intent.action) {
             reloadTouchReceiver()
         }
         return super.onStartCommand(intent, flags, startId)
@@ -346,6 +352,10 @@ class LauncherOverlayService : Service() {
                 currentConfig!!.isOnRightSide,
                 Color.TRANSPARENT)
 
+        if(!avr.success) {
+            return
+        }
+
         @Suppress("ClickableViewAccessibility")
         avr.activationView!!.setOnTouchListener { _, event -> handleTouch(avr.activationView!!, event) }
 
@@ -363,6 +373,7 @@ class LauncherOverlayService : Service() {
     class ActivationViewResult {
         var container: LinearLayout? = null
         var activationView: LinearLayout? = null
+        var success: Boolean = false
     }
 
     @Synchronized private fun finishLauncher() {
@@ -465,6 +476,7 @@ class LauncherOverlayService : Service() {
         private val ACTION_LAUNCH = "ACTION_LAUNCH"
         private val ACTION_NOTIFYDATACHANGED = "ACTION_NOTIFYDATACHANGED"
         private val ACTION_NOTIFYCONFIGCHANGED = "ACTION_NOTIFYCONFIGCHANGED"
+        private val ACTION_NOTIFYPERMISSIONCHANGED = "ACTION_NOTIFYPERMISSIONCHANGED"
         private val ACTION_ENSUREACTIVATIONTAPPABLE = "ACTION_ENSUREACTIVATIONTAPPABLE"
         private val ACTION_PAUSE = "ACTION_PAUSE"
         private val ACTION_PLAY = "ACTION_PLAY"
@@ -495,6 +507,12 @@ class LauncherOverlayService : Service() {
             context.startService(launchServiceIntent)
         }
 
+        fun permissionChanged(context: Context) {
+            val launchServiceIntent = Intent(context, LauncherOverlayService::class.java)
+            launchServiceIntent.action = ACTION_NOTIFYPERMISSIONCHANGED
+            context.startService(launchServiceIntent)
+        }
+
         fun removeTouchReceiver(context: Context, container: LinearLayout?) {
 
             if (container != null) {
@@ -513,6 +531,12 @@ class LauncherOverlayService : Service() {
                 backgroundColor: Int): ActivationViewResult {
 
             val result = ActivationViewResult()
+
+            if(!PermissionUtils.checkOverlayPermission(context)) {
+                return result
+            }
+
+            result.success = true
 
             val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 

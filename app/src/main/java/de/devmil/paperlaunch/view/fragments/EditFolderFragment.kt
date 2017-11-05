@@ -92,11 +92,11 @@ class EditFolderFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         val result = inflater.inflate(R.layout.fragment_edit_folder, container, false)
 
-        recyclerView = result.findViewById(R.id.fragment_edit_folder_entrieslist) as RecyclerView
+        recyclerView = result.findViewById(R.id.fragment_edit_folder_entrieslist)
         emptyListView = result.findViewById(R.id.fragment_edit_folder_emptyentries)
-        addButton = result.findViewById(R.id.fragment_edit_folder_fab) as FloatingActionButton
-        editNameLayout = result.findViewById(R.id.fragment_edit_folder_editname_layout) as LinearLayout
-        folderNameEditText = result.findViewById(R.id.fragment_edit_folder_editname_text) as EditText
+        addButton = result.findViewById(R.id.fragment_edit_folder_fab)
+        editNameLayout = result.findViewById(R.id.fragment_edit_folder_editname_layout)
+        folderNameEditText = result.findViewById(R.id.fragment_edit_folder_editname_text)
 
         editNameLayout!!.visibility = if (folderId >= 0) View.VISIBLE else View.GONE
 
@@ -405,12 +405,12 @@ class EditFolderFragment : Fragment() {
         }
 
         internal inner class ViewHolder(dragSortAdapter: DragSortAdapter<*>, itemView: View) : DragSortAdapter.ViewHolder(dragSortAdapter, itemView), View.OnLongClickListener, View.OnClickListener {
-            val container: LinearLayout = itemView.findViewById(R.id.fragment_edit_folder_entries_container) as LinearLayout
-            val imageView: ImageView = itemView.findViewById(R.id.fragment_edit_folder_entries_image) as ImageView
-            val textView: TextView = itemView.findViewById(R.id.fragment_edit_folder_entries_text) as TextView
-            private val handle: ImageView = itemView.findViewById(R.id.fragment_edit_folder_entries_handle) as ImageView
-            private val deleteImg: ImageView = itemView.findViewById(R.id.fragment_edit_folder_entries_delete) as ImageView
-            val detailsImg: ImageView = itemView.findViewById(R.id.fragment_edit_folder_entries_details) as ImageView
+            val container: LinearLayout = itemView.findViewById(R.id.fragment_edit_folder_entries_container)
+            val imageView: ImageView = itemView.findViewById(R.id.fragment_edit_folder_entries_image)
+            val textView: TextView = itemView.findViewById(R.id.fragment_edit_folder_entries_text)
+            private val handle: ImageView = itemView.findViewById(R.id.fragment_edit_folder_entries_handle)
+            private val deleteImg: ImageView = itemView.findViewById(R.id.fragment_edit_folder_entries_delete)
+            val detailsImg: ImageView = itemView.findViewById(R.id.fragment_edit_folder_entries_details)
 
             init {
 

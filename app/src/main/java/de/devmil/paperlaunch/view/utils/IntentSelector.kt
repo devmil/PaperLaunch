@@ -215,13 +215,13 @@ class IntentSelector : Activity() {
 
         setContentView(R.layout.common__intentselectorview)
 
-        llWait = findViewById(R.id.common__intentSelector_llWait) as LinearLayout
+        llWait = findViewById(R.id.common__intentSelector_llWait)
         //		progressWait = (ProgressBar)findViewById(R.id.intentSelector_progressWait);
-        lvActivities = findViewById(R.id.common__intentSelector_lvActivities) as ExpandableListView
-        chkShowAllActivities = findViewById(R.id.common__intentSelector_chkShowAllActivities) as CheckBox
-        lvShortcuts = findViewById(R.id.common__intentSelector_lvShortcuts) as ExpandableListView
-        txtShortcuts = findViewById(R.id.common__intentSelector_txtShortcuts) as TextView
-        toolbar = findViewById(R.id.common__intentSelector_toolbar) as Toolbar
+        lvActivities = findViewById(R.id.common__intentSelector_lvActivities)
+        chkShowAllActivities = findViewById(R.id.common__intentSelector_chkShowAllActivities)
+        lvShortcuts = findViewById(R.id.common__intentSelector_lvShortcuts)
+        txtShortcuts = findViewById(R.id.common__intentSelector_txtShortcuts)
+        toolbar = findViewById(R.id.common__intentSelector_toolbar)
 
         setActionBar(toolbar)
 
@@ -243,7 +243,7 @@ class IntentSelector : Activity() {
             false
         }
 
-        val tabs = this.findViewById(android.R.id.tabhost) as TabHost
+        val tabs = this.findViewById<TabHost>(android.R.id.tabhost)
         tabs.setup()
         val tspecActivities = tabs.newTabSpec(activitiesLabel)
         tspecActivities.setIndicator(activitiesLabel)
@@ -316,8 +316,8 @@ class IntentSelector : Activity() {
             if (effectiveConvertView == null) {
                 effectiveConvertView = LayoutInflater.from(context).inflate(R.layout.common__intentselectoritem, parent, false)
             }
-            val txt = effectiveConvertView!!.findViewById(R.id.common__intentselectoritem_text) as TextView
-            val txtActivityName = effectiveConvertView.findViewById(R.id.common__intentselectoritem_activityName) as TextView
+            val txt = effectiveConvertView!!.findViewById<TextView>(R.id.common__intentselectoritem_text)
+            val txtActivityName = effectiveConvertView.findViewById<TextView>(R.id.common__intentselectoritem_activityName)
 
             txt.text = getSubList(entries[groupPosition])[childPosition].displayName
             txtActivityName.text = getSubList(entries[groupPosition])[childPosition].activityName
@@ -346,8 +346,8 @@ class IntentSelector : Activity() {
             if (effectiveConvertView == null) {
                 effectiveConvertView = LayoutInflater.from(context).inflate(R.layout.common__intentselectorgroup, parent, false)
             }
-            val img = effectiveConvertView!!.findViewById(R.id.common__intentselectorgroup_img) as ImageView
-            val txt = effectiveConvertView.findViewById(R.id.common__intentselectorgroup_text) as TextView
+            val img = effectiveConvertView!!.findViewById<ImageView>(R.id.common__intentselectorgroup_img)
+            val txt = effectiveConvertView.findViewById<TextView>(R.id.common__intentselectorgroup_text)
 
             txt.text = entries[groupPosition].name
             val appIcon = entries[groupPosition].getAppIcon()

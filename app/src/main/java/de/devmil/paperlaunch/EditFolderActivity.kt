@@ -16,7 +16,7 @@ class EditFolderActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_folder)
 
-        toolbar = findViewById(R.id.activity_edit_folder_toolbar) as Toolbar
+        toolbar = findViewById(R.id.activity_edit_folder_toolbar)
 
         setActionBar(toolbar)
         actionBar!!.setDisplayHomeAsUpEnabled(true)

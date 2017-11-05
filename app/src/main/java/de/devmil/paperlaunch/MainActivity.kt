@@ -15,12 +15,19 @@
  */
 package de.devmil.paperlaunch
 
+import android.Manifest
 import android.app.Activity
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.view.Menu
 import android.widget.Toolbar
 import de.devmil.paperlaunch.service.LauncherOverlayService
+import de.devmil.paperlaunch.utils.PermissionUtils
 import de.devmil.paperlaunch.view.fragments.EditFolderFragment
 
 class MainActivity : Activity() {
@@ -33,10 +40,23 @@ class MainActivity : Activity() {
         LauncherOverlayService.launch(this)
         setContentView(R.layout.activity_main)
 
-        toolbar = findViewById(R.id.activity_main_toolbar) as Toolbar
+        toolbar = findViewById<Toolbar>(R.id.activity_main_toolbar)
         fragment = fragmentManager.findFragmentById(R.id.activity_main_editfolder_fragment) as EditFolderFragment
 
         setActionBar(toolbar)
+
+        PermissionUtils.checkOverlayPermissionAndRouteToSettingsIfNeeded(this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode) {
+            PermissionUtils.REQUEST_DRAW_OVERLAY_PERMISSION -> {
+                LauncherOverlayService.permissionChanged(this)
+                finish()
+                startActivity(intent)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

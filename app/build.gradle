@@ -2,15 +2,15 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "de.devmil.paperlaunch"
         minSdkVersion 21
-        targetSdkVersion 22
-        versionCode 6
-        versionName "1.0.6"
+        targetSdkVersion 26
+        versionCode 7
+        versionName "1.0.7"
     }
     signingConfigs {
         release {
@@ -22,6 +22,8 @@ android {
                 keyAlias keyProps["alias"] != null ? keyProps["alias"] : null
                 storePassword keyProps["storePass"] != null ? keyProps["storePass"] : null
                 keyPassword keyProps["pass"] != null ? keyProps["pass"] : null
+            } else {
+                Console.writeLine("No Keystore properties found! Building unsigned...")
             }
         }
     }

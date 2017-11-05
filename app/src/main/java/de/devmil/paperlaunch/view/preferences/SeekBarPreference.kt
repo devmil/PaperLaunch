@@ -47,8 +47,8 @@ class SeekBarPreference(context: Context, min: Int, max: Int) : Preference(conte
             return
         }
 
-        val seekbar = view.findViewById(R.id.preference_seekbar_seek) as SeekBar
-        val labelText = view.findViewById(R.id.preference_seekbar_label) as TextView
+        val seekbar = view.findViewById<SeekBar>(R.id.preference_seekbar_seek)
+        val labelText = view.findViewById<TextView>(R.id.preference_seekbar_label)
 
         seekbar.max = max - min
         seekbar.progress = currentValue - min
