@@ -14,12 +14,15 @@ android {
     }
     signingConfigs {
         release {
-            def Properties keyProps = new Properties()
-            keyProps.load(new FileInputStream(file('../Key/keystore.properties')))
-            storeFile keyProps["store"] != null ? file(keyProps["store"]) : null
-            keyAlias keyProps["alias"]
-            storePassword keyProps["storePass"]
-            keyPassword keyProps["pass"]
+            def propsFile = file('../Key/keystore.properties')
+            if(propsFile.exists()) {
+                def Properties keyProps = new Properties()
+                keyProps.load(new FileInputStream(propsFile))
+                storeFile keyProps["store"] != null ? file(keyProps["store"]) : null
+                keyAlias keyProps["alias"] != null ? keyProps["alias"] : null
+                storePassword keyProps["storePass"] != null ? keyProps["storePass"] : null
+                keyPassword keyProps["pass"] != null ? keyProps["pass"] : null
+            }
         }
     }
     buildTypes {
