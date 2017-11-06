@@ -27,14 +27,15 @@ object PermissionUtils {
             return true
         }
         if(!checkOverlayPermission(activity)) {
-            var ad = AlertDialog.Builder(activity)
-            ad.setTitle(R.string.permission_request_title)
-            ad.setMessage(R.string.permission_request_description)
-            ad.setNeutralButton(R.string.permission_request_button_ok) { dialog, _ ->
+            val alertDialog = AlertDialog.Builder(activity)
+            alertDialog.setTitle(R.string.permission_request_title)
+            alertDialog.setMessage(R.string.permission_request_description)
+            alertDialog.setNeutralButton(R.string.permission_request_button_ok) { dialog, _ ->
                 dialog.dismiss()
                 launchOverlaySettings(activity)
             }
-            ad.show()
+            alertDialog.setOnDismissListener { activity.finish() }
+            alertDialog.show()
             return false
         }
         return true
