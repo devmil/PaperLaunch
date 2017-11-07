@@ -621,6 +621,7 @@ class LauncherOverlayService : Service() {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             } else {
+                @Suppress("DEPRECATION")
                 WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
             }
         }

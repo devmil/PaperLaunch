@@ -353,8 +353,8 @@ class EditFolderFragment : Fragment() {
             notifyDataSetChanged()
         }
 
-        override fun getPositionForId(entryId: Long): Int {
-            return mEntries.indices.firstOrNull { mEntries[it].entryId == entryId }  ?: -1
+        override fun getPositionForId(id: Long): Int {
+            return mEntries.indices.firstOrNull { mEntries[it].entryId == id }  ?: -1
         }
 
         private fun getEntryById(entryId: Long): IEntry? {
