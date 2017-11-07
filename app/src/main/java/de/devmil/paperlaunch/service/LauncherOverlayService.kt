@@ -508,7 +508,11 @@ class LauncherOverlayService : Service() {
         fun launch(context: Context) {
             val launchServiceIntent = Intent(context, LauncherOverlayService::class.java)
             launchServiceIntent.action = ACTION_LAUNCH
-            context.startService(launchServiceIntent)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(launchServiceIntent)
+            } else {
+                context.startService(launchServiceIntent)
+            }
         }
 
         fun notifyDataChanged(context: Context) {
