@@ -30,6 +30,7 @@ class SeekBarPreference(context: Context, min: Int, max: Int) : Preference(conte
     private var max = 1
     private var isRangeInitialized = false
     private var valueSet = false
+    private var touchActive = false
 
     init {
         construct()
@@ -50,10 +51,20 @@ class SeekBarPreference(context: Context, min: Int, max: Int) : Preference(conte
         val seekbar = view.findViewById<SeekBar>(R.id.preference_seekbar_seek)
         val labelText = view.findViewById<TextView>(R.id.preference_seekbar_label)
 
-        seekbar.max = max - min
-        seekbar.progress = currentValue - min
+        val seekbarMax: Int = max - min
+        val progress = currentValue - min
+
+        if(seekbar.max != seekbarMax) {
+            seekbar.max = seekbarMax
+        }
         seekbar.setOnSeekBarChangeListener(this)
-        seekbar.isEnabled = isEnabled
+
+        if(seekbar.isEnabled != isEnabled) {
+            seekbar.isEnabled = isEnabled
+        }
+        if(seekbar.progress != progress) {
+            seekbar.progress = progress
+        }
 
         if (titleRes > 0) {
             labelText.text = context.getString(titleRes)
@@ -83,7 +94,9 @@ class SeekBarPreference(context: Context, min: Int, max: Int) : Preference(conte
         currentValue = value
         persistInt(value)
         valueSet = true
-        notifyChanged()
+        if(!touchActive) {
+            notifyChanged()
+        }
         callChangeListener(value)
     }
 
@@ -94,10 +107,10 @@ class SeekBarPreference(context: Context, min: Int, max: Int) : Preference(conte
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar) {
-
+        touchActive = true
     }
 
     override fun onStopTrackingTouch(seekBar: SeekBar) {
-
+        touchActive = false
     }
 }
