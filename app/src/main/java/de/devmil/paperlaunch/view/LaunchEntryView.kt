@@ -55,10 +55,6 @@ class LaunchEntryView : LinearLayout {
         construct()
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-        construct()
-    }
-
     fun doInitialize(viewModel: LaunchEntryViewModel) {
         this.viewModel = viewModel
 

@@ -20,7 +20,6 @@ import android.graphics.drawable.Drawable
 
 class VirtualFolder(private val name: String, private val icon: Drawable, subEntries: List<IEntry>) : IFolder {
     override var subEntries: List<IEntry>? = null
-        get() = field
 
     init {
         this.subEntries = subEntries

@@ -131,7 +131,6 @@ constructor(context: Context, packageName: String) : Comparable<IntentApplicatio
         var isShortcut = false
         var isMainActivity = false
         private var isLauncherActivity = false
-            set
 
         fun setIsLauncher(isLauncher: Boolean) {
             this.isLauncherActivity = isLauncher

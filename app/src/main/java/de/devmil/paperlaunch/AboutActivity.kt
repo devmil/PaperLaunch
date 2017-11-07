@@ -32,7 +32,6 @@ import android.view.ViewGroup
 import android.widget.*
 import de.devmil.common.licensing.LicenseManager
 import de.devmil.common.licensing.PackageInfo
-import org.w3c.dom.Text
 
 class AboutActivity : Activity() {
 
@@ -45,9 +44,9 @@ class AboutActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
 
-        toolbar = findViewById<Toolbar>(R.id.activity_about_toolbar)
-        licenseList = findViewById<ListView>(R.id.activity_about_info_listView)
-        txtVersionText = findViewById<TextView>(R.id.feature_image_versiontext)
+        toolbar = findViewById(R.id.activity_about_toolbar)
+        licenseList = findViewById(R.id.activity_about_info_listView)
+        txtVersionText = findViewById(R.id.feature_image_versiontext)
 
         setActionBar(toolbar)
         actionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -79,7 +78,7 @@ class AboutActivity : Activity() {
             if (convertView == null) {
                 localConvertView = LayoutInflater.from(context).inflate(R.layout.activity_about_info_entry, parent, false)
                 val vh = ViewHolder()
-                vh.image = localConvertView!!.findViewById<ImageView>(R.id.activity_license_info_entry_image)
+                vh.image = localConvertView!!.findViewById(R.id.activity_license_info_entry_image)
                 vh.name = localConvertView.findViewById(R.id.activity_license_info_entry_name)
                 vh.copyright = localConvertView.findViewById(R.id.activity_license_info_entry_copyright)
                 vh.url = localConvertView.findViewById(R.id.activity_license_info_entry_url)

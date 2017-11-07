@@ -34,11 +34,11 @@ class VerticalTextView : TextView {
 
     private fun construct() {
         val gravity = gravity
-        if (Gravity.isVertical(gravity) && gravity and Gravity.VERTICAL_GRAVITY_MASK == Gravity.BOTTOM) {
+        topDown = if (Gravity.isVertical(gravity) && gravity and Gravity.VERTICAL_GRAVITY_MASK == Gravity.BOTTOM) {
             setGravity(gravity and Gravity.HORIZONTAL_GRAVITY_MASK or Gravity.TOP)
-            topDown = false
+            false
         } else
-            topDown = true
+            true
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -58,6 +58,7 @@ class VerticalTextView : TextView {
             canvas.translate(0f, width.toFloat())
             canvas.rotate(-90f)
         }
+        @Suppress("DEPRECATION")
         canvas.clipRect(0f, 0f, width.toFloat(), height.toFloat(), android.graphics.Region.Op.REPLACE)
         super.draw(canvas)
     }

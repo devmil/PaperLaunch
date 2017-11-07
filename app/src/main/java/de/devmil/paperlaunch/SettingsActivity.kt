@@ -15,11 +15,8 @@
  */
 package de.devmil.paperlaunch
 
-import android.Manifest
 import android.app.Activity
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.widget.LinearLayout
 import android.widget.Toolbar
@@ -42,7 +39,7 @@ class SettingsActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        toolbar = findViewById<Toolbar>(R.id.activity_settings_toolbar)
+        toolbar = findViewById(R.id.activity_settings_toolbar)
         setActionBar(toolbar)
 
         actionBar!!.setDisplayHomeAsUpEnabled(true)

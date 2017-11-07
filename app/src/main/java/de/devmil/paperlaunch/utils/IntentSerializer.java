@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
@@ -47,7 +48,7 @@ public class IntentSerializer {
 		try {
 			ObjectOutputStream objectOutStream = new ObjectOutputStream(
 					outStream);
-			HashMap<String, ContentDescriptor> contentStorage = new HashMap<String, ContentDescriptor>();
+			HashMap<String, ContentDescriptor> contentStorage = new HashMap<>();
 			addContent(contentStorage, "", intent);
 
 			objectOutStream.writeObject(new SerializableHashMap<String, ContentDescriptor>(contentStorage));
@@ -56,15 +57,16 @@ public class IntentSerializer {
 			e.printStackTrace();
 			Log.e(IntentSerializer.class.getSimpleName(), "Error serializing Intent", e);
 		}
-		return Base64.encodeBytes(outStream.toByteArray());
+		byte[] bytes = outStream.toByteArray();
+		return Base64.encodeToString(bytes, Base64.DEFAULT);
 	}
 
-	public static Intent deserialize(String input) {
+	@SuppressWarnings("unchecked")
+    public static Intent deserialize(String input) {
 		if (input == null)
 			return null;
 		try {
-			ByteArrayInputStream inStream = new ByteArrayInputStream(Base64
-					.decode(input));
+			ByteArrayInputStream inStream = new ByteArrayInputStream(Base64.decode(input, Base64.DEFAULT));
 			ObjectInputStream objectInStream = new ObjectInputStream(inStream);
 			if(inStream.available() > 0) {
 				Object obj = objectInStream.readObject();
@@ -87,14 +89,14 @@ public class IntentSerializer {
 		if(object == null)
 			return;
 		if(Bundle.class.isAssignableFrom(object.getClass())) {
-			HashMap<String, ContentDescriptor> bundleData = new HashMap<String, ContentDescriptor>();
+			HashMap<String, ContentDescriptor> bundleData = new HashMap<>();
 			Bundle castedObj = (Bundle)object;
 			for(String k : castedObj.keySet()) {
 				addContent(bundleData, k, castedObj.get(k));
 			}
 			content.put(key, new ContentDescriptor(Bundle.class, new SerializableHashMap<String, ContentDescriptor>(bundleData)));
 		} else if(Intent.class.isAssignableFrom(object.getClass())) {
-			HashMap<String, ContentDescriptor> intentData = new HashMap<String, ContentDescriptor>();
+			HashMap<String, ContentDescriptor> intentData = new HashMap<>();
 			Intent castedObj = (Intent)object;
 			intentData.put(KEY_ACTION, new ContentDescriptor(String.class, castedObj.getAction()));
 
@@ -119,12 +121,10 @@ public class IntentSerializer {
 		} else if(Serializable.class.isAssignableFrom(object.getClass())) {
 			content.put(key, new ContentDescriptor(object.getClass(), object));
 		}
-		else {
-			//Add special handler?
-		}
 	}
 
-	private static Object getContent(Map<String, ContentDescriptor> content, String key) {
+	@SuppressWarnings({"unchecked", "ConstantConditions"})
+    private static Object getContent(Map<String, ContentDescriptor> content, String key) {
 		if(!content.containsKey(key))
 			return null;
 		ContentDescriptor desc = content.get(key);
@@ -173,7 +173,8 @@ public class IntentSerializer {
 		}
 	}
 
-	private static void setBundleValue(Bundle bundle, String key, Object value) {
+	@SuppressWarnings("unchecked")
+    private static void setBundleValue(Bundle bundle, String key, Object value) {
 //		if(Boolean.class.isAssignableFrom(value.getClass()))
 //			bundle.putBoolean(key, (Boolean)value);
 //		if(boolean[].class.isAssignableFrom(value.getClass()))

@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import de.devmil.paperlaunch.R
 
+@Suppress("DEPRECATION")
 object AppMetadataUtils {
 
     fun getAppName(context: Context, intent: Intent): String? {

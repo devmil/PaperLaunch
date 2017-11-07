@@ -15,13 +15,13 @@
  */
 package de.devmil.paperlaunch.storage
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-
-import java.util.HashMap
+import java.util.*
 
 class EntriesSQLiteOpenHelper(context: Context) : SQLiteOpenHelper(context, EntriesSQLiteOpenHelper.DATABASE_NAME, null, EntriesSQLiteOpenHelper.DATABASE_VERSION) {
 
@@ -46,6 +46,7 @@ class EntriesSQLiteOpenHelper(context: Context) : SQLiteOpenHelper(context, Entr
         }
     }
 
+    @SuppressLint("UseSparseArrays")
     private fun updateDepth(db: SQLiteDatabase) {
         val sql = "SELECT f1._id f1ID, f2._id f2ID, f3._id f3ID, f4._id f4ID, f5._id f5ID, f6._id f6ID, f7._id f7ID, f8._id f8ID, f9._id f9ID, f10._id f10ID\n" +
                 "FROM folders f1\n" +
@@ -87,11 +88,9 @@ class EntriesSQLiteOpenHelper(context: Context) : SQLiteOpenHelper(context, Entr
     }
 
     private fun getDepthFromCursor(c: Cursor): Int {
-        for (i in 9 downTo 1) {
-            if (!c.isNull(i))
-                return i
-        }
-        return 0
+        return (9 downTo 1)
+                .firstOrNull { !c.isNull(it) }
+                ?: 0
     }
 
     fun clear(db: SQLiteDatabase) {

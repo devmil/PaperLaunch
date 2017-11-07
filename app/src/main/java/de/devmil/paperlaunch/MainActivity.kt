@@ -15,15 +15,9 @@
  */
 package de.devmil.paperlaunch
 
-import android.Manifest
 import android.app.Activity
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
 import android.view.Menu
 import android.widget.Toolbar
 import de.devmil.paperlaunch.service.LauncherOverlayService
@@ -40,7 +34,7 @@ class MainActivity : Activity() {
         LauncherOverlayService.launch(this)
         setContentView(R.layout.activity_main)
 
-        toolbar = findViewById<Toolbar>(R.id.activity_main_toolbar)
+        toolbar = findViewById(R.id.activity_main_toolbar)
         fragment = fragmentManager.findFragmentById(R.id.activity_main_editfolder_fragment) as EditFolderFragment
 
         setActionBar(toolbar)

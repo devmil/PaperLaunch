@@ -25,6 +25,7 @@ import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.os.Build
 import android.os.IBinder
+import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.DisplayMetrics
 import android.util.Log
@@ -327,7 +328,12 @@ class LauncherOverlayService : Service() {
             if (currentConfig!!.isVibrateOnActivation) {
                 try {
                     val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                    v.vibrate(60)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        v.vibrate(VibrationEffect.createOneShot(60, VibrationEffect.DEFAULT_AMPLITUDE))
+                    } else {
+                        @Suppress("DEPRECATION")
+                        v.vibrate(60)
+                    }
                 } catch (e: Exception) {
                     Log.w(TAG, "Vibrate didn't work", e)
                 }
@@ -432,6 +438,7 @@ class LauncherOverlayService : Service() {
         val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
         } else {
+            @Suppress("DEPRECATION")
             Notification.Builder(this)
         }
         builder.setContentTitle("PaperLaunch")
@@ -443,6 +450,7 @@ class LauncherOverlayService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setBadgeIconType(Notification.BADGE_ICON_NONE)
         } else {
+            @Suppress("DEPRECATION")
             builder.setLocalOnly(true)
                    //.setLargeIcon(largeIcon)
                    .setPriority(Notification.PRIORITY_MIN)
