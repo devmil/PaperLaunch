@@ -23,7 +23,7 @@ android {
                 storePassword keyProps["storePass"] != null ? keyProps["storePass"] : null
                 keyPassword keyProps["pass"] != null ? keyProps["pass"] : null
             } else {
-                Console.writeLine("No Keystore properties found! Building unsigned...")
+                println "No Keystore properties found! Building unsigned..."
             }
         }
     }
