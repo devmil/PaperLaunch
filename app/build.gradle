@@ -10,7 +10,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 7
-        versionName "1.0.7"
+        versionName "1.0.7-beta1"
     }
     signingConfigs {
         release {
