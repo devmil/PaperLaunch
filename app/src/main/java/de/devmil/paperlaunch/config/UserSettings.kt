@@ -68,7 +68,7 @@ class UserSettings(context: Context) : IUserSettings {
         private val KEY_IS_ON_RIGHT_SIDE = "isOnRightSide"
         private val KEY_LAUNCHER_GRAVITY = "launcherGravity"
 
-        private val DEFAULT_SENSITIVITY_DIP = 15
+        private val DEFAULT_SENSITIVITY_DIP = 10
         private val DEFAULT_ACTIVATION_OFFSET_POSITION_DIP = 0
         private val DEFAULT_ACTIVATION_OFFSET_HEIGHT_DIP = 0
         private val DEFAULT_SHOW_BACKGROUND = false
