@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit
 class SettingsActivity : Activity() {
 
     private var toolbar: Toolbar? = null
-    private var activationIndicatorContainer: LinearLayout? = null
+    private var activationIndicatorView: LinearLayout? = null
     private var fragment: SettingsFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +61,7 @@ class SettingsActivity : Activity() {
         val us = UserSettings(this)
 
         val avr = LauncherOverlayService.addActivationViewToWindow(
-                activationIndicatorContainer,
+                activationIndicatorView,
                 this,
                 ViewUtils.getPxFromDip(this, us.sensitivityDip.toFloat()).toInt(),
                 ViewUtils.getPxFromDip(this, us.activationOffsetPositionDip.toFloat()).toInt(),
@@ -70,7 +70,7 @@ class SettingsActivity : Activity() {
                 ContextCompat.getColor(this, R.color.theme_accent)
         )
 
-        activationIndicatorContainer = avr.activationView
+        activationIndicatorView = avr.activationView
 
         avr.activationView!!.elevation = ViewUtils.getPxFromDip(this, 3f)
 
@@ -88,8 +88,8 @@ class SettingsActivity : Activity() {
 
     override fun onPause() {
         super.onPause()
-        LauncherOverlayService.removeTouchReceiver(this, activationIndicatorContainer)
-        activationIndicatorContainer = null
+        LauncherOverlayService.removeTouchReceiver(this, activationIndicatorView)
+        activationIndicatorView = null
     }
 
     override fun onResume() {

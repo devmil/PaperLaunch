@@ -56,8 +56,7 @@ class LauncherOverlayService : Service() {
 
     private var notification: Notification? = null
     private var alreadyRegistered = false
-    //private LinearLayout mTouchReceiver = null;
-    private var touchReceiverContainer: LinearLayout? = null
+    private var touchReceiverView: LinearLayout? = null
     private var launcherView: LauncherView? = null
     private var isLauncherActive = false
     private var currentConfig: LaunchConfig? = null
@@ -357,15 +356,15 @@ class LauncherOverlayService : Service() {
     }
 
     @Synchronized private fun removeTouchReceiver() {
-        removeTouchReceiver(this, touchReceiverContainer)
-        touchReceiverContainer = null
+        removeTouchReceiver(this, touchReceiverView)
+        touchReceiverView = null
         alreadyRegistered = false
     }
 
     @Synchronized private fun reloadTouchReceiver() {
 
         val avr = addActivationViewToWindow(
-                touchReceiverContainer,
+                touchReceiverView,
                 this,
                 ViewUtils.getPxFromDip(this, currentConfig!!.launcherSensitivityDip.toFloat()).toInt(),
                 ViewUtils.getPxFromDip(this, currentConfig!!.launcherOffsetPositionDip.toFloat()).toInt(),
@@ -386,7 +385,7 @@ class LauncherOverlayService : Service() {
             }
         }
 
-        touchReceiverContainer = avr.activationView
+        touchReceiverView = avr.activationView
 
         alreadyRegistered = true
     }
@@ -550,11 +549,11 @@ class LauncherOverlayService : Service() {
             context.startService(launchServiceIntent)
         }
 
-        fun removeTouchReceiver(context: Context, container: LinearLayout?) {
+        fun removeTouchReceiver(context: Context, touchReceiverView: LinearLayout?) {
 
-            if (container != null) {
+            if (touchReceiverView != null) {
                 val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-                wm.removeView(container)
+                wm.removeView(touchReceiverView)
             }
         }
 
