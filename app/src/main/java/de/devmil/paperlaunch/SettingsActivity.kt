@@ -70,7 +70,7 @@ class SettingsActivity : Activity() {
                 ContextCompat.getColor(this, R.color.theme_accent)
         )
 
-        activationIndicatorContainer = avr.container
+        activationIndicatorContainer = avr.activationView
 
         avr.activationView!!.elevation = ViewUtils.getPxFromDip(this, 3f)
 

@@ -227,6 +227,7 @@ class LauncherOverlayService : Service() {
         }
         if (currentConfig == null) {
             currentConfig = LaunchConfig(UserSettings(this))
+            ensureData(forceReload)
         }
     }
 
@@ -346,11 +347,13 @@ class LauncherOverlayService : Service() {
                 }
             })
 
-        } else {
             transferMotionEvent(touchReceiver, launcherView!!, event)
-        }
 
-        return true
+            return true
+
+        } else {
+            return transferMotionEvent(touchReceiver, launcherView!!, event)
+        }
     }
 
     @Synchronized private fun removeTouchReceiver() {
@@ -383,13 +386,12 @@ class LauncherOverlayService : Service() {
             }
         }
 
-        touchReceiverContainer = avr.container
+        touchReceiverContainer = avr.activationView
 
         alreadyRegistered = true
     }
 
     class ActivationViewResult {
-        var container: LinearLayout? = null
         var activationView: LinearLayout? = null
         var success: Boolean = false
     }
@@ -407,7 +409,7 @@ class LauncherOverlayService : Service() {
         isLauncherActive = false
     }
 
-    private fun transferMotionEvent(from: View, to: LauncherView, event: MotionEvent) {
+    private fun transferMotionEvent(from: View, to: LauncherView, event: MotionEvent) : Boolean {
         val fromX = event.x
         val fromY = event.y
 
@@ -419,7 +421,7 @@ class LauncherOverlayService : Service() {
         val newX = fromX + (fromLocation[0] - toLocation[0])
         val newY = fromY + (fromLocation[1] - toLocation[1])
 
-        to.handleTouchEvent(event.action, newX, newY)
+        return to.handleTouchEvent(event.action, newX, newY)
     }
 
     private fun ensureNotification(force: Boolean = false) {
@@ -557,7 +559,7 @@ class LauncherOverlayService : Service() {
         }
 
         fun addActivationViewToWindow(
-                oldContainer: LinearLayout?,
+                oldActivationView: LinearLayout?,
                 context: Context,
                 sensitivityPx: Int,
                 offsetPositionPx: Int,
@@ -590,17 +592,22 @@ class LauncherOverlayService : Service() {
 
             val params = WindowManager.LayoutParams(
                     WindowManager.LayoutParams.WRAP_CONTENT,
-                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
                     getWindowType(),
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                     PixelFormat.TRANSLUCENT)
 
-            @Suppress("RtlHardcoded")
-            params.gravity = if (isOnRightSide) Gravity.RIGHT else Gravity.LEFT
+            if (isOnRightSide) {
+                params.x = activationRect.left
+            } else {
+                params.x = 0
+            }
+            params.y = activationRect.top
+            params.height = activationRect.height()
+            params.width = activationRect.width()
 
-            result.container = LinearLayout(context)
-
-            wm.addView(result.container, params)
+//            @Suppress("RtlHardcoded")
+            params.gravity = Gravity.LEFT or Gravity.TOP
 
             result.activationView = LinearLayout(context)
             result.activationView!!.setBackgroundColor(backgroundColor)
@@ -610,9 +617,9 @@ class LauncherOverlayService : Service() {
                     activationRect.height())
             touchReceiverParams.setMargins(0, activationRect.top, 0, windowRect.height() - activationRect.bottom)
 
-            result.container!!.addView(result.activationView, touchReceiverParams)
+            wm.addView(result.activationView, params)
 
-            removeTouchReceiver(context, oldContainer)
+            removeTouchReceiver(context, oldActivationView)
 
             return result
         }
