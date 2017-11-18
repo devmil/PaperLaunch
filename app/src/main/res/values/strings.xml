@@ -41,7 +41,7 @@
     <string name="fragment_settings_appearance_side_optionright_summary">PaperLaunch gets activated from the right</string>
     <string name="fragment_settings_appearance_side_optionleft_summary">PaperLaunch gets activated from the left</string>
     <string name="fragment_settings_appearance_side_title">Activation side</string>
-    <string name="activity_about_copyright">(c) 2016 by Devmil Solutions</string>
+    <string name="activity_about_copyright">(c) 2017 by Devmil Solutions</string>
     <string name="activity_about_opensource_headline">Open source licenses</string>
     <string name="common__intentselectorgroup_text_default">Group</string>
     <string name="common__intentselectoritem_text_default">Item</string>
