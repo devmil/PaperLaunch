@@ -55,7 +55,7 @@ class LaunchConfig(userSettings: IUserSettings) : ILaunchEntryConfig, ILaunchLan
     override val launcherGravity: LauncherGravity?
 
     var entries: List<IEntry>
-        get() = ArrayList(mEntries!!)
+        get() = mEntries?.let { ArrayList(it) } ?: ArrayList()
         set(entries) {
             mEntries = ArrayList(entries)
         }

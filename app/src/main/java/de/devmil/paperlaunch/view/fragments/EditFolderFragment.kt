@@ -436,14 +436,16 @@ class EditFolderFragment : Fragment() {
                 } else if (v === deleteImg) {
                     EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
                         override fun execute(transactionContext: ITransactionContext) {
-                            transactionContext.deleteEntry(entry!!.entryId)
+                            entry?.let { e ->
+                                transactionContext.deleteEntry(e.entryId)
 
-                            val pos = getPositionForId(itemId)
-                            mEntries.removeAt(pos)
-                            if (folder != null) {
-                                updateFolderImage(folder!!.dto, mEntries)
+                                val pos = getPositionForId(itemId)
+                                mEntries.removeAt(pos)
+                                folder?.let { f ->
+                                    updateFolderImage(f.dto, mEntries)
+                                }
+                                notifyItemRemoved(pos)
                             }
-                            notifyItemRemoved(pos)
                         }
                     })
                     notifyDataChanged()
