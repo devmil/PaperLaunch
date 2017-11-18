@@ -105,34 +105,33 @@ class LaunchLaneView : RelativeLayout {
 
     fun doHandleTouch(action: Int, x: Int, y: Int) {
         val focusSelectionBorder = width
-        if (viewModel == null) {
-            return
-        }
-        if (viewModel!!.state === LaunchLaneViewModel.State.Focusing) {
-            if (action == MotionEvent.ACTION_UP) {
-                sendAllEntriesToState(LaunchEntryViewModel.State.Active)
-                focusedEntryView = null
-            } else {
-                ensureFocusedEntryAt(y)
-                if (focusedEntryView != null) {
-                    if (viewModel!!.isOnRightSide) {
-                        if (x < focusSelectionBorder) {
-                            transitToState(LaunchLaneViewModel.State.Selecting)
-                        }
-                    } else {
-                        if (x > 0) {
-                            transitToState(LaunchLaneViewModel.State.Selecting)
+        viewModel?.let {
+            if (it.state === LaunchLaneViewModel.State.Focusing) {
+                if (action == MotionEvent.ACTION_UP) {
+                    sendAllEntriesToState(LaunchEntryViewModel.State.Active)
+                    focusedEntryView = null
+                } else {
+                    ensureFocusedEntryAt(y)
+                    if (focusedEntryView != null) {
+                        if (it.isOnRightSide) {
+                            if (x < focusSelectionBorder) {
+                                transitToState(LaunchLaneViewModel.State.Selecting)
+                            }
+                        } else {
+                            if (x > 0) {
+                                transitToState(LaunchLaneViewModel.State.Selecting)
+                            }
                         }
                     }
                 }
-            }
-        } else if (viewModel!!.state === LaunchLaneViewModel.State.Selected) {
-            if (viewModel!!.isOnRightSide) {
-                if (x > focusSelectionBorder)
-                    transitToState(LaunchLaneViewModel.State.Focusing)
-            } else {
-                if (x < 0)
-                    transitToState(LaunchLaneViewModel.State.Focusing)
+            } else if (it.state === LaunchLaneViewModel.State.Selected) {
+                if (it.isOnRightSide) {
+                    if (x > focusSelectionBorder)
+                        transitToState(LaunchLaneViewModel.State.Focusing)
+                } else {
+                    if (x < 0)
+                        transitToState(LaunchLaneViewModel.State.Focusing)
+                }
             }
         }
     }
@@ -154,7 +153,9 @@ class LaunchLaneView : RelativeLayout {
         entriesContainer = LinearLayout(context)
         entriesContainer!!.orientation = LinearLayout.VERTICAL
 
-        when (viewModel!!.launcherGravity) {
+        val localViewModel = viewModel!!
+
+        when (localViewModel.launcherGravity) {
             LauncherGravity.Top -> entriesContainer!!.gravity = Gravity.TOP
             LauncherGravity.Center -> entriesContainer!!.gravity = Gravity.CENTER_VERTICAL
             LauncherGravity.Bottom -> entriesContainer!!.gravity = Gravity.BOTTOM
@@ -163,7 +164,7 @@ class LaunchLaneView : RelativeLayout {
         val entriesContainerParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
         entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-        if (viewModel!!.isOnRightSide) {
+        if (localViewModel.isOnRightSide) {
             entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
         } else {
             entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
@@ -187,8 +188,8 @@ class LaunchLaneView : RelativeLayout {
 
 
         selectIndicator = LinearLayout(context)
-        selectIndicator!!.setBackgroundColor(viewModel!!.frameDefaultColor)
-        selectIndicator!!.elevation = ViewUtils.getPxFromDip(context, viewModel!!.selectedImageElevationDip)
+        selectIndicator!!.setBackgroundColor(localViewModel.frameDefaultColor)
+        selectIndicator!!.elevation = ViewUtils.getPxFromDip(context, localViewModel.selectedImageElevationDip)
         selectIndicator!!.visibility = View.INVISIBLE
         selectIndicator!!.gravity = Gravity.CENTER_HORIZONTAL
         selectIndicator!!.orientation = LinearLayout.VERTICAL
@@ -202,25 +203,25 @@ class LaunchLaneView : RelativeLayout {
 
         selectedIcon = ImageView(context)
         selectedIcon!!.scaleType = ImageView.ScaleType.CENTER_INSIDE
-        selectedIcon!!.setImageResource(viewModel!!.unknownAppImageId)
+        selectedIcon!!.setImageResource(localViewModel.unknownAppImageId)
 
         val selectIconParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT)
-        selectIconParams.setMargins(0, ViewUtils.getPxFromDip(context, viewModel!!.laneIconTopMarginDip).toInt(), 0, 0)
+        selectIconParams.setMargins(0, ViewUtils.getPxFromDip(context, localViewModel.laneIconTopMarginDip).toInt(), 0, 0)
 
         selectIndicator!!.addView(selectedIcon, selectIconParams)
 
         selectedItemTextView = VerticalTextView(context)
         selectedItemTextView!!.visibility = View.GONE
-        selectedItemTextView!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, viewModel!!.itemNameTextSizeSP)
+        selectedItemTextView!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, localViewModel.itemNameTextSizeSP)
         //this is needed because the parts in the system run with another theme than the application parts
         selectedItemTextView!!.setTextColor(ContextCompat.getColor(context, R.color.name_label))
 
         val selectedItemTextViewParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT)
-        selectedItemTextViewParams.setMargins(0, ViewUtils.getPxFromDip(context, viewModel!!.laneTextTopMarginDip).toInt(), 0, 0)
+        selectedItemTextViewParams.setMargins(0, ViewUtils.getPxFromDip(context, localViewModel.laneTextTopMarginDip).toInt(), 0, 0)
         selectIndicator!!.addView(selectedItemTextView, selectedItemTextViewParams)
     }
 
@@ -228,7 +229,8 @@ class LaunchLaneView : RelativeLayout {
         entriesContainer!!.removeAllViews()
         entryViews.clear()
 
-        for (e in viewModel!!.entries) {
+        val entries = viewModel!!.entries
+        for (e in entries) {
             val ev = LaunchEntryView(context)
             entryViews.add(ev)
             val params = LinearLayout.LayoutParams(
@@ -261,9 +263,9 @@ class LaunchLaneView : RelativeLayout {
             }
             LaunchLaneViewModel.State.Selected -> fireSelectedEvent()
         }
-        if (viewModel != null) {
-            val oldState = viewModel!!.state
-            viewModel!!.state = state
+        viewModel?.let {
+            val oldState = it.state
+            it.state = state
             fireStateChangedEvent(oldState, state)
         }
     }
