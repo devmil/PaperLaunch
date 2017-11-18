@@ -19,6 +19,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toolbar
 import de.devmil.paperlaunch.service.LauncherOverlayService
 import de.devmil.paperlaunch.utils.PermissionUtils
@@ -57,6 +58,8 @@ class MainActivity : Activity() {
         val result = super.onCreateOptionsMenu(menu)
 
         val itemSettings = menu.add(R.string.title_activity_settings)
+        itemSettings.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        itemSettings.icon = getDrawable(R.mipmap.ic_settings_black_48dp)
         itemSettings.setOnMenuItemClickListener {
             val settingsIntent = Intent(this@MainActivity, SettingsActivity::class.java)
             startActivity(settingsIntent)

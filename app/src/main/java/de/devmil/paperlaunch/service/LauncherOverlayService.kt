@@ -99,7 +99,8 @@ class LauncherOverlayService : Service() {
                 if (lastConfiguration != newOrientation) {
                     lastConfiguration = newOrientation
                     finishLauncher()
-                    ensureData(true)
+                    resetData()
+                    ensureData()
                 }
             }
         }
@@ -208,11 +209,14 @@ class LauncherOverlayService : Service() {
             return
         }
 
-        ensureConfig(forceReload)
+        if(forceReload) {
+            resetConfig()
+            resetData()
+        }
+        ensureConfig()
+        ensureData()
 
         reloadTouchReceiver()
-
-        ensureData(forceReload)
     }
 
     private fun ensureOverlayInActive() {
@@ -220,29 +224,31 @@ class LauncherOverlayService : Service() {
         removeTouchReceiver()
     }
 
-    private fun ensureConfig(forceReload: Boolean) {
-        if (forceReload) {
-            currentConfig = null
-        }
+    private fun resetConfig() {
+        currentConfig = null
+    }
+
+    private fun resetData() {
+        entriesLoaded = false
+    }
+
+    private fun ensureConfig() {
         if (currentConfig == null) {
             currentConfig = LaunchConfig(UserSettings(this))
-            ensureData(forceReload)
+            ensureData()
         }
     }
 
     private fun reloadConfigMetadata() {
-        ensureConfig(false)
+        ensureConfig()
 
         val entries = currentConfig!!.entries
         currentConfig = LaunchConfig(UserSettings(this))
         currentConfig!!.entries = entries
     }
 
-    private fun ensureData(forceReload: Boolean) {
-        ensureConfig(forceReload)
-        if (forceReload) {
-            entriesLoaded = false
-        }
+    private fun ensureData() {
+        ensureConfig()
         if (!entriesLoaded) {
             class Local {
                 var entries: MutableList<IEntry>? = null
@@ -300,7 +306,7 @@ class LauncherOverlayService : Service() {
 
     private fun createLauncherView(event: MotionEvent): LauncherView {
         val result = LauncherView(this)
-        ensureData(false)
+        ensureData()
         result.doInitialize(currentConfig!!)
         result.doAutoStart(event)
 
@@ -605,7 +611,7 @@ class LauncherOverlayService : Service() {
             params.height = activationRect.height()
             params.width = activationRect.width()
 
-//            @Suppress("RtlHardcoded")
+            @Suppress("RtlHardcoded")
             params.gravity = Gravity.LEFT or Gravity.TOP
 
             result.activationView = LinearLayout(context)
