@@ -56,94 +56,96 @@ class IntentSelector : Activity() {
             //				List<ResolveInfo> mainResolved = getPackageManager().queryIntentActivities(mainIntent, PackageManager.GET_ACTIVITIES | PackageManager.GET_INTENT_FILTERS);
             //				List<ResolveInfo> launcherResolved = getPackageManager().queryIntentActivities(launcherIntent, PackageManager.GET_ACTIVITIES | PackageManager.GET_INTENT_FILTERS);
 
-            val pm = intentSelector.get()!!.packageManager
+            intentSelectorRef.get()?.let {
+                val pm = it.packageManager
 
-            val shortcutResolved = ArrayList<ResolveInfo>()
-            val mainResolved = ArrayList<ResolveInfo>()
-            val launcherResolved = ArrayList<ResolveInfo>()
+                val shortcutResolved = ArrayList<ResolveInfo>()
+                val mainResolved = ArrayList<ResolveInfo>()
+                val launcherResolved = ArrayList<ResolveInfo>()
 
-            val appInfos = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+                val appInfos = pm.getInstalledApplications(PackageManager.GET_META_DATA)
 
-            val showAll = intentSelector.get()!!.chkShowAllActivities!!.isChecked
+                val showAll = it.chkShowAllActivities!!.isChecked
 
-            for (appInfo in appInfos) {
-                if(isCancelled || isObsolete) {
-                    return
-                }
-                val shortcutIntent = Intent(Intent.ACTION_CREATE_SHORTCUT)
-                shortcutIntent.`package` = appInfo.packageName
+                for (appInfo in appInfos) {
+                    if(isCancelled || isObsolete) {
+                        return
+                    }
+                    val shortcutIntent = Intent(Intent.ACTION_CREATE_SHORTCUT)
+                    shortcutIntent.`package` = appInfo.packageName
 
-                val appShortcutResolved = pm.queryIntentActivities(shortcutIntent, PackageManager.GET_META_DATA)
-                shortcutResolved.addAll(appShortcutResolved)
+                    val appShortcutResolved = pm.queryIntentActivities(shortcutIntent, PackageManager.GET_META_DATA)
+                    shortcutResolved.addAll(appShortcutResolved)
 
-                var addMainActivities = true
+                    var addMainActivities = true
 
-                if (showAll) {
-                    try {
-                        val pi = pm.getPackageInfo(appInfo.packageName, PackageManager.GET_ACTIVITIES or PackageManager.GET_INTENT_FILTERS)
+                    if (showAll) {
+                        try {
+                            val pi = pm.getPackageInfo(appInfo.packageName, PackageManager.GET_ACTIVITIES or PackageManager.GET_INTENT_FILTERS)
 
-                        for (ai in pi.activities) {
-                            val ri = ResolveInfo()
-                            ri.activityInfo = ai
+                            for (ai in pi.activities) {
+                                val ri = ResolveInfo()
+                                ri.activityInfo = ai
 
-                            mainResolved.add(ri)
+                                mainResolved.add(ri)
+                            }
+
+                            addMainActivities = false
+                        } catch (e: Exception) {
                         }
 
-                        addMainActivities = false
-                    } catch (e: Exception) {
                     }
 
+                    if (addMainActivities) {
+                        val mainIntent = Intent(Intent.ACTION_MAIN)
+                        mainIntent.`package` = appInfo.packageName
+
+                        val appMainResolved = pm.queryIntentActivities(mainIntent, PackageManager.GET_META_DATA)
+                        mainResolved.addAll(appMainResolved)
+                    }
+
+                    val launcherIntent = Intent(Intent.ACTION_MAIN)
+                    launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+                    launcherIntent.`package` = appInfo.packageName
+
+                    val appLauncherResolved = pm.queryIntentActivities(launcherIntent, PackageManager.GET_META_DATA)
+                    launcherResolved.addAll(appLauncherResolved)
                 }
 
-                if (addMainActivities) {
-                    val mainIntent = Intent(Intent.ACTION_MAIN)
-                    mainIntent.`package` = appInfo.packageName
-
-                    val appMainResolved = pm.queryIntentActivities(mainIntent, PackageManager.GET_META_DATA)
-                    mainResolved.addAll(appMainResolved)
+                for (ri in shortcutResolved) {
+                    if(isCancelled || isObsolete) {
+                        return
+                    }
+                    addResolveInfo(ri, IntentApplicationEntry.IntentType.Shortcut, false, entries)
                 }
-
-                val launcherIntent = Intent(Intent.ACTION_MAIN)
-                launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER)
-                launcherIntent.`package` = appInfo.packageName
-
-                val appLauncherResolved = pm.queryIntentActivities(launcherIntent, PackageManager.GET_META_DATA)
-                launcherResolved.addAll(appLauncherResolved)
+                for (ri in mainResolved) {
+                    if(isCancelled || isObsolete) {
+                        return
+                    }
+                    addResolveInfo(ri, IntentApplicationEntry.IntentType.Main, showAll, entries)
+                }
+                for (ri in launcherResolved) {
+                    if(isCancelled || isObsolete) {
+                        return
+                    }
+                    addResolveInfo(ri, IntentApplicationEntry.IntentType.Launcher, false, entries)
+                }
+                //sort
+                val comparator = Comparator<IntentApplicationEntry> { object1, object2 -> object1.compareTo(object2) }
+                entries.sortWith(comparator)
+                entries.forEach { if(!isCancelled && !isObsolete) it.sort() }
             }
-
-            for (ri in shortcutResolved) {
-                if(isCancelled || isObsolete) {
-                    return
-                }
-                addResolveInfo(ri, IntentApplicationEntry.IntentType.Shortcut, false, entries)
-            }
-            for (ri in mainResolved) {
-                if(isCancelled || isObsolete) {
-                    return
-                }
-                addResolveInfo(ri, IntentApplicationEntry.IntentType.Main, showAll, entries)
-            }
-            for (ri in launcherResolved) {
-                if(isCancelled || isObsolete) {
-                    return
-                }
-                addResolveInfo(ri, IntentApplicationEntry.IntentType.Launcher, false, entries)
-            }
-            //sort
-            val comparator = Comparator<IntentApplicationEntry> { object1, object2 -> object1.compareTo(object2) }
-            entries.sortWith(comparator)
-            entries.forEach { if(!isCancelled && !isObsolete) it.sort() }
         }
 
         override fun onPreExecute() {
             super.onPreExecute()
-            val localIntentSelector = intentSelector.get()
+            val localIntentSelector = intentSelectorRef.get()
             localIntentSelector?.runOnUiThread { localIntentSelector.llWait!!.visibility = View.VISIBLE }
         }
 
         override fun onPostExecute(result: Unit?) {
             super.onPostExecute(result)
-            val localIntentSelector = intentSelector.get()
+            val localIntentSelector = intentSelectorRef.get()
             localIntentSelector?.runOnUiThread {
                 if(!isCancelled && !isObsolete) {
                     localIntentSelector.adapterActivities = IntentSelectorAdapter(localIntentSelector, entries, IntentApplicationEntry.IntentType.Main)
@@ -160,7 +162,7 @@ class IntentSelector : Activity() {
 
         override fun onCancelled() {
             super.onCancelled()
-            val localIntentSelector = intentSelector.get()
+            val localIntentSelector = intentSelectorRef.get()
             localIntentSelector?.runOnUiThread {
                 if(!isAnotherSearchRunning) {
                     localIntentSelector.llWait!!.visibility = View.GONE
@@ -169,24 +171,24 @@ class IntentSelector : Activity() {
         }
 
         private fun addResolveInfo(ri: ResolveInfo, intentType: IntentApplicationEntry.IntentType, addAll: Boolean, entries : MutableList<IntentApplicationEntry>) {
-            val localIntentSelector = intentSelector.get() ?: return
-            try {
-                if (!addAll && !ri.activityInfo.exported)
-                    return
-                var newEntry = IntentApplicationEntry(localIntentSelector, ri.activityInfo.packageName)
-                if (!entries.contains(newEntry)) {
-                    entries.add(newEntry)
-                } else {
-                    newEntry = entries[entries.indexOf(newEntry)]
+            intentSelectorRef.get()?.let {
+                try {
+                    if (!addAll && !ri.activityInfo.exported)
+                        return
+                    var newEntry = IntentApplicationEntry(it, ri.activityInfo.packageName)
+                    if (!entries.contains(newEntry)) {
+                        entries.add(newEntry)
+                    } else {
+                        newEntry = entries[entries.indexOf(newEntry)]
+                    }
+                    newEntry.addResolveInfo(ri, intentType)
+                } catch (e: NameNotFoundException) {
+                    Log.e(TAG, "Error while adding a package", e)
                 }
-                newEntry.addResolveInfo(ri, intentType)
-            } catch (e: NameNotFoundException) {
-                Log.e(TAG, "Error while adding a package", e)
             }
-
         }
 
-        private var intentSelector : WeakReference<IntentSelector> = WeakReference(intentSelector)
+        private var intentSelectorRef: WeakReference<IntentSelector> = WeakReference(intentSelector)
     }
 
     private var mSearchTask : SearchTask? = null
@@ -283,10 +285,19 @@ class IntentSelector : Activity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        if (requestCode == CREATE_SHORTCUT_REQUEST && resultCode == Activity.RESULT_OK) {
-            setResultIntent(data)
+        try {
+            if (requestCode == CREATE_SHORTCUT_REQUEST && resultCode == Activity.RESULT_OK) {
+                setResultIntent(data)
+            }
+            super.onActivityResult(requestCode, resultCode, data)
         }
-        super.onActivityResult(requestCode, resultCode, data)
+        catch (ex : Exception) {
+            try {
+                this@IntentSelector.finish()
+            }
+            catch (ex : Exception) {
+            }
+        }
     }
 
     internal class IntentSelectorAdapter(private val context: Context, entriesList: List<IntentApplicationEntry>, private val intentType: IntentApplicationEntry.IntentType) : BaseExpandableListAdapter() {

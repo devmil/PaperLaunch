@@ -9,7 +9,7 @@ android {
         applicationId "de.devmil.paperlaunch"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 8
+        versionCode 9
         versionName "1.0.7"
     }
     signingConfigs {

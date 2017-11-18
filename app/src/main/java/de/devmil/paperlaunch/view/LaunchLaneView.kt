@@ -271,27 +271,29 @@ class LaunchLaneView : RelativeLayout {
     }
 
     private fun fireStateChangedEvent(oldState: LaunchLaneViewModel.State, newState: LaunchLaneViewModel.State) {
-        if (laneListener != null) {
-            laneListener!!.onStateChanged(oldState, newState)
-        }
+        laneListener?.onStateChanged(oldState, newState)
     }
 
     private fun fireSelectedEvent() {
-        if (laneListener != null) {
-            laneListener!!.onItemSelected(focusedEntryView!!.entry)
+        laneListener?.let { listener ->
+            focusedEntryView?.let { entryView ->
+                listener.onItemSelected(entryView.entry)
+            }
         }
     }
 
     private fun fireSelectingEvent() {
-        if (laneListener != null) {
-            laneListener!!.onItemSelecting(focusedEntryView!!.entry)
+        laneListener?.let { listener ->
+            focusedEntryView?.let { entryView ->
+                listener.onItemSelecting(entryView.entry)
+            }
         }
     }
 
     private fun fireNotSelectedEvents() {
-        if (laneListener != null) {
-            laneListener!!.onItemSelected(null)
-            laneListener!!.onItemSelecting(null)
+        laneListener?.let { listener ->
+            listener.onItemSelected(null)
+            listener.onItemSelecting(null)
         }
     }
 
