@@ -35,7 +35,7 @@
             android:exported="false" />
 
         <receiver
-            android:name=".service.BootReceiver"
+            android:name=".service.LaunchServiceReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
