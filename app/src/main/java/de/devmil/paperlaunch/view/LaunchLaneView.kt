@@ -94,6 +94,9 @@ class LaunchLaneView : RelativeLayout {
 
     fun stop() {
         removeAllViews()
+        viewModel?.let {
+            it.state = LaunchLaneViewModel.State.Init
+        }
     }
 
     private fun gotoState(state: LaunchLaneViewModel.State) {
