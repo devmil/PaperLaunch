@@ -100,22 +100,13 @@ class LauncherView : RelativeLayout {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        var result = super.onTouchEvent(event)
-
-        result = handleTouchEvent(event.action, event.x, event.y) || result
-
-        return result
+        return super.onTouchEvent(event) || handleTouchEvent(event.action, event.x, event.y)
     }
 
     fun handleTouchEvent(action: Int, x: Float, y: Float): Boolean {
-        var result = false
-
-        //find the lane to dispatch to
-        for (l in laneViews) {
-            result = sendIfMatches(l, action, x, y) || result
+        return laneViews.fold(false) { currentResult, laneView ->
+            sendIfMatches(laneView, action, x, y) || currentResult
         }
-
-        return result
     }
 
     fun doAutoStart(firstMotionEvent: MotionEvent) {
@@ -131,25 +122,38 @@ class LauncherView : RelativeLayout {
     }
 
     private val laneIds: IntArray
-        get() = intArrayOf(R.id.id_launchview_lane1, R.id.id_launchview_lane2, R.id.id_launchview_lane3, R.id.id_launchview_lane4, R.id.id_launchview_lane5, R.id.id_launchview_lane6, R.id.id_launchview_lane7, R.id.id_launchview_lane8, R.id.id_launchview_lane9, R.id.id_launchview_lane10, R.id.id_launchview_lane11, R.id.id_launchview_lane12, R.id.id_launchview_lane13)
+        get() = intArrayOf(
+                R.id.id_launchview_lane1,
+                R.id.id_launchview_lane2,
+                R.id.id_launchview_lane3,
+                R.id.id_launchview_lane4,
+                R.id.id_launchview_lane5,
+                R.id.id_launchview_lane6,
+                R.id.id_launchview_lane7,
+                R.id.id_launchview_lane8,
+                R.id.id_launchview_lane9,
+                R.id.id_launchview_lane10,
+                R.id.id_launchview_lane11,
+                R.id.id_launchview_lane12,
+                R.id.id_launchview_lane13)
 
     private fun buildViews() {
         removeAllViews()
         laneViews.clear()
         addBackground()
         addNeutralZone()
-        var currentAnchor = neutralZone!!.id
         val laneIds = laneIds
 
-        for (i in laneIds.indices) {
-            currentAnchor = addLaneView(i, currentAnchor).id
+        laneIds.indices.fold(neutralZone!!.id) { current, i ->
+            addLaneView(i, current).id
         }
 
         setEntriesToLane(laneViews[0], viewModel!!.entries)
 
-        for (i in laneViews.indices.reversed()) {
+        laneViews.indices.reversed().forEach { i ->
             laneViews[i].bringToFront()
         }
+
         neutralZone!!.bringToFront()
         neutralZoneBackground!!.bringToFront()
     }
@@ -235,10 +239,12 @@ class LauncherView : RelativeLayout {
         val params = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
         params.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-        if (viewModel!!.isOnRightSide)
+        if (viewModel!!.isOnRightSide) {
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-        else
+        }
+        else {
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+        }
 
         addView(neutralZone, params)
 
@@ -298,24 +304,19 @@ class LauncherView : RelativeLayout {
         laneView.doHandleTouch(action, laneX, laneY)
         if (action == MotionEvent.ACTION_UP) {
             launchAppIfSelected()
-            if (listener != null) {
-                listener!!.onFinished()
-            }
+            listener?.onFinished()
         }
         return true
     }
 
     private fun launchAppIfSelected() {
-        if (currentlySelectedItem == null) {
-            return
-        }
-        if (currentlySelectedItem!!.isFolder) {
+        if (currentlySelectedItem?.isFolder != false) {
             return
         }
         val l = currentlySelectedItem as Launch?
-        val intent = l!!.launchIntent
-        if (intent != null) {
-            intent.flags = intent.flags or Intent.FLAG_ACTIVITY_NEW_TASK
+        val intent = l?.launchIntent
+        intent?.let {
+            it.flags = it.flags or Intent.FLAG_ACTIVITY_NEW_TASK
         }
         try {
             context.startActivity(intent)
@@ -402,7 +403,7 @@ class LauncherView : RelativeLayout {
                     PositionAndSizeEvaluator(neutralZoneBackground!!),
                     fromRect,
                     toRect)
-            anim!!.addListener(object : Animator.AnimatorListener {
+            anim.addListener(object : Animator.AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
                     neutralZoneBackground!!.visibility = View.VISIBLE
                 }
