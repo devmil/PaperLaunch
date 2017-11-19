@@ -284,20 +284,14 @@ class IntentSelector : Activity() {
         this@IntentSelector.finish()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        try {
-            if (requestCode == CREATE_SHORTCUT_REQUEST && resultCode == Activity.RESULT_OK) {
-                setResultIntent(data)
-            }
-            super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(data == null) {
+            return
         }
-        catch (ex : Exception) {
-            try {
-                this@IntentSelector.finish()
-            }
-            catch (ex : Exception) {
-            }
+        if (requestCode == CREATE_SHORTCUT_REQUEST && resultCode == Activity.RESULT_OK) {
+            setResultIntent(data)
         }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     internal class IntentSelectorAdapter(private val context: Context, entriesList: List<IntentApplicationEntry>, private val intentType: IntentApplicationEntry.IntentType) : BaseExpandableListAdapter() {
