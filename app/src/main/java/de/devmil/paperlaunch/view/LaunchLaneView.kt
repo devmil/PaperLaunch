@@ -150,18 +150,20 @@ class LaunchLaneView : RelativeLayout {
 
     private fun createViews() {
         removeAllViews()
-        entriesContainer = LinearLayout(context)
-        entriesContainer!!.orientation = LinearLayout.VERTICAL
+        val localEntriesContainer = LinearLayout(context)
+        localEntriesContainer.orientation = LinearLayout.VERTICAL
 
         val localViewModel = viewModel!!
 
         when (localViewModel.launcherGravity) {
-            LauncherGravity.Top -> entriesContainer!!.gravity = Gravity.TOP
-            LauncherGravity.Center -> entriesContainer!!.gravity = Gravity.CENTER_VERTICAL
-            LauncherGravity.Bottom -> entriesContainer!!.gravity = Gravity.BOTTOM
+            LauncherGravity.Top -> localEntriesContainer.gravity = Gravity.TOP
+            LauncherGravity.Center -> localEntriesContainer.gravity = Gravity.CENTER_VERTICAL
+            LauncherGravity.Bottom -> localEntriesContainer.gravity = Gravity.BOTTOM
         }
 
-        val entriesContainerParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+        val entriesContainerParams = RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT)
         entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
         if (localViewModel.isOnRightSide) {
@@ -170,73 +172,83 @@ class LaunchLaneView : RelativeLayout {
             entriesContainerParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
         }
 
-        addView(entriesContainer, entriesContainerParams)
-        ViewUtils.disableClipping(entriesContainer!!)
+        addView(localEntriesContainer, entriesContainerParams)
+        ViewUtils.disableClipping(localEntriesContainer)
 
 
-        selectIndicatorContainer = LinearLayout(context)
-        selectIndicatorContainer!!.orientation = LinearLayout.VERTICAL
+        val localSelectIndicatorContainer = LinearLayout(context)
+        localSelectIndicatorContainer.orientation = LinearLayout.VERTICAL
 
-        val indicatorContainerParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+        val indicatorContainerParams = RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT)
         indicatorContainerParams.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         indicatorContainerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
         indicatorContainerParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
         indicatorContainerParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
 
-        addView(selectIndicatorContainer, indicatorContainerParams)
-        ViewUtils.disableClipping(selectIndicatorContainer!!)
+        addView(localSelectIndicatorContainer, indicatorContainerParams)
+        ViewUtils.disableClipping(localSelectIndicatorContainer)
 
 
-        selectIndicator = LinearLayout(context)
-        selectIndicator!!.setBackgroundColor(localViewModel.frameDefaultColor)
-        selectIndicator!!.elevation = ViewUtils.getPxFromDip(context, localViewModel.selectedImageElevationDip)
-        selectIndicator!!.visibility = View.INVISIBLE
-        selectIndicator!!.gravity = Gravity.CENTER_HORIZONTAL
-        selectIndicator!!.orientation = LinearLayout.VERTICAL
+        val localSelectIndicator = LinearLayout(context)
+        localSelectIndicator.setBackgroundColor(localViewModel.frameDefaultColor)
+        localSelectIndicator.elevation = ViewUtils.getPxFromDip(context, localViewModel.selectedImageElevationDip)
+        localSelectIndicator.visibility = View.INVISIBLE
+        localSelectIndicator.gravity = Gravity.CENTER_HORIZONTAL
+        localSelectIndicator.orientation = LinearLayout.VERTICAL
 
         val selectIndicatorParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT)
 
-        selectIndicatorContainer!!.addView(selectIndicator, selectIndicatorParams)
-        ViewUtils.disableClipping(selectIndicator!!)
+        localSelectIndicatorContainer.addView(localSelectIndicator, selectIndicatorParams)
+        ViewUtils.disableClipping(localSelectIndicator)
 
-        selectedIcon = ImageView(context)
-        selectedIcon!!.scaleType = ImageView.ScaleType.CENTER_INSIDE
-        selectedIcon!!.setImageResource(localViewModel.unknownAppImageId)
+        val localSelectedIcon = ImageView(context)
+        localSelectedIcon.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        localSelectedIcon.setImageResource(localViewModel.unknownAppImageId)
 
         val selectIconParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT)
         selectIconParams.setMargins(0, ViewUtils.getPxFromDip(context, localViewModel.laneIconTopMarginDip).toInt(), 0, 0)
 
-        selectIndicator!!.addView(selectedIcon, selectIconParams)
+        localSelectIndicator.addView(localSelectedIcon, selectIconParams)
 
-        selectedItemTextView = VerticalTextView(context)
-        selectedItemTextView!!.visibility = View.GONE
-        selectedItemTextView!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, localViewModel.itemNameTextSizeSP)
+        val localSelectedItemTextView = VerticalTextView(context)
+        localSelectedItemTextView.visibility = View.GONE
+        localSelectedItemTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, localViewModel.itemNameTextSizeSP)
         //this is needed because the parts in the system run with another theme than the application parts
-        selectedItemTextView!!.setTextColor(ContextCompat.getColor(context, R.color.name_label))
+        localSelectedItemTextView.setTextColor(ContextCompat.getColor(context, R.color.name_label))
 
         val selectedItemTextViewParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT)
         selectedItemTextViewParams.setMargins(0, ViewUtils.getPxFromDip(context, localViewModel.laneTextTopMarginDip).toInt(), 0, 0)
-        selectIndicator!!.addView(selectedItemTextView, selectedItemTextViewParams)
+        localSelectIndicator.addView(localSelectedItemTextView, selectedItemTextViewParams)
+
+        entriesContainer = localEntriesContainer
+        selectIndicatorContainer = localSelectIndicatorContainer
+        selectIndicator = localSelectIndicator
+        selectedIcon = localSelectedIcon
+        selectedItemTextView = localSelectedItemTextView
     }
 
     private fun createEntryViews() {
-        entriesContainer!!.removeAllViews()
+        val localEntriesContainer = entriesContainer!!
+        val localViewModel = viewModel!!
+        localEntriesContainer.removeAllViews()
         entryViews.clear()
 
-        val entries = viewModel!!.entries
+        val entries = localViewModel.entries
         for (e in entries) {
             val ev = LaunchEntryView(context)
             entryViews.add(ev)
             val params = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT)
-            entriesContainer!!.addView(ev, params)
+            localEntriesContainer.addView(ev, params)
 
             ev.doInitialize(e)
         }
@@ -309,6 +321,7 @@ class LaunchLaneView : RelativeLayout {
     }
 
     private fun sendAllEntriesToState(state: LaunchEntryViewModel.State, except: LaunchEntryView? = null) {
+        val localViewModel = viewModel!!
         var delay = 0
 
         val entryCount = entryViews.size
@@ -322,7 +335,7 @@ class LaunchLaneView : RelativeLayout {
             if (entryViews[centerIndex] != except) {
                 entryViews[centerIndex].gotoState(state, delay)
             }
-            delay += viewModel!!.entryMoveDiffMS
+            delay += localViewModel.entryMoveDiffMS
         }
 
         for (i in count - 1 downTo 0) {
@@ -336,41 +349,50 @@ class LaunchLaneView : RelativeLayout {
                 entryViews[lowerIdx].gotoState(state, delay)
             }
 
-            delay += viewModel!!.entryMoveDiffMS
+            delay += localViewModel.entryMoveDiffMS
         }
     }
 
     private fun applySizeParameters() {
-        selectedIcon!!.maxHeight = ViewUtils.getPxFromDip(context, viewModel!!.imageWidthDip).toInt()
-        selectedIcon!!.maxWidth = ViewUtils.getPxFromDip(context, viewModel!!.imageWidthDip).toInt()
+        val localViewModel = viewModel!!
+        val localSelectedIcon = selectedIcon!!
+        localSelectedIcon.maxHeight = ViewUtils.getPxFromDip(context, localViewModel.imageWidthDip).toInt()
+        localSelectedIcon.maxWidth = ViewUtils.getPxFromDip(context, localViewModel.imageWidthDip).toInt()
     }
 
     private fun showSelectionIndicator() {
         if (focusedEntryView == null) {
             return
         }
+        val localFocusedEntryView = focusedEntryView!!
+        val localSelectIndicatorContainer = selectIndicatorContainer!!
+        val localSelectedIcon = selectedIcon!!
+        val localSelectedItemTextView = selectedItemTextView!!
+        val localSelectIndicator = selectIndicator!!
+        val localViewModel = viewModel!!
+
         val fromRect = Rect()
-        focusedEntryView!!.getHitRect(fromRect)
+        localFocusedEntryView.getHitRect(fromRect)
         val toRect = Rect()
-        selectIndicatorContainer!!.getHitRect(toRect)
+        localSelectIndicatorContainer.getHitRect(toRect)
 
-        val drawable = focusedEntryView!!.entry.getIcon(context)
-        selectedIcon!!.setImageDrawable(drawable)
+        val drawable = localFocusedEntryView.entry.getIcon(context)
+        localSelectedIcon.setImageDrawable(drawable)
 
-        val useIconColor = focusedEntryView!!.entry.useIconColor()
+        val useIconColor = localFocusedEntryView.entry.useIconColor()
 
-        selectedItemTextView!!.text = focusedEntryView!!.entry.getName(context)
+        localSelectedItemTextView.text = localFocusedEntryView.entry.getName(context)
 
         val bmpResult = BitmapUtils.drawableToBitmap(drawable)
         if (useIconColor
                 && bmpResult != null) {
-            selectIndicator!!.setBackgroundColor(
+            localSelectIndicator.setBackgroundColor(
                     ColorUtils.getBackgroundColorFromImage(
                             bmpResult.bitmap,
-                            viewModel!!.frameDefaultColor))
+                            localViewModel.frameDefaultColor))
         } else {
-            selectIndicator!!.setBackgroundColor(
-                    viewModel!!.frameDefaultColor)
+            localSelectIndicator.setBackgroundColor(
+                    localViewModel.frameDefaultColor)
         }
 
         if (bmpResult != null && bmpResult.isNew) {
@@ -379,9 +401,9 @@ class LaunchLaneView : RelativeLayout {
 
         try {
             val anim = ObjectAnimator.ofObject(
-                    selectIndicator,
+                    localSelectIndicator,
                     "margins",
-                    PositionAndSizeEvaluator(selectIndicator!!),
+                    PositionAndSizeEvaluator(localSelectIndicator),
                     fromRect,
                     toRect)
             anim.addListener(object : Animator.AnimatorListener {
@@ -395,29 +417,25 @@ class LaunchLaneView : RelativeLayout {
 
                 override fun onAnimationRepeat(animation: Animator) {}
             })
-            anim.duration = viewModel!!.selectingAnimationDurationMS.toLong()
+            anim.duration = localViewModel.selectingAnimationDurationMS.toLong()
             anim.start()
 
             Thread(Runnable {
                 try {
-                    Thread.sleep((viewModel!!.selectingAnimationDurationMS / 2).toLong())
-                    selectedItemTextView!!.post { selectedItemTextView!!.visibility = View.VISIBLE }
+                    Thread.sleep((localViewModel.selectingAnimationDurationMS / 2).toLong())
+                    localSelectedItemTextView.post { localSelectedItemTextView.visibility = View.VISIBLE }
                 } catch (e: InterruptedException) {
                 }
             }).start()
         } catch (e: Exception) {
         }
 
-        selectIndicator!!.visibility = View.VISIBLE
+        localSelectIndicator.visibility = View.VISIBLE
     }
 
     private fun hideSelectionIndicator() {
-        if (selectIndicator != null) {
-            selectIndicator!!.visibility = View.INVISIBLE
-        }
-        if (selectedItemTextView != null) {
-            selectedItemTextView!!.visibility = View.GONE
-        }
+        selectIndicator?.visibility = View.INVISIBLE
+        selectedItemTextView?.visibility = View.GONE
     }
 
     private fun hideEntries() {
