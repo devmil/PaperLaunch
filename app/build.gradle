@@ -9,14 +9,14 @@ android {
         applicationId "de.devmil.paperlaunch"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 11
-        versionName "1.0.9"
+        versionCode 12
+        versionName "1.0.10"
     }
     signingConfigs {
         release {
             def propsFile = file('../Key/keystore.properties')
             if(propsFile.exists()) {
-                def Properties keyProps = new Properties()
+                Properties keyProps = new Properties()
                 keyProps.load(new FileInputStream(propsFile))
                 storeFile keyProps["store"] != null ? file(keyProps["store"]) : null
                 keyAlias keyProps["alias"] != null ? keyProps["alias"] : null
@@ -42,10 +42,10 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:recyclerview-v7:25.4.0'
-    compile 'com.android.support:design:25.4.0'
+    compile 'com.android.support:recyclerview-v7:26.1.0'
+    compile 'com.android.support:design:26.1.0'
     compile 'com.cocosw:bottomsheet:1.+@aar'
-    compile 'com.android.support:palette-v7:25.4.0'
+    compile 'com.android.support:palette-v7:26.1.0'
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'io.reactivex:rxjava:1.1.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
