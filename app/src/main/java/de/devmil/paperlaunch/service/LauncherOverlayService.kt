@@ -27,6 +27,8 @@ import android.os.Build
 import android.os.IBinder
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.support.annotation.RequiresApi
+import android.support.v4.app.NotificationCompat
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
@@ -109,7 +111,9 @@ class LauncherOverlayService : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        createNotificationChannel()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel()
+        }
 
         registerScreenOnReceiver()
         registerOrientationChangeReceiver()
@@ -149,18 +153,18 @@ class LauncherOverlayService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            val notificationChannel = NotificationChannel(
-                    NOTIFICATION_CHANNEL_ID,
-                    NOTIFICATION_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_MIN)
-            notificationChannel.enableLights(false)
-            notificationChannel.enableVibration(false)
-            notificationChannel.setShowBadge(false)
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationChannel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_MIN)
+        notificationChannel.enableLights(false)
+        notificationChannel.enableVibration(false)
+        notificationChannel.setShowBadge(false)
+        notificationChannel.lockscreenVisibility = Notification.VISIBILITY_SECRET
+        notificationManager.createNotificationChannel(notificationChannel)
     }
 
     private fun adaptState(forceReload: Boolean) {
@@ -442,27 +446,22 @@ class LauncherOverlayService : Service() {
 
         //val largeIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
 
-        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
-        } else {
-            @Suppress("DEPRECATION")
-            Notification.Builder(this)
-        }
+        val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+
         builder.setContentTitle("PaperLaunch")
                .setContentText(getString(if (state.isActive) R.string.notification_content_active else R.string.notification_content_inactive))
                .setSmallIcon(R.mipmap.ic_launcher)
                .setContentIntent(settingsPendingIntent)
                .setOngoing(true)
+               .setCategory(Notification.CATEGORY_SERVICE)
+               .setLocalOnly(true)
+               .setVisibility(Notification.VISIBILITY_PUBLIC)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setBadgeIconType(Notification.BADGE_ICON_NONE)
         } else {
             @Suppress("DEPRECATION")
-            builder.setLocalOnly(true)
-                   //.setLargeIcon(largeIcon)
-                   .setPriority(Notification.PRIORITY_MIN)
-                   .setCategory(Notification.CATEGORY_SERVICE)
-                   .setVisibility(Notification.VISIBILITY_PUBLIC)
+            builder.setPriority(Notification.PRIORITY_MIN)
         }
 
         if (state.isActive) {
@@ -473,8 +472,7 @@ class LauncherOverlayService : Service() {
                     0,
                     pauseIntent,
                     0)
-            @Suppress("DEPRECATION")
-            builder.addAction(Notification.Action(
+            builder.addAction(NotificationCompat.Action(
                     R.mipmap.ic_pause_black_24dp,
                     getString(R.string.notification_pause),
                     pendingPauseIntent
@@ -487,8 +485,7 @@ class LauncherOverlayService : Service() {
                     0,
                     playIntent,
                     0)
-            @Suppress("DEPRECATION")
-            builder.addAction(Notification.Action(
+            builder.addAction(NotificationCompat.Action(
                     R.mipmap.ic_play_arrow_black_24dp,
                     getString(R.string.notification_play),
                     pendingPlayIntent
