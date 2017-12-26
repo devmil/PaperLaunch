@@ -444,8 +444,6 @@ class LauncherOverlayService : Service() {
                 0
         )
 
-        //val largeIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
-
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
 
         builder.setContentTitle("PaperLaunch")
@@ -453,15 +451,14 @@ class LauncherOverlayService : Service() {
                .setSmallIcon(R.mipmap.ic_launcher)
                .setContentIntent(settingsPendingIntent)
                .setOngoing(true)
-               .setCategory(Notification.CATEGORY_SERVICE)
-               .setLocalOnly(true)
-               .setVisibility(Notification.VISIBILITY_PUBLIC)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setBadgeIconType(Notification.BADGE_ICON_NONE)
         } else {
             @Suppress("DEPRECATION")
             builder.setPriority(Notification.PRIORITY_MIN)
+                   .setCategory(Notification.CATEGORY_SERVICE)
+                   .setLocalOnly(true)
         }
 
         if (state.isActive) {

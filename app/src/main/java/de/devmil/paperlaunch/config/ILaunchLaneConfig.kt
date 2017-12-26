@@ -25,6 +25,7 @@ interface ILaunchLaneConfig {
     val selectingAnimationDurationMS: Int
     val itemNameTextSizeSP: Float
     val laneIconTopMarginDip: Float
+    val laneIconMarginsDip: Float
     val laneTextTopMarginDip: Float
     val launcherGravity: LauncherGravity?
 }

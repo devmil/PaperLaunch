@@ -56,6 +56,9 @@ class LaunchLaneViewModel(entryModels: List<LaunchEntryViewModel>, private val m
     val laneIconTopMarginDip: Float
         get() = mConfig.laneIconTopMarginDip
 
+    val laneIconMarginsDip: Float
+        get() = mConfig.laneIconMarginsDip
+
     val laneTextTopMarginDip: Float
         get() = mConfig.laneTextTopMarginDip
 

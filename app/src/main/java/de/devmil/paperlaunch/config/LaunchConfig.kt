@@ -38,6 +38,7 @@ class LaunchConfig(userSettings: IUserSettings) : ILaunchEntryConfig, ILaunchLan
     val launcherInitAnimationDurationMS = 150
     override val imageOffsetDip = 5f
     override val laneIconTopMarginDip = 5f
+    override val laneIconMarginsDip = 3f
     override val laneTextTopMarginDip = 20f
     val launcherBackgroundColor = Color.BLACK
     val launcherBackgroundAlpha = 0.3f

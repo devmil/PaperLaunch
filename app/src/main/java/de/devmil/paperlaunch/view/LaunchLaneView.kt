@@ -39,6 +39,7 @@ import de.devmil.paperlaunch.utils.PositionAndSizeEvaluator
 import de.devmil.paperlaunch.view.utils.ViewUtils
 import de.devmil.paperlaunch.view.utils.ColorUtils
 import de.devmil.paperlaunch.view.widgets.VerticalTextView
+import kotlin.math.roundToInt
 
 class LaunchLaneView : RelativeLayout {
     interface ILaneListener {
@@ -210,9 +211,15 @@ class LaunchLaneView : RelativeLayout {
         localSelectedIcon.setImageResource(localViewModel.unknownAppImageId)
 
         val selectIconParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT)
-        selectIconParams.setMargins(0, ViewUtils.getPxFromDip(context, localViewModel.laneIconTopMarginDip).toInt(), 0, 0)
+                ViewUtils.getPxFromDip(context, localViewModel.imageWidthDip).toInt(),
+                ViewUtils.getPxFromDip(context, localViewModel.imageWidthDip).toInt())
+        selectIconParams.setMargins(
+                ViewUtils.getPxFromDip(context, localViewModel.laneIconMarginsDip).toInt(),
+                ViewUtils.getPxFromDip(context, localViewModel.laneIconTopMarginDip).toInt(),
+                ViewUtils.getPxFromDip(context, localViewModel.laneIconMarginsDip).toInt(),
+                ViewUtils.getPxFromDip(context, localViewModel.laneIconMarginsDip).toInt())
+
+        ViewUtils.getPxFromDip(context, localViewModel.imageWidthDip).toInt()
 
         localSelectIndicator.addView(localSelectedIcon, selectIconParams)
 
@@ -311,7 +318,6 @@ class LaunchLaneView : RelativeLayout {
 
     private fun adaptModelState() {
         transitToState(viewModel!!.state)
-        applySizeParameters()
     }
 
     private fun initEntryState(state: LaunchEntryViewModel.State) {
@@ -351,13 +357,6 @@ class LaunchLaneView : RelativeLayout {
 
             delay += localViewModel.entryMoveDiffMS
         }
-    }
-
-    private fun applySizeParameters() {
-        val localViewModel = viewModel!!
-        val localSelectedIcon = selectedIcon!!
-        localSelectedIcon.maxHeight = ViewUtils.getPxFromDip(context, localViewModel.imageWidthDip).toInt()
-        localSelectedIcon.maxWidth = ViewUtils.getPxFromDip(context, localViewModel.imageWidthDip).toInt()
     }
 
     private fun showSelectionIndicator() {
