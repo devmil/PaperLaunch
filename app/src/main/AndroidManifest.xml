@@ -24,7 +24,10 @@
         </activity>
         <activity
             android:name=".view.utils.IntentSelector"
-            android:label="Select an Intent" />
+            android:label="@string/activity_intentselector_label" />
+        <activity
+            android:name=".view.utils.UrlSelector"
+            android:label="@string/activity_urlselector_label" />
         <activity
             android:name=".EditFolderActivity"
             android:label="@string/title_activity_edit_folder" />

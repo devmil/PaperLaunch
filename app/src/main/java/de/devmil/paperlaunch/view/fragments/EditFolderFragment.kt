@@ -50,6 +50,7 @@ import de.devmil.paperlaunch.storage.ITransactionAction
 import de.devmil.paperlaunch.storage.ITransactionContext
 import de.devmil.paperlaunch.utils.FolderImageHelper
 import de.devmil.paperlaunch.view.utils.IntentSelector
+import de.devmil.paperlaunch.view.utils.UrlSelector
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
@@ -133,6 +134,7 @@ class EditFolderFragment : Fragment() {
                     .grid()
                     .sheet(2001, R.mipmap.ic_link_black_48dp, R.string.folder_settings_add_app)
                     .sheet(2002, R.mipmap.ic_folder_black_48dp, R.string.folder_settings_add_folder)
+                    .sheet(2003, R.mipmap.ic_web_black_48dp, R.string.folder_settings_add_url)
                     .icon(R.mipmap.ic_add_black_24dp)
                     .listener { dialog, which ->
                         when (which) {
@@ -142,6 +144,10 @@ class EditFolderFragment : Fragment() {
                             }
                             2002 -> {
                                 initiateCreateFolder()
+                                dialog.dismiss()
+                            }
+                            2003 -> {
+                                initiateCreateUrl()
                                 dialog.dismiss()
                             }
                         }
@@ -249,17 +255,28 @@ class EditFolderFragment : Fragment() {
         startActivityForResult(intent, REQUEST_ADD_APP)
     }
 
+    private fun initiateCreateUrl() {
+        val intent = Intent()
+        intent.setClass(activity, UrlSelector::class.java)
+
+        startActivityForResult(intent, REQUEST_ADD_URL)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (REQUEST_ADD_APP == requestCode) {
-            if (resultCode != Activity.RESULT_OK) {
-                return
+        when(requestCode) {
+            REQUEST_ADD_APP,
+            REQUEST_ADD_URL -> {
+                if (resultCode != Activity.RESULT_OK) {
+                    return
+                }
+                if(data != null) {
+                    addLaunch(data)
+                }
             }
-            if(data != null) {
-                addLaunch(data)
+            REQUEST_EDIT_FOLDER -> {
+                invalidate()
             }
-        } else if (REQUEST_EDIT_FOLDER == requestCode) {
-            invalidate()
         }
     }
 
@@ -457,6 +474,7 @@ class EditFolderFragment : Fragment() {
     companion object {
         private val ARG_PARAM_FOLDERID = "paramFolderId"
         private val REQUEST_ADD_APP = 1000
+        private val REQUEST_ADD_URL = 1001
         private val REQUEST_EDIT_FOLDER = 1010
 
         private val sNotifyDataChangedWorker = Executors.newSingleThreadScheduledExecutor()

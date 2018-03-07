@@ -13,6 +13,7 @@
     <string name="folder_settings_add_app_activities">Activities</string>
     <string name="folder_settings_add_app_shortcuts">Shortcuts</string>
     <string name="folder_settings_add_folder">Folder</string>
+    <string name="folder_settings_add_url">Url</string>
 
     <string name="fragment_edit_folder_name">Name:</string>
     <string name="fragment_edit_folder_new_folder_name">New Folder</string>
@@ -69,4 +70,11 @@
     <string name="permission_request_title">Permission request</string>
     <string name="permission_request_description">PaperLaunch needs the permission to draw over system UI in order to function properly. If you see this message even after setting this permission please try to restart PaperLaunch (this can happen due to an Android Oreo bug)</string>
     <string name="permission_request_button_ok">OK</string>
+    <string name="activity_urlselectorview_lbl_url">Enter the URL that shall be opened when this item is selected</string>
+    <string name="activity_urlselectorview_edit_hint_url">Enter URL (e.g. https://www.google.de)</string>
+    <string name="activity_urlselectorview_btn_OK_text">OK</string>
+    <string name="activity_intentselector_label">Select an Intent</string>
+    <string name="activity_urlselector_label">Enter an URL</string>
+    <string name="activity_urlselectorview_lbl_name">Enter a name that describes this URL. This name will be displayed in PaperLaunch. Leave empty to get the URL as a name</string>
+    <string name="activity_urlselectorview_edit_hint_name">Name (e.g. Google)</string>
 </resources>

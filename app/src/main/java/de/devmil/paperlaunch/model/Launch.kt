@@ -15,9 +15,11 @@
  */
 package de.devmil.paperlaunch.model
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import de.devmil.paperlaunch.R
 
 import de.devmil.paperlaunch.storage.EntryDTO
 import de.devmil.paperlaunch.storage.LaunchDTO
@@ -42,9 +44,23 @@ class Launch(val dto: LaunchDTO, private val entryDto: EntryDTO) : IEntry {
             return dto.name
         }
         if (defaultAppName == null) {
-            val launchIntent = launchIntent ?: return null
-
-            defaultAppName = AppMetadataUtils.getAppName(context, launchIntent)
+            defaultAppName = launchIntent?.let {
+                when(it.action) {
+                    Intent.ACTION_MAIN -> {
+                        AppMetadataUtils.getAppName(context, it)
+                    }
+                    Intent.ACTION_VIEW -> {
+                        if(it.hasExtra(EXTRA_URL_NAME)) {
+                            it.getStringExtra(EXTRA_URL_NAME)
+                        } else {
+                            it.data.toString()
+                        }
+                    }
+                    else -> {
+                        null
+                    }
+                }
+            }
         }
         return defaultAppName
     }
@@ -54,9 +70,18 @@ class Launch(val dto: LaunchDTO, private val entryDto: EntryDTO) : IEntry {
             return dto.icon
         }
         if (defaultAppIcon == null) {
-            val launchIntent = launchIntent
-            if (launchIntent != null) {
-                defaultAppIcon = AppMetadataUtils.getAppIcon(context, launchIntent)
+            defaultAppIcon = launchIntent?.let {
+                when (it.action) {
+                    Intent.ACTION_MAIN -> {
+                        AppMetadataUtils.getAppIcon(context, it)
+                    }
+                    Intent.ACTION_VIEW -> {
+                        context.getDrawable(R.mipmap.ic_web_black_48dp)
+                    }
+                    else -> {
+                        null
+                    }
+                }
             }
         }
         return defaultAppIcon
@@ -75,4 +100,8 @@ class Launch(val dto: LaunchDTO, private val entryDto: EntryDTO) : IEntry {
 
     val launchIntent: Intent?
         get() = dto.launchIntent
+
+    companion object {
+        val EXTRA_URL_NAME = "de.devmil.paperlaunch.EXTRA_URL_NAME"
+    }
 }
