@@ -76,8 +76,12 @@ class EditFolderFragment : Fragment() {
 
     fun setListener(listener: (String) -> Unit) {
         folderNameChangedCallback = listener
-        if (folderNameChangedCallback != null && folder != null) {
-            folderNameChangedCallback!!(folder!!.dto.name!!)
+        folderNameChangedCallback?.let { itFolderNameChangedCallback ->
+            folder?.let { itFolder ->
+                itFolder.dto.name?.let { itName ->
+                    itFolderNameChangedCallback(itName)
+                }
+            }
         }
     }
 
@@ -111,60 +115,70 @@ class EditFolderFragment : Fragment() {
         editNameLayout = result.findViewById(R.id.fragment_edit_folder_editname_layout)
         folderNameEditText = result.findViewById(R.id.fragment_edit_folder_editname_text)
 
-        editNameLayout!!.visibility = if (folderId >= 0) View.VISIBLE else View.GONE
+        editNameLayout?.let { itEditNameLayout ->
+            itEditNameLayout.visibility = if (folderId >= 0) View.VISIBLE else View.GONE
+        }
 
-        recyclerView!!.layoutManager = LinearLayoutManager(activity, LinearLayout.VERTICAL, false)
-        recyclerView!!.itemAnimator = EntriesItemAnimator()
+        recyclerView?.let { itRecyclerView ->
+            itRecyclerView.layoutManager = LinearLayoutManager(activity, LinearLayout.VERTICAL, false)
+            itRecyclerView.itemAnimator = EntriesItemAnimator()
+        }
 
         loadData()
 
-        folderNameEditText!!.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+        folderNameEditText?.let { itFolderNameEditText ->
+            itFolderNameEditText.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
-            override fun afterTextChanged(s: Editable) {
-                if (folder == null) {
-                    return
-                }
-                folder!!.dto.name = folderNameEditText!!.text.toString()
-                EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
-                    override fun execute(transactionContext: ITransactionContext) {
-                        transactionContext.updateFolderData(folder!!)
-                    }
-                })
-                if (folderNameChangedCallback != null) {
-                    folderNameChangedCallback!!(folder!!.dto.name!!)
-                }
-                notifyDataChanged()
-            }
-        })
-
-        addButton!!.setOnClickListener {
-            BottomSheet.Builder(activity)
-                    .title(R.string.folder_settings_add_title)
-                    .grid()
-                    .sheet(CreateSheetActionIds.AddApp.id, R.mipmap.ic_link_black_48dp, R.string.folder_settings_add_app)
-                    .sheet(CreateSheetActionIds.AddURL.id, R.mipmap.ic_web_black_48dp, R.string.folder_settings_add_url)
-                    .sheet(CreateSheetActionIds.AddFolder.id, R.mipmap.ic_folder_black_48dp, R.string.folder_settings_add_folder)
-                    .icon(R.mipmap.ic_add_black_24dp)
-                    .listener { dialog, which ->
-                        when (CreateSheetActionIds.fromId(which)) {
-                            CreateSheetActionIds.AddApp -> {
-                                initiateCreateLaunch()
-                                dialog.dismiss()
+                override fun afterTextChanged(s: Editable) {
+                    folder?.let { itFolder ->
+                        itFolder.dto.name = itFolderNameEditText.text.toString()
+                        EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
+                            override fun execute(transactionContext: ITransactionContext) {
+                                transactionContext.updateFolderData(itFolder)
                             }
-                            CreateSheetActionIds.AddFolder -> {
-                                initiateCreateFolder()
-                                dialog.dismiss()
-                            }
-                            CreateSheetActionIds.AddURL -> {
-                                initiateCreateUrl()
-                                dialog.dismiss()
+                        })
+                        folderNameChangedCallback?.let { itCallback ->
+                            itFolder.dto.name?.let { itName ->
+                                itCallback(itName)
                             }
                         }
-                    }.show()
+                        notifyDataChanged()
+                    }
+                }
+            })
         }
+
+        addButton?.let { itAddButton ->
+            itAddButton.setOnClickListener {
+                BottomSheet.Builder(activity)
+                        .title(R.string.folder_settings_add_title)
+                        .grid()
+                        .sheet(CreateSheetActionIds.AddApp.id, R.mipmap.ic_link_black_48dp, R.string.folder_settings_add_app)
+                        .sheet(CreateSheetActionIds.AddURL.id, R.mipmap.ic_web_black_48dp, R.string.folder_settings_add_url)
+                        .sheet(CreateSheetActionIds.AddFolder.id, R.mipmap.ic_folder_black_48dp, R.string.folder_settings_add_folder)
+                        .icon(R.mipmap.ic_add_black_24dp)
+                        .listener { dialog, which ->
+                            when (CreateSheetActionIds.fromId(which)) {
+                                CreateSheetActionIds.AddApp -> {
+                                    initiateCreateLaunch()
+                                    dialog.dismiss()
+                                }
+                                CreateSheetActionIds.AddFolder -> {
+                                    initiateCreateFolder()
+                                    dialog.dismiss()
+                                }
+                                CreateSheetActionIds.AddURL -> {
+                                    initiateCreateUrl()
+                                    dialog.dismiss()
+                                }
+                            }
+                        }.show()
+            }
+        }
+
         return result
     }
 
@@ -173,53 +187,64 @@ class EditFolderFragment : Fragment() {
     }
 
     private fun loadData() {
-        adapter = EntriesAdapter(recyclerView!!, loadEntries())
-        recyclerView!!.adapter = adapter
-        adapter!!.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onChanged() {
-                super.onChanged()
-                checkEntryViewStates()
-            }
+        recyclerView?.let { itRecyclerView ->
+            val localAdapter = EntriesAdapter(itRecyclerView, loadEntries())
+            itRecyclerView.adapter = localAdapter
+            localAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onChanged() {
+                    super.onChanged()
+                    checkEntryViewStates()
+                }
 
-            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-                super.onItemRangeChanged(positionStart, itemCount)
-                checkEntryViewStates()
-            }
+                override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeChanged(positionStart, itemCount)
+                    checkEntryViewStates()
+                }
 
-            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
-                super.onItemRangeChanged(positionStart, itemCount, payload)
-                checkEntryViewStates()
-            }
+                override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+                    super.onItemRangeChanged(positionStart, itemCount, payload)
+                    checkEntryViewStates()
+                }
 
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                checkEntryViewStates()
-            }
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+                    checkEntryViewStates()
+                }
 
-            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-                super.onItemRangeRemoved(positionStart, itemCount)
-                checkEntryViewStates()
-            }
+                override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeRemoved(positionStart, itemCount)
+                    checkEntryViewStates()
+                }
 
-            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-                super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-                checkEntryViewStates()
-            }
-        })
-        if (folder != null) {
-            folderNameEditText!!.setText(folder!!.dto.name)
-            if (folderNameChangedCallback != null) {
-                folderNameChangedCallback!!(folder!!.dto.name!!)
+                override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                    super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                    checkEntryViewStates()
+                }
+            })
+            adapter = localAdapter
+        }
+
+        folder?.let { itFolder ->
+            folderNameEditText?.setText(itFolder.dto.name)
+            folderNameChangedCallback?.let { itFolderNameChangedCallback ->
+                itFolder.dto.name?.let { itName ->
+                    itFolderNameChangedCallback(itName)
+                }
             }
         }
+
         checkEntryViewStates()
     }
 
     private fun checkEntryViewStates() {
-        val isEmpty = adapter == null || adapter!!.itemCount <= 0
+        val isEmpty = adapter?.let { it.itemCount <= 0 } != false
 
-        emptyListView!!.visibility = if (isEmpty) View.VISIBLE else View.GONE
-        recyclerView!!.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        emptyListView?.let { itEmptyListView ->
+            itEmptyListView.visibility = if(isEmpty) View.VISIBLE else View.GONE
+        }
+        recyclerView?.let { itRecyclerView ->
+            itRecyclerView.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        }
     }
 
     private fun loadEntries(): MutableList<IEntry> {
@@ -234,8 +259,9 @@ class EditFolderFragment : Fragment() {
                 if (folderId == -1L) {
                     local.result = transactionContext.loadRootContent()
                 } else {
-                    folder = transactionContext.loadFolder(folderId)
-                    local.result = folder!!.subEntries
+                    val localFolder = transactionContext.loadFolder(folderId)
+                    local.result = localFolder.subEntries
+                    folder = localFolder
                 }
             }
         })
@@ -244,7 +270,12 @@ class EditFolderFragment : Fragment() {
     }
 
     private fun initiateCreateFolder() {
-        if (folder != null && folder!!.dto.depth >= config!!.maxFolderDepth) {
+        val tooDeep = folder?.let { itFolder ->
+            config?.let { itConfig ->
+                itFolder.dto.depth >= itConfig.maxFolderDepth
+            }
+        } ?: false
+        if (tooDeep) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.folder_settings_add_folder_maxdepth_alert_title)
                     .setMessage(R.string.folder_settings_add_folder_maxdepth_alert_message)
@@ -299,10 +330,11 @@ class EditFolderFragment : Fragment() {
                 l.dto.launchIntent = launchIntent
                 transactionContext.updateLaunchData(l)
 
-                adapter!!.addEntry(l)
-
-                if (folder != null) {
-                    updateFolderImage(folder!!.dto, adapter!!.entries)
+                adapter?.let { itAdapter ->
+                    itAdapter.addEntry(l)
+                    folder?.let { itFolder ->
+                        updateFolderImage(itFolder.dto, itAdapter.entries)
+                    }
                 }
             }
         })
@@ -310,17 +342,19 @@ class EditFolderFragment : Fragment() {
     }
 
     private fun updateFolderImage(folderDto: FolderDTO, entries: List<IEntry>) {
-        val imgWidth = config!!.imageWidthDip
-        val bmp = FolderImageHelper.createImageFromEntries(activity, entries, imgWidth)
-        val newIcon = BitmapDrawable(resources, bmp)
-        folderDto.icon = newIcon
+        config?.let { itConfig ->
+            val imgWidth = itConfig.imageWidthDip
+            val bmp = FolderImageHelper.createImageFromEntries(activity, entries, imgWidth)
+            val newIcon = BitmapDrawable(resources, bmp)
+            folderDto.icon = newIcon
 
-        EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
-            override fun execute(transactionContext: ITransactionContext) {
-                transactionContext.updateFolderData(folderDto)
-            }
-        })
-        notifyDataChanged()
+            EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
+                override fun execute(transactionContext: ITransactionContext) {
+                    transactionContext.updateFolderData(folderDto)
+                }
+            })
+            notifyDataChanged()
+        }
     }
 
     private fun addFolder(initialName: String): Long {
@@ -331,25 +365,26 @@ class EditFolderFragment : Fragment() {
         val local = Local()
         EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
             override fun execute(transactionContext: ITransactionContext) {
-                local.folder = transactionContext.createFolder(folderId, -1, if (folder == null) 0 else folder!!.dto.depth)
-                local.folder!!.dto.name = initialName
-                transactionContext.updateFolderData(local.folder!!)
+                val localFolder = transactionContext.createFolder(folderId, -1, folder?.dto?.depth ?: 0)
+                localFolder.dto.name = initialName
+                local.folder = localFolder
+                transactionContext.updateFolderData(localFolder)
             }
         })
 
-        adapter!!.addEntry(local.folder!!)
-
-        notifyDataChanged()
-
-        return local.folder!!.id
+        return adapter?.let { itAdapter ->
+            local.folder?.let { itFolder ->
+                itAdapter.addEntry(itFolder)
+                notifyDataChanged()
+                return itFolder.id
+            }
+        } ?: -1
     }
 
     private var mScheduledNotifyDataChanged: ScheduledFuture<*>? = null
 
     private fun notifyDataChanged() {
-        if (mScheduledNotifyDataChanged != null) {
-            mScheduledNotifyDataChanged!!.cancel(false)
-        }
+        mScheduledNotifyDataChanged?.cancel(false)
         mScheduledNotifyDataChanged = sNotifyDataChangedWorker.schedule({ LauncherOverlayService.notifyDataChanged(activity) }, 1, TimeUnit.SECONDS)
     }
 
@@ -400,8 +435,8 @@ class EditFolderFragment : Fragment() {
             }
             mEntries.add(toPosition, mEntries.removeAt(fromPosition))
             saveOrder()
-            if (folder != null) {
-                updateFolderImage(folder!!.dto, mEntries)
+            folder?.let { itFolder ->
+                updateFolderImage(itFolder.dto, mEntries)
             }
             notifyDataChanged()
             return true
@@ -457,16 +492,16 @@ class EditFolderFragment : Fragment() {
 
             override fun onClick(v: View) {
                 val entry = getEntryById(itemId)
-                if (v === container) {
-                    if (entry!!.isFolder) {
-                        val editFolderIntent = EditFolderActivity.createLaunchIntent(activity, entry.id)
-                        startActivityForResult(editFolderIntent, REQUEST_EDIT_FOLDER)
-                    }
-                } else if (v === deleteImg) {
-                    EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
-                        override fun execute(transactionContext: ITransactionContext) {
-                            entry?.let { e ->
-                                transactionContext.deleteEntry(e.entryId)
+                entry?.let { itEntry ->
+                    if (v === container) {
+                        if (itEntry.isFolder) {
+                            val editFolderIntent = EditFolderActivity.createLaunchIntent(activity, itEntry.id)
+                            startActivityForResult(editFolderIntent, REQUEST_EDIT_FOLDER)
+                        }
+                    } else if (v === deleteImg) {
+                        EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
+                            override fun execute(transactionContext: ITransactionContext) {
+                                transactionContext.deleteEntry(itEntry.entryId)
 
                                 val pos = getPositionForId(itemId)
                                 mEntries.removeAt(pos)
@@ -475,19 +510,19 @@ class EditFolderFragment : Fragment() {
                                 }
                                 notifyItemRemoved(pos)
                             }
-                        }
-                    })
-                    notifyDataChanged()
+                        })
+                        notifyDataChanged()
+                    }
                 }
             }
         }
     }
 
     companion object {
-        private val ARG_PARAM_FOLDERID = "paramFolderId"
-        private val REQUEST_ADD_APP = 1000
-        private val REQUEST_ADD_URL = 1001
-        private val REQUEST_EDIT_FOLDER = 1010
+        private const val ARG_PARAM_FOLDERID = "paramFolderId"
+        private const val REQUEST_ADD_APP = 1000
+        private const val REQUEST_ADD_URL = 1001
+        private const val REQUEST_EDIT_FOLDER = 1010
 
         private val sNotifyDataChangedWorker = Executors.newSingleThreadScheduledExecutor()
 
