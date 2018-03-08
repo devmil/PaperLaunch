@@ -89,6 +89,18 @@ class EditFolderFragment : Fragment() {
         }
     }
 
+    enum class CreateSheetActionIds(val id: Int) {
+        AddApp(20001),
+        AddFolder(2002),
+        AddURL(2003);
+
+        companion object {
+            fun fromId(id: Int) : CreateSheetActionIds? {
+                return values().firstOrNull { it.id == id }
+            }
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val result = inflater.inflate(R.layout.fragment_edit_folder, container, false)
@@ -132,21 +144,21 @@ class EditFolderFragment : Fragment() {
             BottomSheet.Builder(activity)
                     .title(R.string.folder_settings_add_title)
                     .grid()
-                    .sheet(2001, R.mipmap.ic_link_black_48dp, R.string.folder_settings_add_app)
-                    .sheet(2002, R.mipmap.ic_folder_black_48dp, R.string.folder_settings_add_folder)
-                    .sheet(2003, R.mipmap.ic_web_black_48dp, R.string.folder_settings_add_url)
+                    .sheet(CreateSheetActionIds.AddApp.id, R.mipmap.ic_link_black_48dp, R.string.folder_settings_add_app)
+                    .sheet(CreateSheetActionIds.AddURL.id, R.mipmap.ic_web_black_48dp, R.string.folder_settings_add_url)
+                    .sheet(CreateSheetActionIds.AddFolder.id, R.mipmap.ic_folder_black_48dp, R.string.folder_settings_add_folder)
                     .icon(R.mipmap.ic_add_black_24dp)
                     .listener { dialog, which ->
-                        when (which) {
-                            2001 -> {
+                        when (CreateSheetActionIds.fromId(which)) {
+                            CreateSheetActionIds.AddApp -> {
                                 initiateCreateLaunch()
                                 dialog.dismiss()
                             }
-                            2002 -> {
+                            CreateSheetActionIds.AddFolder -> {
                                 initiateCreateFolder()
                                 dialog.dismiss()
                             }
-                            2003 -> {
+                            CreateSheetActionIds.AddURL -> {
                                 initiateCreateUrl()
                                 dialog.dismiss()
                             }
