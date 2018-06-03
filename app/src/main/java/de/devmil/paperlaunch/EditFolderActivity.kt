@@ -58,6 +58,7 @@ class EditFolderActivity : Activity() {
 
         fun createLaunchIntent(context: Context, folderId: Long): Intent {
             val result = Intent(context, EditFolderActivity::class.java)
+            result.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
             result.putExtra(ARG_FOLDERID, folderId)
             return result
         }
