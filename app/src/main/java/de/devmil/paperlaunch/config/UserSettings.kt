@@ -27,6 +27,8 @@ class UserSettings(context: Context) : IUserSettings {
     override var isVibrateOnActivation: Boolean = false
     override var isOnRightSide: Boolean = false
     override var launcherGravity: LauncherGravity = LauncherGravity.Center
+    override var showLogo: Boolean = true
+    override var itemScalePercent: Int = 100
 
     init {
         load(context)
@@ -41,6 +43,8 @@ class UserSettings(context: Context) : IUserSettings {
         isVibrateOnActivation = prefs.getBoolean(KEY_VIBRATE_ON_ACTIVATION, DEFAULT_VIBRATE_ON_ACTIVATION)
         isOnRightSide = prefs.getBoolean(KEY_IS_ON_RIGHT_SIDE, DEFAULT_IS_ON_RIGHT_SIDE)
         launcherGravity = LauncherGravity.fromValue(prefs.getInt(KEY_LAUNCHER_GRAVITY, DEFAULT_LAUNCHER_GRAVITY.value))
+        showLogo = prefs.getBoolean(KEY_SHOW_LOGO, DEFAULT_SHOW_LOGO)
+        itemScalePercent = prefs.getInt(KEY_ITEM_SCALE_PERCENT, DEFAULT_ITEM_SCALE_PERCENT)
     }
 
     fun save(context: Context) {
@@ -53,6 +57,8 @@ class UserSettings(context: Context) : IUserSettings {
                 .putBoolean(KEY_VIBRATE_ON_ACTIVATION, isVibrateOnActivation)
                 .putBoolean(KEY_IS_ON_RIGHT_SIDE, isOnRightSide)
                 .putInt(KEY_LAUNCHER_GRAVITY, launcherGravity.value)
+                .putBoolean(KEY_SHOW_LOGO, showLogo)
+                .putInt(KEY_ITEM_SCALE_PERCENT, itemScalePercent)
                 .apply()
     }
 
@@ -67,6 +73,8 @@ class UserSettings(context: Context) : IUserSettings {
         private val KEY_VIBRATE_ON_ACTIVATION = "vibrateOnActivation"
         private val KEY_IS_ON_RIGHT_SIDE = "isOnRightSide"
         private val KEY_LAUNCHER_GRAVITY = "launcherGravity"
+        private val KEY_SHOW_LOGO = "showLogo"
+        private val KEY_ITEM_SCALE_PERCENT = "itemScalePercent"
 
         private val DEFAULT_SENSITIVITY_DIP = 10
         private val DEFAULT_ACTIVATION_OFFSET_POSITION_DIP = 0
@@ -75,5 +83,7 @@ class UserSettings(context: Context) : IUserSettings {
         private val DEFAULT_VIBRATE_ON_ACTIVATION = false
         private val DEFAULT_IS_ON_RIGHT_SIDE = true
         private val DEFAULT_LAUNCHER_GRAVITY = LauncherGravity.Center
+        private val DEFAULT_SHOW_LOGO = true
+        private val DEFAULT_ITEM_SCALE_PERCENT = 100
     }
 }

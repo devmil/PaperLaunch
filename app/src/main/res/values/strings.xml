@@ -77,4 +77,8 @@
     <string name="activity_urlselector_label">Enter an URL</string>
     <string name="activity_urlselectorview_lbl_name">Enter a name that describes this URL. This name will be displayed in PaperLaunch. Leave empty to get the URL as a name</string>
     <string name="activity_urlselectorview_edit_hint_name">Name (e.g. Google)</string>
+    <string name="fragment_settings_appearance_item_scale_title">Entry scale</string>
+    <string name="fragment_settings_activation_show_logo_title">Show logo</string>
+    <string name="fragment_settings_activation_show_logo_summary_on">Logo is shown</string>
+    <string name="fragment_settings_activation_show_logo_summary_off">Logo is not shown</string>
 </resources>

@@ -28,4 +28,5 @@ interface ILaunchLaneConfig {
     val laneIconMarginsDip: Float
     val laneTextTopMarginDip: Float
     val launcherGravity: LauncherGravity?
+    val showLogo: Boolean
 }

@@ -24,4 +24,6 @@ interface IUserSettings {
     val isShowBackground: Boolean
     val isVibrateOnActivation: Boolean
     val launcherGravity: LauncherGravity?
+    val showLogo: Boolean
+    val itemScalePercent: Int
 }

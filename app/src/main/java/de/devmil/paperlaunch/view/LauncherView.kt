@@ -272,46 +272,52 @@ class LauncherView : RelativeLayout {
         )
         localNeutralZone.addView(localNeutralZoneBackground, backParams)
 
-        val localNeutralZoneBackgroundImage = ImageView(context)
-        localNeutralZoneBackgroundImage.setImageResource(R.mipmap.ic_launcher)
-        localNeutralZoneBackgroundImage.isClickable = false
-        localNeutralZoneBackgroundImage.visibility = View.GONE
+        if(localViewModel.laneConfig.showLogo) {
+            val localNeutralZoneBackgroundImage = ImageView(context)
+            localNeutralZoneBackgroundImage.setImageResource(R.mipmap.ic_launcher)
+            localNeutralZoneBackgroundImage.isClickable = false
+            localNeutralZoneBackgroundImage.visibility = View.GONE
 
-        val backImageParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        backImageParams.setMargins(0, ViewUtils.getPxFromDip(context, localViewModel.laneConfig.laneIconTopMarginDip).toInt(), 0, 0)
-        localNeutralZoneBackground.addView(localNeutralZoneBackgroundImage, backImageParams)
+            val backImageParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            backImageParams.setMargins(0, ViewUtils.getPxFromDip(context, localViewModel.laneConfig.laneIconTopMarginDip).toInt(), 0, 0)
+            localNeutralZoneBackground.addView(localNeutralZoneBackgroundImage, backImageParams)
 
-        localNeutralZoneBackground.setBackgroundColor(
-                ColorUtils.getBackgroundColorFromImage(
-                        resources.getDrawable(
-                                R.mipmap.ic_launcher,
-                                context.theme
-                        ),
-                        localViewModel.frameDefaultColor))
+            val localNeutralZoneBackgroundAppNameText = VerticalTextView(context)
+            localNeutralZoneBackgroundAppNameText.visibility = View.GONE
+            localNeutralZoneBackgroundAppNameText.setTextSize(TypedValue.COMPLEX_UNIT_SP, localViewModel.itemNameTextSizeSP)
+            //this is needed because the parts in the system run with another theme than the application parts
+            localNeutralZoneBackgroundAppNameText.setTextColor(ContextCompat.getColor(context, R.color.name_label))
+            localNeutralZoneBackgroundAppNameText.setText(R.string.app_name)
+            localNeutralZoneBackgroundAppNameText.visibility = View.GONE
 
-        val localNeutralZoneBackgroundAppNameText = VerticalTextView(context)
-        localNeutralZoneBackgroundAppNameText.visibility = View.GONE
-        localNeutralZoneBackgroundAppNameText.setTextSize(TypedValue.COMPLEX_UNIT_SP, localViewModel.itemNameTextSizeSP)
-        //this is needed because the parts in the system run with another theme than the application parts
-        localNeutralZoneBackgroundAppNameText.setTextColor(ContextCompat.getColor(context, R.color.name_label))
-        localNeutralZoneBackgroundAppNameText.setText(R.string.app_name)
-        localNeutralZoneBackgroundAppNameText.visibility = View.GONE
+            val backTextParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            backTextParams.setMargins(0, ViewUtils.getPxFromDip(context, localViewModel.laneConfig.laneTextTopMarginDip).toInt(), 0, 0)
 
-        val backTextParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        backTextParams.setMargins(0, ViewUtils.getPxFromDip(context, localViewModel.laneConfig.laneTextTopMarginDip).toInt(), 0, 0)
+            localNeutralZoneBackground.addView(localNeutralZoneBackgroundAppNameText, backTextParams)
 
-        localNeutralZoneBackground.addView(localNeutralZoneBackgroundAppNameText, backTextParams)
+            localNeutralZoneBackground.setBackgroundColor(
+                    ColorUtils.getBackgroundColorFromImage(
+                            resources.getDrawable(
+                                    R.mipmap.ic_launcher,
+                                    context.theme
+                            ),
+                            localViewModel.frameDefaultColor))
+
+            neutralZoneBackgroundImage = localNeutralZoneBackgroundImage
+            neutralZoneBackgroundAppNameText = localNeutralZoneBackgroundAppNameText
+        } else {
+            neutralZoneBackgroundImage = null
+            neutralZoneBackgroundAppNameText = null
+        }
 
         neutralZone = localNeutralZone
         neutralZoneBackground = localNeutralZoneBackground
-        neutralZoneBackgroundImage = localNeutralZoneBackgroundImage
-        neutralZoneBackgroundAppNameText = localNeutralZoneBackgroundAppNameText
     }
 
     private fun sendIfMatches(laneView: LaunchLaneView, action: Int, x: Float, y: Float): Boolean {

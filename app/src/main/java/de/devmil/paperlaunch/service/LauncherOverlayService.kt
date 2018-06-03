@@ -137,6 +137,8 @@ class LauncherOverlayService : Service() {
         } else if (intent != null && ACTION_NOTIFYCONFIGCHANGED == intent.action) {
             reloadConfigMetadata()
             reloadTouchReceiver()
+        } else if (intent != null && ACTION_NOTIFYDATACONFIGCHANGED == intent.action) {
+            adaptState(true)
         } else if (intent != null && ACTION_PAUSE == intent.action) {
             state.isActive = false
             state.save(this)
@@ -506,6 +508,7 @@ class LauncherOverlayService : Service() {
         private val ACTION_LAUNCH = "ACTION_LAUNCH"
         private val ACTION_NOTIFYDATACHANGED = "ACTION_NOTIFYDATACHANGED"
         private val ACTION_NOTIFYCONFIGCHANGED = "ACTION_NOTIFYCONFIGCHANGED"
+        private val ACTION_NOTIFYDATACONFIGCHANGED = "ACTION_NOTIFYDATACONFIGCHANGED"
         private val ACTION_NOTIFYPERMISSIONCHANGED = "ACTION_NOTIFYPERMISSIONCHANGED"
         private val ACTION_ENSUREACTIVATIONTAPPABLE = "ACTION_ENSUREACTIVATIONTAPPABLE"
         private val ACTION_PAUSE = "ACTION_PAUSE"
@@ -533,6 +536,12 @@ class LauncherOverlayService : Service() {
         fun notifyConfigChanged(context: Context) {
             val launchServiceIntent = Intent(context, LauncherOverlayService::class.java)
             launchServiceIntent.action = ACTION_NOTIFYCONFIGCHANGED
+            context.startService(launchServiceIntent)
+        }
+
+        fun notifyDataConfigChanged(context: Context) {
+            val launchServiceIntent = Intent(context, LauncherOverlayService::class.java)
+            launchServiceIntent.action = ACTION_NOTIFYDATACONFIGCHANGED
             context.startService(launchServiceIntent)
         }
 

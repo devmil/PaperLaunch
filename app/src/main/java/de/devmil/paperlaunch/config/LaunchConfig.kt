@@ -23,7 +23,9 @@ import de.devmil.paperlaunch.model.IEntry
 
 class LaunchConfig(userSettings: IUserSettings) : ILaunchEntryConfig, ILaunchLaneConfig {
     private var mEntries: List<IEntry>? = null
-    override val imageWidthDip = 48f
+
+    private val BASE_IMAGE_WIDTH_DIP = 48f
+
     override val imageMarginDip = 1f
     override val entriesMarginDip = 3f
     override val lowElevationDip = 2f
@@ -54,6 +56,8 @@ class LaunchConfig(userSettings: IUserSettings) : ILaunchEntryConfig, ILaunchLan
     val showLauncherBackground: Boolean
     val isVibrateOnActivation: Boolean
     override val launcherGravity: LauncherGravity?
+    override val imageWidthDip: Float
+    override val showLogo: Boolean
 
     var entries: List<IEntry>
         get() = mEntries?.let { ArrayList(it) } ?: ArrayList()
@@ -69,5 +73,7 @@ class LaunchConfig(userSettings: IUserSettings) : ILaunchEntryConfig, ILaunchLan
         showLauncherBackground = userSettings.isShowBackground
         isVibrateOnActivation = userSettings.isVibrateOnActivation
         launcherGravity = userSettings.launcherGravity
+        imageWidthDip = (BASE_IMAGE_WIDTH_DIP * userSettings.itemScalePercent) / 100f
+        showLogo = userSettings.showLogo
     }
 }

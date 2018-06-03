@@ -236,6 +236,36 @@ class SettingsFragment : PreferenceFragment() {
             fireActivationParametersChanged()
             true
         }
+
+        val itemScalePreference = SeekBarPreference(context, 50, 150)
+        apperanceCategory.addPreference(itemScalePreference)
+
+        itemScalePreference.setValue(userSettings!!.itemScalePercent)
+        itemScalePreference.setTitle(R.string.fragment_settings_appearance_item_scale_title)
+        itemScalePreference.isPersistent = false
+        itemScalePreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+            userSettings!!.load(activity)
+            userSettings!!.itemScalePercent = newValue as Int
+            userSettings!!.save(activity)
+            LauncherOverlayService.notifyDataConfigChanged(activity)
+            true
+        }
+
+        val showLogoPreference = CheckBoxPreference(context)
+        apperanceCategory.addPreference(showLogoPreference)
+
+        showLogoPreference.isChecked = userSettings!!.showLogo
+        showLogoPreference.setTitle(R.string.fragment_settings_activation_show_logo_title)
+        showLogoPreference.setSummaryOn(R.string.fragment_settings_activation_show_logo_summary_on)
+        showLogoPreference.setSummaryOff(R.string.fragment_settings_activation_show_logo_summary_off)
+        showLogoPreference.isPersistent = false
+        showLogoPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+            userSettings!!.load(activity)
+            userSettings!!.showLogo = newValue as Boolean
+            userSettings!!.save(activity)
+            LauncherOverlayService.notifyConfigChanged(activity)
+            true
+        }
     }
 
     private fun getSideSummary(isOnRightSide: Boolean): Int {
