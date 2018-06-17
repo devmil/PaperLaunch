@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".locale.EditSettingActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/activity_edit_settings_toolbarlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include
+            android:id="@+id/activity_edit_settings_toolbar"
+            layout="@layout/toolbar"
+            />
+    </android.support.design.widget.AppBarLayout>
+
+    <TextView
+        android:id="@+id/activity_edit_setting_explanation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:layout_marginTop="30dp"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/activity_edit_settings_toolbarlayout"
+        android:text="@string/activity_edit_setting_explanation_txt" />
+    <LinearLayout
+        android:id="@+id/activity_edit_setting_action_radios"
+        app:layout_constraintTop_toBottomOf="@id/activity_edit_setting_explanation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:layout_marginTop="30dp"
+        android:orientation="vertical">
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:id="@+id/activity_edit_setting_rbEnable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/activity_edit_setting_rbEnable"/>
+            <RadioButton
+                android:id="@+id/activity_edit_setting_rbDisable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/activity_edit_setting_rbDisable"/>
+        </RadioGroup>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:layout_marginTop="30dp"
+        android:gravity="end|bottom"
+        app:layout_constraintTop_toBottomOf="@id/activity_edit_setting_action_radios">
+        <Button
+            android:id="@+id/activity_edit_setting_btn_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/activity_edit_setting_btn_ok"/>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

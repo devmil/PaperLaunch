@@ -15,7 +15,7 @@ android {
     signingConfigs {
         release {
             def propsFile = file('../Key/keystore.properties')
-            if(propsFile.exists()) {
+            if (propsFile.exists()) {
                 Properties keyProps = new Properties()
                 keyProps.load(new FileInputStream(propsFile))
                 storeFile keyProps["store"] != null ? file(keyProps["store"]) : null
@@ -48,7 +48,10 @@ dependencies {
     implementation 'io.reactivex:rxandroid:1.1.0'
     implementation 'io.reactivex:rxjava:1.1.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 }
 repositories {
     mavenCentral()
 }
+
+apply plugin: 'kotlin-android-extensions'

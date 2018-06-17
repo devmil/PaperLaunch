@@ -9,14 +9,14 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.PaperLaunch">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
             android:clearTaskOnLaunch="true"
+            android:label="@string/app_name"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -65,6 +65,23 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.devmil.paperlaunch.MainActivity" />
         </activity>
+        <activity
+            android:name=".locale.EditSettingActivity"
+            android:exported="true"
+            android:label="@string/title_activity_edit_setting">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".locale.LocaleReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
