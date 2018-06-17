@@ -81,4 +81,5 @@
     <string name="fragment_settings_activation_show_logo_title">Show logo</string>
     <string name="fragment_settings_activation_show_logo_summary_on">Logo is shown</string>
     <string name="fragment_settings_activation_show_logo_summary_off">Logo is not shown</string>
+    <string name="folder_settings_add_cancel">Cancel</string>
 </resources>
