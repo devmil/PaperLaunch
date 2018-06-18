@@ -8,13 +8,13 @@ import de.devmil.paperlaunch.service.LauncherOverlayService
 class LocaleReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        if(intent.action != "com.twofortyfouram.locale.intent.action.FIRE_SETTING") {
+        if(intent.action != LocaleConstants.ACTION_FIRE_SETTING) {
             return
         }
-        if(!intent.hasExtra("com.twofortyfouram.locale.intent.extra.BUNDLE")) {
+        if(!intent.hasExtra(LocaleConstants.EXTRA_BUNDLE)) {
             return
         }
-        val bundle = intent.getBundleExtra("com.twofortyfouram.locale.intent.extra.BUNDLE")
+        val bundle = intent.getBundleExtra(LocaleConstants.EXTRA_BUNDLE)
         if(!LocaleBundle.isValid(bundle)) {
             return
         }

@@ -32,8 +32,8 @@ class EditSettingActivity : Activity() {
         var isEnabled = true
 
 
-        if(intent.hasExtra("com.twofortyfouram.locale.intent.extra.BUNDLE")) {
-            val localeBundle = intent.getBundleExtra("com.twofortyfouram.locale.intent.extra.BUNDLE")
+        if(intent.hasExtra(LocaleConstants.EXTRA_BUNDLE)) {
+            val localeBundle = intent.getBundleExtra(LocaleConstants.EXTRA_BUNDLE)
             if(LocaleBundle.isValid(localeBundle)) {
                 isEnabled = LocaleBundle.from(localeBundle).isEnabled
             }
@@ -53,13 +53,13 @@ class EditSettingActivity : Activity() {
             rbEnable?.let { itRbEnable ->
                 val localeBundle = LocaleBundle(itRbEnable.isChecked)
                 val resultIntent = Intent()
-                resultIntent.putExtra("com.twofortyfouram.locale.intent.extra.BUNDLE", localeBundle.toBundle())
+                resultIntent.putExtra(LocaleConstants.EXTRA_BUNDLE, localeBundle.toBundle())
                 val stringResource =
                         if(itRbEnable.isChecked)
                             R.string.activity_edit_setting_description_enable
                         else
                             R.string.activity_edit_setting_description_disable
-                resultIntent.putExtra("com.twofortyfouram.locale.intent.extra.BLURB", getString(stringResource))
+                resultIntent.putExtra(LocaleConstants.EXTRA_BLURB, getString(stringResource))
                 setResult(RESULT_OK, resultIntent)
             }
             finish()
