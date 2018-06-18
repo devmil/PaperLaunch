@@ -48,17 +48,35 @@
                 android:text="@string/activity_edit_setting_rbDisable"/>
         </RadioGroup>
     </LinearLayout>
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:layout_marginTop="30dp"
-        android:gravity="end|bottom"
         app:layout_constraintTop_toBottomOf="@id/activity_edit_setting_action_radios">
+        <TextView
+            android:id="@+id/activity_edit_setting_txt_result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/activity_edit_setting_new_paperlaunch_state"/>
+        <ImageView
+            android:id="@+id/activity_edit_setting_img_result"
+            android:layout_marginEnd="30dp"
+            app:layout_constraintLeft_toRightOf="@id/activity_edit_setting_txt_result"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
         <Button
             android:id="@+id/activity_edit_setting_btn_ok"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/activity_edit_setting_btn_ok"/>
-    </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

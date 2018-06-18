@@ -87,4 +87,7 @@
     <string name="activity_edit_setting_rbEnable">Enable PaperLaunch</string>
     <string name="activity_edit_setting_rbDisable">Disable PaperLaunch</string>
     <string name="activity_edit_setting_btn_ok">OK</string>
+    <string name="activity_edit_setting_description_enable">Activate</string>
+    <string name="activity_edit_setting_description_disable">Pause</string>
+    <string name="activity_edit_setting_new_paperlaunch_state">New PaperLaunch state:</string>
 </resources>

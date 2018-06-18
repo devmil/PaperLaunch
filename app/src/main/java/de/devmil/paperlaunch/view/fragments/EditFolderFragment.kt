@@ -445,12 +445,7 @@ class EditFolderFragment : Fragment() {
             if (fromPosition < 0 || toPosition >= mEntries.size) {
                 return false
             }
-            if(fromPosition < toPosition) {
-                mEntries.add(toPosition, mEntries[fromPosition])
-                mEntries.removeAt(fromPosition)
-            } else {
-                mEntries.add(toPosition, mEntries.removeAt(fromPosition))
-            }
+            mEntries.add(toPosition, mEntries.removeAt(fromPosition))
 
             saveOrder()
             folder?.let { itFolder ->
