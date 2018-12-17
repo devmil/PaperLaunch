@@ -81,4 +81,13 @@
     <string name="fragment_settings_activation_show_logo_title">Show logo</string>
     <string name="fragment_settings_activation_show_logo_summary_on">Logo is shown</string>
     <string name="fragment_settings_activation_show_logo_summary_off">Logo is not shown</string>
+    <string name="folder_settings_add_cancel">Cancel</string>
+    <string name="title_activity_edit_setting">Choose Action</string>
+    <string name="activity_edit_setting_explanation_txt">This Action is able to activate or deactivate PaperLaunch. Please choose what this action should do</string>
+    <string name="activity_edit_setting_rbEnable">Enable PaperLaunch</string>
+    <string name="activity_edit_setting_rbDisable">Disable PaperLaunch</string>
+    <string name="activity_edit_setting_btn_ok">OK</string>
+    <string name="activity_edit_setting_description_enable">Activate</string>
+    <string name="activity_edit_setting_description_disable">Pause</string>
+    <string name="activity_edit_setting_new_paperlaunch_state">New PaperLaunch state:</string>
 </resources>

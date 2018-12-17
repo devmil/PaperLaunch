@@ -22,7 +22,9 @@ import android.app.Fragment
 import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.FloatingActionButton
+import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -31,11 +33,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import com.cocosw.bottomsheet.BottomSheet
+import android.widget.*
 import com.makeramen.dragsortadapter.DragSortAdapter
 import de.devmil.paperlaunch.EditFolderActivity
 import de.devmil.paperlaunch.R
@@ -66,8 +64,14 @@ class EditFolderFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
     private var emptyListView: View? = null
     private var addButton: FloatingActionButton? = null
+    private var bottomSheet: RelativeLayout? = null
+    private var bottomSheetBehavior: BottomSheetBehavior<RelativeLayout>? = null
     private var editNameLayout: LinearLayout? = null
     private var folderNameEditText: EditText? = null
+    private var buttonAddApp: Button? = null
+    private var buttonAddUrl: Button? = null
+    private var buttonAddFolder: Button? = null
+    private var buttonAddCancel: Button? = null
     private var folderId: Long = -1
     private var folder: Folder? = null
     internal var config: LaunchConfig? = null
@@ -93,16 +97,9 @@ class EditFolderFragment : Fragment() {
         }
     }
 
-    enum class CreateSheetActionIds(val id: Int) {
-        AddApp(20001),
-        AddFolder(2002),
-        AddURL(2003);
-
-        companion object {
-            fun fromId(id: Int) : CreateSheetActionIds? {
-                return values().firstOrNull { it.id == id }
-            }
-        }
+    override fun onResume() {
+        super.onResume()
+        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -114,6 +111,11 @@ class EditFolderFragment : Fragment() {
         addButton = result.findViewById(R.id.fragment_edit_folder_fab)
         editNameLayout = result.findViewById(R.id.fragment_edit_folder_editname_layout)
         folderNameEditText = result.findViewById(R.id.fragment_edit_folder_editname_text)
+        bottomSheet = result.findViewById(R.id.fragment_edit_folder_bottom_sheet)
+        buttonAddApp = result.findViewById(R.id.fragment_edit_folder_add_app)
+        buttonAddUrl = result.findViewById(R.id.fragment_edit_folder_add_url)
+        buttonAddFolder = result.findViewById(R.id.fragment_edit_folder_add_folder)
+        buttonAddCancel = result.findViewById(R.id.fragment_edit_folder_add_cancel)
 
         editNameLayout?.let { itEditNameLayout ->
             itEditNameLayout.visibility = if (folderId >= 0) View.VISIBLE else View.GONE
@@ -122,7 +124,15 @@ class EditFolderFragment : Fragment() {
         recyclerView?.let { itRecyclerView ->
             itRecyclerView.layoutManager = LinearLayoutManager(activity, LinearLayout.VERTICAL, false)
             itRecyclerView.itemAnimator = EntriesItemAnimator()
+            itRecyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                    bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+                }
+            })
         }
+
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
 
         loadData()
 
@@ -151,31 +161,33 @@ class EditFolderFragment : Fragment() {
             })
         }
 
+        buttonAddApp?.let { itAddApp ->
+            itAddApp.setOnClickListener {
+                initiateCreateLaunch()
+                bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        }
+        buttonAddUrl?.let { itAddUrl ->
+            itAddUrl.setOnClickListener {
+                initiateCreateUrl()
+                bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        }
+        buttonAddFolder?.let { itAddFolder ->
+            itAddFolder.setOnClickListener {
+                initiateCreateFolder()
+                bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        }
+        buttonAddCancel?.let { itAddCancel ->
+            itAddCancel.setOnClickListener {
+                bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        }
+
         addButton?.let { itAddButton ->
             itAddButton.setOnClickListener {
-                BottomSheet.Builder(activity)
-                        .title(R.string.folder_settings_add_title)
-                        .grid()
-                        .sheet(CreateSheetActionIds.AddApp.id, R.mipmap.ic_link_black_48dp, R.string.folder_settings_add_app)
-                        .sheet(CreateSheetActionIds.AddURL.id, R.mipmap.ic_web_black_48dp, R.string.folder_settings_add_url)
-                        .sheet(CreateSheetActionIds.AddFolder.id, R.mipmap.ic_folder_black_48dp, R.string.folder_settings_add_folder)
-                        .icon(R.mipmap.ic_add_black_24dp)
-                        .listener { dialog, which ->
-                            when (CreateSheetActionIds.fromId(which)) {
-                                CreateSheetActionIds.AddApp -> {
-                                    initiateCreateLaunch()
-                                    dialog.dismiss()
-                                }
-                                CreateSheetActionIds.AddFolder -> {
-                                    initiateCreateFolder()
-                                    dialog.dismiss()
-                                }
-                                CreateSheetActionIds.AddURL -> {
-                                    initiateCreateUrl()
-                                    dialog.dismiss()
-                                }
-                            }
-                        }.show()
+                bottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
 
@@ -434,6 +446,7 @@ class EditFolderFragment : Fragment() {
                 return false
             }
             mEntries.add(toPosition, mEntries.removeAt(fromPosition))
+
             saveOrder()
             folder?.let { itFolder ->
                 updateFolderImage(itFolder.dto, mEntries)

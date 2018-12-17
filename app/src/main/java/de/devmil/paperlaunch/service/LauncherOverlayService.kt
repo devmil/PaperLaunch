@@ -527,6 +527,18 @@ class LauncherOverlayService : Service() {
             }
         }
 
+        fun play(context: Context) {
+            val launchServiceIntent = Intent(context, LauncherOverlayService::class.java)
+            launchServiceIntent.action = ACTION_PLAY
+            context.startService(launchServiceIntent)
+        }
+
+        fun pause(context: Context) {
+            val launchServiceIntent = Intent(context, LauncherOverlayService::class.java)
+            launchServiceIntent.action = ACTION_PAUSE
+            context.startService(launchServiceIntent)
+        }
+
         fun notifyDataChanged(context: Context) {
             val launchServiceIntent = Intent(context, LauncherOverlayService::class.java)
             launchServiceIntent.action = ACTION_NOTIFYDATACHANGED

@@ -1,5 +1,7 @@
 ![Feature Graphic](images/FeatureGraphic.jpg "Feature Graphic")
 
+[![Build status](https://devmil.visualstudio.com/PaperLaunch/_apis/build/status/PaperLaunch-Docker%20container-CI)](https://devmil.visualstudio.com/PaperLaunch/_build/latest?definitionId=3)
+
 # PaperLaunch
 An Android side launcher in Material design with a strong focus on UX speed and material design.
 Furthermore it allows to organize the Launcher items into a folder structure that easily extends the launcher by so called lanes and integrates into the Launcher selection flow.
