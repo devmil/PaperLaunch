@@ -16,6 +16,7 @@ android {
         release {
             def propsFile = file('../Key/keystore.properties')
             if (propsFile.exists()) {
+                println "Keystore properties found! Building signed..."
                 Properties keyProps = new Properties()
                 keyProps.load(new FileInputStream(propsFile))
                 storeFile keyProps["store"] != null ? file(keyProps["store"]) : null
