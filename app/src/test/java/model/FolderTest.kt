@@ -3,14 +3,21 @@ package model
 import android.graphics.drawable.Drawable
 import android.test.InstrumentationTestCase
 import de.devmil.paperlaunch.model.Folder
+import de.devmil.paperlaunch.model.IContextAccess
 import de.devmil.paperlaunch.model.IEntry
 import de.devmil.paperlaunch.storage.EntryDTO
 import de.devmil.paperlaunch.storage.FolderDTO
 import org.junit.Assert
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.runners.MockitoJUnitRunner
 
-class FolderTest : InstrumentationTestCase() {
+@RunWith(MockitoJUnitRunner::class)
+class FolderTest {
 
+    @Mock
+    private lateinit var mockContextAccess : IContextAccess;
 
     private fun createUUT(
             entryId: Long,
@@ -24,7 +31,7 @@ class FolderTest : InstrumentationTestCase() {
         val fDto = FolderDTO(folderId, name, icon, depth)
         val eDto = EntryDTO(entryId, entryOrderIndex, 0, folderId, parentFolderId)
 
-        return Folder(fDto, eDto, subEntries)
+        return Folder(mockContextAccess, fDto, eDto, subEntries)
     }
 
     @Test fun creatingWorks() {
