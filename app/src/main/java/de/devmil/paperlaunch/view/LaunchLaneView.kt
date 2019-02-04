@@ -375,12 +375,12 @@ class LaunchLaneView : RelativeLayout {
         val toRect = Rect()
         localSelectIndicatorContainer.getHitRect(toRect)
 
-        val drawable = localFocusedEntryView.entry.getIcon()
+        val drawable = localFocusedEntryView.entry.icon
         localSelectedIcon.setImageDrawable(drawable)
 
-        val useIconColor = localFocusedEntryView.entry.useIconColor()
+        val useIconColor = localFocusedEntryView.entry.useIconColor
 
-        localSelectedItemTextView.text = localFocusedEntryView.entry.getName()
+        localSelectedItemTextView.text = localFocusedEntryView.entry.name
 
         val bmpResult = BitmapUtils.drawableToBitmap(drawable)
         if (useIconColor

@@ -26,10 +26,10 @@ class LaunchEntryViewModel(private val mContext: Context, val entry: IEntry, pri
 
     @Suppress("unused")
     val appName: String
-        get() = entry.getName().orEmpty()
+        get() = entry.name.orEmpty()
 
     val appIcon: Drawable?
-        get() = entry.getIcon()
+        get() = entry.icon
 
     val imageWidthDip: Float
         get() = mConfig.imageWidthDip

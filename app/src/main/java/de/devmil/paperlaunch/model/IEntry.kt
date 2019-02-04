@@ -23,9 +23,9 @@ interface IEntry {
     val id: Long
     val entryId: Long
     val orderIndex: Long
-    fun getName(): String?
-    fun getIcon(): Drawable?
-    fun getFolderSummaryIcon(): Drawable?
+    val name: String?
+    val icon: Drawable?
+    val folderSummaryIcon: Drawable?
     val isFolder: Boolean
-    fun useIconColor(): Boolean
+    val useIconColor: Boolean
 }

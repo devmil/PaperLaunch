@@ -35,64 +35,68 @@ class Launch(private val contextAccess: IContextAccess, val dto: LaunchDTO, priv
     override val orderIndex: Long
         get() = entryDto.orderIndex
 
-    override fun getName(): String? {
-        if (dto.name != null) {
-            return dto.name
-        }
-        if (defaultAppName == null) {
-            defaultAppName = launchIntent?.let {
-                when(it.action) {
-                    Intent.ACTION_MAIN -> {
-                        contextAccess.getAppName(it)
-                    }
-                    Intent.ACTION_VIEW -> {
-                        if(it.hasExtra(EXTRA_URL_NAME)) {
-                            it.getStringExtra(EXTRA_URL_NAME)
-                        } else {
-                            it.data.toString()
+    override val name: String?
+        get() {
+            if (dto.name != null) {
+                return dto.name
+            }
+            if (defaultAppName == null) {
+                defaultAppName = launchIntent?.let {
+                    when (it.action) {
+                        Intent.ACTION_MAIN -> {
+                            contextAccess.getAppName(it)
+                        }
+                        Intent.ACTION_VIEW -> {
+                            if (it.hasExtra(EXTRA_URL_NAME)) {
+                                it.getStringExtra(EXTRA_URL_NAME)
+                            } else {
+                                it.data.toString()
+                            }
+                        }
+                        else -> {
+                            null
                         }
                     }
-                    else -> {
-                        null
+                }
+            }
+            return defaultAppName
+        }
+
+    override val icon: Drawable?
+        get() {
+            if (dto.icon != null) {
+                return dto.icon
+            }
+            if (defaultAppIcon == null) {
+                defaultAppIcon = launchIntent?.let {
+                    when (it.action) {
+                        Intent.ACTION_MAIN -> {
+                            contextAccess.getAppIcon(it)
+                        }
+                        Intent.ACTION_VIEW -> {
+                            contextAccess.getDrawable(R.mipmap.ic_web_black_48dp, false)
+                        }
+                        else -> {
+                            null
+                        }
                     }
                 }
             }
+            return defaultAppIcon
         }
-        return defaultAppName
-    }
 
-    override fun getIcon(): Drawable? {
-        if (dto.icon != null) {
-            return dto.icon
+    override val folderSummaryIcon: Drawable?
+        get() {
+            return icon
         }
-        if (defaultAppIcon == null) {
-            defaultAppIcon = launchIntent?.let {
-                when (it.action) {
-                    Intent.ACTION_MAIN -> {
-                        contextAccess.getAppIcon(it)
-                    }
-                    Intent.ACTION_VIEW -> {
-                        contextAccess.getDrawable(R.mipmap.ic_web_black_48dp, false)
-                    }
-                    else -> {
-                        null
-                    }
-                }
-            }
-        }
-        return defaultAppIcon
-    }
-
-    override fun getFolderSummaryIcon(): Drawable? {
-        return getIcon()
-    }
 
     override val isFolder: Boolean
         get() = false
 
-    override fun useIconColor(): Boolean {
-        return true
-    }
+    override val useIconColor: Boolean
+        get() {
+            return true
+        }
 
     val launchIntent: Intent?
         get() = dto.launchIntent

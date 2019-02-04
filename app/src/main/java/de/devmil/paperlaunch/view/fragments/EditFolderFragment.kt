@@ -464,8 +464,8 @@ class EditFolderFragment : Fragment() {
 
             holder.container.visibility = if (draggingId == entry.entryId) View.INVISIBLE else View.VISIBLE
             holder.detailsImg.visibility = if (entry.isFolder) View.VISIBLE else View.GONE
-            holder.imageView.setImageDrawable(entry.getIcon())
-            holder.textView.text = entry.getName()
+            holder.imageView.setImageDrawable(entry.icon)
+            holder.textView.text = entry.name
         }
 
         override fun getItemCount(): Int {

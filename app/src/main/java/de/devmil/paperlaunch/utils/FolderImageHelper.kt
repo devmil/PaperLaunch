@@ -61,7 +61,7 @@ object FolderImageHelper {
 
                 val entry = entries[idx]
 
-                val img = entry.getFolderSummaryIcon()
+                val img = entry.folderSummaryIcon
                 val entryImageView = ImageView(context)
                 entryImageView.setImageDrawable(img)
                 entryImageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
