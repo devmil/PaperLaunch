@@ -34,15 +34,15 @@ class VirtualFolder(private val name: String, private val icon: Drawable, subEnt
     override val orderIndex: Long
         get() = -1
 
-    override fun getName(context: Context): String? {
+    override fun getName(): String? {
         return name
     }
 
-    override fun getIcon(context: Context): Drawable? {
+    override fun getIcon(): Drawable? {
         return icon
     }
 
-    override fun getFolderSummaryIcon(context: Context): Drawable? {
+    override fun getFolderSummaryIcon(): Drawable? {
         return icon
     }
 

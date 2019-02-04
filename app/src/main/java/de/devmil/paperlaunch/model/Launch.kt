@@ -15,17 +15,13 @@
  */
 package de.devmil.paperlaunch.model
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import de.devmil.paperlaunch.R
-
 import de.devmil.paperlaunch.storage.EntryDTO
 import de.devmil.paperlaunch.storage.LaunchDTO
-import de.devmil.paperlaunch.utils.AppMetadataUtils
 
-class Launch(val dto: LaunchDTO, private val entryDto: EntryDTO) : IEntry {
+class Launch(private val contextAccess: IContextAccess, val dto: LaunchDTO, private val entryDto: EntryDTO) : IEntry {
 
     private var defaultAppName: String? = null
     private var defaultAppIcon: Drawable? = null
@@ -39,7 +35,7 @@ class Launch(val dto: LaunchDTO, private val entryDto: EntryDTO) : IEntry {
     override val orderIndex: Long
         get() = entryDto.orderIndex
 
-    override fun getName(context: Context): String? {
+    override fun getName(): String? {
         if (dto.name != null) {
             return dto.name
         }
@@ -47,7 +43,7 @@ class Launch(val dto: LaunchDTO, private val entryDto: EntryDTO) : IEntry {
             defaultAppName = launchIntent?.let {
                 when(it.action) {
                     Intent.ACTION_MAIN -> {
-                        AppMetadataUtils.getAppName(context, it)
+                        contextAccess.getAppName(it)
                     }
                     Intent.ACTION_VIEW -> {
                         if(it.hasExtra(EXTRA_URL_NAME)) {
@@ -65,7 +61,7 @@ class Launch(val dto: LaunchDTO, private val entryDto: EntryDTO) : IEntry {
         return defaultAppName
     }
 
-    override fun getIcon(context: Context): Drawable? {
+    override fun getIcon(): Drawable? {
         if (dto.icon != null) {
             return dto.icon
         }
@@ -73,10 +69,10 @@ class Launch(val dto: LaunchDTO, private val entryDto: EntryDTO) : IEntry {
             defaultAppIcon = launchIntent?.let {
                 when (it.action) {
                     Intent.ACTION_MAIN -> {
-                        AppMetadataUtils.getAppIcon(context, it)
+                        contextAccess.getAppIcon(it)
                     }
                     Intent.ACTION_VIEW -> {
-                        context.getDrawable(R.mipmap.ic_web_black_48dp)
+                        contextAccess.getDrawable(R.mipmap.ic_web_black_48dp, false)
                     }
                     else -> {
                         null
@@ -87,8 +83,8 @@ class Launch(val dto: LaunchDTO, private val entryDto: EntryDTO) : IEntry {
         return defaultAppIcon
     }
 
-    override fun getFolderSummaryIcon(context: Context): Drawable? {
-        return getIcon(context)
+    override fun getFolderSummaryIcon(): Drawable? {
+        return getIcon()
     }
 
     override val isFolder: Boolean
