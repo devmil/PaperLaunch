@@ -9,10 +9,8 @@
 An Android side launcher in Material design with a strong focus on UX speed and material design.
 Furthermore it allows to organize the Launcher items into a folder structure that easily extends the launcher by so called lanes and integrates into the Launcher selection flow.
 
-<a href="https://f-droid.org/packages/de.devmil.paperlaunch" target="_blank">
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Get_it_on_F-Droid.svg/200px-Get_it_on_F-Droid.svg.png" alt="Get it on F-Droid" height="60"/></a>
-<a href="https://play.google.com/store/apps/details?id=de.devmil.paperlaunch" target="_blank">
-<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="100"/></a>
+[![Get it on F-Droid](images/f-droid-badge.png)](https://f-droid.org/packages/de.devmil.paperlaunch)
+[![Get it on Google Play](./images/google-play-badge.png)](https://play.google.com/store/apps/details?id=de.devmil.paperlaunch)
 
 ## Speed
 Only one gesture is needed to launch an app. 
