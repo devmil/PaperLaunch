@@ -8,7 +8,7 @@ import de.devmil.paperlaunch.model.IContextAccess
 import de.devmil.paperlaunch.model.Launch
 import de.devmil.paperlaunch.storage.EntryDTO
 import de.devmil.paperlaunch.storage.LaunchDTO
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock

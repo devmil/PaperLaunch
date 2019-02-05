@@ -6,6 +6,7 @@ docker build \
     .
 
 docker run --rm \
+    -it \
     -v "$PWD":/home/gradle/ \
     -w /home/gradle \
     paperlaunch-build \

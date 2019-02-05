@@ -1,6 +1,6 @@
 #!/bin/bash
-set -ex
-gradle build
+set -xeuo pipefail
+gradle test
 gradle assembleDebug
 gradle assembleRelease
 chown -R `stat -c "%u:%g" $(pwd)/app` $(pwd)/app/build
