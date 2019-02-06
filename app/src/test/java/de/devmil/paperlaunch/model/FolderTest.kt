@@ -1,10 +1,7 @@
-package model
+package de.devmil.paperlaunch.model
 
 import android.graphics.drawable.Drawable
 import de.devmil.paperlaunch.R
-import de.devmil.paperlaunch.model.Folder
-import de.devmil.paperlaunch.model.IContextAccess
-import de.devmil.paperlaunch.model.IEntry
 import de.devmil.paperlaunch.storage.EntryDTO
 import de.devmil.paperlaunch.storage.FolderDTO
 import org.junit.Assert

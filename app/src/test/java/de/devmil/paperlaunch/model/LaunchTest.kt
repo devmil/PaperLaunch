@@ -1,11 +1,9 @@
-package model
+package de.devmil.paperlaunch.model
 
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import de.devmil.paperlaunch.R
-import de.devmil.paperlaunch.model.IContextAccess
-import de.devmil.paperlaunch.model.Launch
 import de.devmil.paperlaunch.storage.EntryDTO
 import de.devmil.paperlaunch.storage.LaunchDTO
 import org.junit.Assert

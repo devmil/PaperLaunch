@@ -1,8 +1,6 @@
-package model
+package de.devmil.paperlaunch.model
 
 import android.graphics.drawable.Drawable
-import de.devmil.paperlaunch.model.IEntry
-import de.devmil.paperlaunch.model.VirtualFolder
 import junit.framework.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
