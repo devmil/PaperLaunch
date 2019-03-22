@@ -25,3 +25,6 @@ ENV PATH ${PATH}:${ANDROID_HOME}/tools/bin
 
 RUN yes | sdkmanager --licenses \
 	&& sdkmanager "platforms;android-27" "platform-tools" "extras;google;m2repository" "build-tools;28.0.3" --verbose
+
+# Support for CRLF scripts
+RUN apk add dos2unix
