@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -ex
 
 docker build \
@@ -10,4 +11,4 @@ docker run --rm \
     -v "$PWD":/home/gradle/ \
     -w /home/gradle \
     paperlaunch-build \
-    bash .ci/build.sh
+    bash_r .ci/build.sh

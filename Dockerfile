@@ -28,3 +28,6 @@ RUN yes | sdkmanager --licenses \
 
 # Support for CRLF scripts
 RUN apk add dos2unix
+
+# bash_r is a wrapper for bash that removes \r
+ADD bash_r.tgz /bin
