@@ -9,3 +9,4 @@
 Key/
 /.project
 .ci/build_lf.sh
+local.properties.tmp
