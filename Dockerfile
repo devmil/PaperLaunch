@@ -2,10 +2,10 @@ FROM anapsix/alpine-java:8_jdk
 
 # Install Gradle
 RUN apk add --update openssl \
-	&& wget https://services.gradle.org/distributions/gradle-4.10.1-bin.zip \
-	&& unzip gradle-4.10.1-bin.zip -d /opt/ \
-	&& mv opt/gradle-4.10.1/ opt/gradle \
-	&& rm gradle-4.10.1-bin.zip
+	&& wget https://services.gradle.org/distributions/gradle-5.1.1-bin.zip \
+	&& unzip gradle-5.1.1-bin.zip -d /opt/ \
+	&& mv opt/gradle-5.1.1/ opt/gradle \
+	&& rm gradle-5.1.1-bin.zip
 
 ENV GRADLE /opt/gradle/bin
 ENV PATH ${PATH}:${GRADLE}
