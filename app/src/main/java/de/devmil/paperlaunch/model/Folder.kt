@@ -15,14 +15,12 @@
  */
 package de.devmil.paperlaunch.model
 
-import android.content.Context
 import android.graphics.drawable.Drawable
-
 import de.devmil.paperlaunch.R
 import de.devmil.paperlaunch.storage.EntryDTO
 import de.devmil.paperlaunch.storage.FolderDTO
 
-class Folder(val dto: FolderDTO, private val entryDto: EntryDTO, var subEntriesList: List<IEntry>?) : IFolder {
+class Folder(private val contextAccess: IContextAccess, val dto: FolderDTO, private val entryDto: EntryDTO, private var subEntriesList: List<IEntry>?) : IFolder {
 
     override val id: Long
         get() = dto.id
@@ -33,28 +31,28 @@ class Folder(val dto: FolderDTO, private val entryDto: EntryDTO, var subEntriesL
     override val orderIndex: Long
         get() = entryDto.orderIndex
 
-    override fun getName(context: Context): String? {
-        return dto.name
-    }
+    override val name: String?
+        get() = dto.name
 
-    override fun getFolderSummaryIcon(context: Context): Drawable {
-        return context.resources.getDrawable(R.mipmap.ic_folder_grey600_48dp, context.theme)
-    }
+    override val folderSummaryIcon: Drawable
+        get() = contextAccess.getDrawable(R.mipmap.ic_folder_grey600_48dp, true)
 
     override val isFolder: Boolean
         get() = true
 
-    override fun getIcon(context: Context): Drawable? {
-        var result = dto.icon
-        if (result == null) {
-            result = context.getDrawable(R.mipmap.folder_frame)
+    override val icon: Drawable?
+        get() {
+            var result = dto.icon
+            if (result == null) {
+                result = contextAccess.getDrawable(R.mipmap.folder_frame, false)
+            }
+            return result
         }
-        return result
-    }
 
-    override fun useIconColor(): Boolean {
-        return true
-    }
+    override val useIconColor: Boolean
+        get() {
+            return true
+        }
 
     override var subEntries: List<IEntry>?
         get() = subEntriesList

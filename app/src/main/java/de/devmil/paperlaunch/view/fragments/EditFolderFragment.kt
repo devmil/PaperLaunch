@@ -24,7 +24,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.FloatingActionButton
-import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -465,8 +464,8 @@ class EditFolderFragment : Fragment() {
 
             holder.container.visibility = if (draggingId == entry.entryId) View.INVISIBLE else View.VISIBLE
             holder.detailsImg.visibility = if (entry.isFolder) View.VISIBLE else View.GONE
-            holder.imageView.setImageDrawable(entry.getIcon(holder.imageView.context))
-            holder.textView.text = entry.getName(holder.textView.context)
+            holder.imageView.setImageDrawable(entry.icon)
+            holder.textView.text = entry.name
         }
 
         override fun getItemCount(): Int {

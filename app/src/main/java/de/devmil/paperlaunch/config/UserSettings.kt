@@ -64,17 +64,17 @@ class UserSettings(context: Context) : IUserSettings {
 
     companion object {
 
-        private val SHARED_PREFS_NAME = "paperLaunch"
+        internal val SHARED_PREFS_NAME = "paperLaunch"
 
-        private val KEY_SENSITIVITY_DIP = "sensitivityDip"
-        private val KEY_ACTIVATION_OFFSET_POSITION_DIP = "activationOffsetPositionDip"
-        private val KEY_ACTIVATION_OFFSET_HEIGHT_DIP = "activationOffsetHeightDip"
-        private val KEY_SHOW_BACKGROUND = "showBackground"
-        private val KEY_VIBRATE_ON_ACTIVATION = "vibrateOnActivation"
-        private val KEY_IS_ON_RIGHT_SIDE = "isOnRightSide"
-        private val KEY_LAUNCHER_GRAVITY = "launcherGravity"
-        private val KEY_SHOW_LOGO = "showLogo"
-        private val KEY_ITEM_SCALE_PERCENT = "itemScalePercent"
+        internal val KEY_SENSITIVITY_DIP = "sensitivityDip"
+        internal val KEY_ACTIVATION_OFFSET_POSITION_DIP = "activationOffsetPositionDip"
+        internal val KEY_ACTIVATION_OFFSET_HEIGHT_DIP = "activationOffsetHeightDip"
+        internal val KEY_SHOW_BACKGROUND = "showBackground"
+        internal val KEY_VIBRATE_ON_ACTIVATION = "vibrateOnActivation"
+        internal val KEY_IS_ON_RIGHT_SIDE = "isOnRightSide"
+        internal val KEY_LAUNCHER_GRAVITY = "launcherGravity"
+        internal val KEY_SHOW_LOGO = "showLogo"
+        internal val KEY_ITEM_SCALE_PERCENT = "itemScalePercent"
 
         private val DEFAULT_SENSITIVITY_DIP = 10
         private val DEFAULT_ACTIVATION_OFFSET_POSITION_DIP = 0

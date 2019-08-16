@@ -18,12 +18,9 @@ package de.devmil.paperlaunch.storage
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
+import de.devmil.paperlaunch.model.*
 
 import java.util.ArrayList
-
-import de.devmil.paperlaunch.model.Folder
-import de.devmil.paperlaunch.model.IEntry
-import de.devmil.paperlaunch.model.Launch
 
 class EntriesDataSource private constructor() {
     private var helper: EntriesSQLiteOpenHelper? = null
@@ -31,20 +28,22 @@ class EntriesDataSource private constructor() {
     private var entriesAccess: EntriesAccess? = null
     private var foldersAccess: FoldersAccess? = null
     private var launchesAccess: LaunchesAccess? = null
+    private var contextAccess: IContextAccess? = null;
 
     @Synchronized fun accessData(context: Context, action: ITransactionAction) {
         val opened = database == null
         if (opened) {
             open(context)
         }
-        val transactionContext = TransactionContext()
+        val transactionContext = TransactionContext(contextAccess!!)
         action.execute(transactionContext)
         if (opened) {
             close(transactionContext)
         }
     }
 
-    private inner class TransactionContext : ITransactionContext {
+    private inner class TransactionContext(private val contextAccess: IContextAccess) : ITransactionContext {
+
         override fun startTransaction() {
             database!!.beginTransaction()
         }
@@ -121,7 +120,7 @@ class EntriesDataSource private constructor() {
         }
 
         private fun createLaunchFromDTO(dto: LaunchDTO, entryDto: EntryDTO): Launch {
-            return Launch(dto, entryDto)
+            return Launch(contextAccess, dto, entryDto)
         }
 
         override fun loadFolder(folderId: Long): Folder {
@@ -159,7 +158,7 @@ class EntriesDataSource private constructor() {
                 subEntries.add(loadEntry(subEntryDto)!!)
             }
 
-            return Folder(dto, entryDto, subEntries)
+            return Folder(contextAccess, dto, entryDto, subEntries)
         }
 
         private fun loadEntry(entryDto: EntryDTO): IEntry? {
@@ -212,6 +211,7 @@ class EntriesDataSource private constructor() {
         entriesAccess = EntriesAccess(database!!)
         foldersAccess = FoldersAccess(context, database!!)
         launchesAccess = LaunchesAccess(context, database!!)
+        contextAccess = AndroidContextAccess(context)
     }
 
     private fun close(context: ITransactionContext) {
