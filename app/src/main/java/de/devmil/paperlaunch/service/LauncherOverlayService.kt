@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Rect
@@ -320,6 +321,7 @@ class LauncherOverlayService : Service() {
     }
 
     @Synchronized private fun handleTouch(touchReceiver: LinearLayout, event: MotionEvent): Boolean {
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         if (!isLauncherActive) {
             launcherView = createLauncherView(event)
             //            Rect hitRect = new Rect();
@@ -358,12 +360,12 @@ class LauncherOverlayService : Service() {
                 }
             })
 
-            transferMotionEvent(touchReceiver, launcherView!!, event)
+            transferMotionEvent(touchReceiver, launcherView!!, event, isLandscape)
 
             return true
 
         } else {
-            return transferMotionEvent(touchReceiver, launcherView!!, event)
+            return transferMotionEvent(touchReceiver, launcherView!!, event, isLandscape)
         }
     }
 
@@ -420,9 +422,10 @@ class LauncherOverlayService : Service() {
         isLauncherActive = false
     }
 
-    private fun transferMotionEvent(from: View, to: LauncherView, event: MotionEvent) : Boolean {
-        val fromX = event.x
-        val fromY = event.y
+    private fun transferMotionEvent(from: View, to: LauncherView, event: MotionEvent, isLandscape: Boolean) : Boolean {
+
+        val fromX = if(isLandscape) event.y else event.x
+        val fromY = if(isLandscape) event.x else event.y
 
         val toLocation = IntArray(2)
         to.getLocationOnScreen(toLocation)
@@ -435,15 +438,16 @@ class LauncherOverlayService : Service() {
         return to.handleTouchEvent(event.action, newX, newY)
     }
 
+    @Suppress("SameParameterValue")
     private fun ensureNotification(force: Boolean = false) {
         if (!force && notification != null) {
             return
         }
         val settingsPendingIntent = PendingIntent.getActivity(
-                this,
-                0,
-                Intent(this, MainActivity::class.java),
-                0
+            this,
+            0,
+            Intent(this, MainActivity::class.java),
+            0
         )
 
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
