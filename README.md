@@ -1,9 +1,6 @@
 ![Feature Graphic](images/FeatureGraphic.jpg "Feature Graphic")
 
-|Master|Dev|
-| --- | --- |
-| [![Build status](https://devmil.visualstudio.com/PaperLaunch/_apis/build/status/PaperLaunch-Docker%20container-CI?branchName=master)](https://devmil.visualstudio.com/PaperLaunch/_build/latest?definitionId=3) | [![Build status](https://devmil.visualstudio.com/PaperLaunch/_apis/build/status/PaperLaunch-Docker%20container-CI?branchName=dev)](https://devmil.visualstudio.com/PaperLaunch/_build/latest?definitionId=3) |
-
+[![Android CI](https://github.com/devmil/PaperLaunch/actions/workflows/android.yml/badge.svg)](https://github.com/devmil/PaperLaunch/actions/workflows/android.yml)
 
 # PaperLaunch
 An Android side launcher in Material design with a strong focus on UX speed and material design.
