@@ -124,7 +124,7 @@ class EditFolderFragment : Fragment() {
             itRecyclerView.layoutManager = LinearLayoutManager(activity, LinearLayout.VERTICAL, false)
             itRecyclerView.itemAnimator = EntriesItemAnimator()
             itRecyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
                 }
             })
