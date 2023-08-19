@@ -293,7 +293,7 @@ class LauncherOverlayService : Service() {
             }
             val vf = VirtualFolder(
                     getString(R.string.launcher_virtual_folder_name),
-                    getDrawable(R.mipmap.ic_auto_folder_grey),
+                    getDrawable(R.mipmap.ic_auto_folder_grey)!!,
                     virtualFolderContent)
             entries.add(vf)
         }
@@ -443,7 +443,7 @@ class LauncherOverlayService : Service() {
                 this,
                 0,
                 Intent(this, MainActivity::class.java),
-                0
+                PendingIntent.FLAG_IMMUTABLE
         )
 
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
@@ -470,7 +470,7 @@ class LauncherOverlayService : Service() {
                     this,
                     0,
                     pauseIntent,
-                    0)
+                    PendingIntent.FLAG_IMMUTABLE)
             builder.addAction(NotificationCompat.Action(
                     R.mipmap.ic_pause_black_24dp,
                     getString(R.string.notification_pause),
@@ -483,7 +483,7 @@ class LauncherOverlayService : Service() {
                     this,
                     0,
                     playIntent,
-                    0)
+                    PendingIntent.FLAG_IMMUTABLE)
             builder.addAction(NotificationCompat.Action(
                     R.mipmap.ic_play_arrow_black_24dp,
                     getString(R.string.notification_play),

@@ -127,7 +127,7 @@ constructor(context: Context, packageName: String) : Comparable<IntentApplicatio
     inner class IntentItem(resolveInfo: ResolveInfo) : Comparable<IntentItem> {
         val packageName: String = resolveInfo.activityInfo.packageName
         val activityName: String = resolveInfo.activityInfo.name
-        private val name: CharSequence = resolveInfo.activityInfo.loadLabel(context.get()?.packageManager)
+        private val name: CharSequence = resolveInfo.activityInfo.loadLabel(context.get()?.packageManager!!)
         var isShortcut = false
         var isMainActivity = false
         private var isLauncherActivity = false

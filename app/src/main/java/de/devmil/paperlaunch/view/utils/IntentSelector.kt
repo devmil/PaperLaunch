@@ -206,14 +206,14 @@ class IntentSelector : Activity() {
 
         var shortcutText = ""
         if (intent.hasExtra(EXTRA_SHORTCUT_TEXT))
-            shortcutText = intent.getStringExtra(EXTRA_SHORTCUT_TEXT)
+            shortcutText = intent.getStringExtra(EXTRA_SHORTCUT_TEXT)!!
 
         var shortcutLabel = "Shortcuts"
         if (intent.hasExtra(EXTRA_STRING_SHORTCUTS))
-            shortcutLabel = intent.getStringExtra(EXTRA_STRING_SHORTCUTS)
+            shortcutLabel = intent.getStringExtra(EXTRA_STRING_SHORTCUTS)!!
         var activitiesLabel = "Shortcuts"
         if (intent.hasExtra(EXTRA_STRING_ACTIVITIES))
-            activitiesLabel = intent.getStringExtra(EXTRA_STRING_ACTIVITIES)
+            activitiesLabel = intent.getStringExtra(EXTRA_STRING_ACTIVITIES)!!
 
         setContentView(R.layout.common__intentselectorview)
 

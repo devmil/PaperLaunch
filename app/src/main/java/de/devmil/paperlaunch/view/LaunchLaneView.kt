@@ -158,7 +158,7 @@ class LaunchLaneView : RelativeLayout {
 
         when (localViewModel.launcherGravity) {
             LauncherGravity.Top -> localEntriesContainer.gravity = Gravity.TOP
-            LauncherGravity.Center -> localEntriesContainer.gravity = Gravity.CENTER_VERTICAL
+            LauncherGravity.Center, null -> localEntriesContainer.gravity = Gravity.CENTER_VERTICAL
             LauncherGravity.Bottom -> localEntriesContainer.gravity = Gravity.BOTTOM
         }
 

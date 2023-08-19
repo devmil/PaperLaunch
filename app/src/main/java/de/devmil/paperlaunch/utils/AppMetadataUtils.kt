@@ -35,9 +35,9 @@ object AppMetadataUtils {
         }
 
         if (appIntent.hasExtra(Intent.EXTRA_SHORTCUT_INTENT)) {
-            appIntent = appIntent.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT)
+            appIntent = appIntent.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT)!!
         }
-        val componentName = appIntent.component
+        val componentName = appIntent.component!!
 
         val pm = context.packageManager
 
@@ -96,14 +96,14 @@ object AppMetadataUtils {
         }
 
         if (launchIntent.hasExtra(Intent.EXTRA_SHORTCUT_INTENT)) {
-            launchIntent = launchIntent.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT)
+            launchIntent = launchIntent.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT)!!
         }
 
         val pm = context.packageManager
 
         val appInfo: ApplicationInfo?
         appInfo = try {
-            pm.getApplicationInfo(launchIntent.component.packageName, 0)
+            pm.getApplicationInfo(launchIntent.component!!.packageName, 0)
         } catch (e: Exception) {
             null
         }
@@ -124,7 +124,7 @@ object AppMetadataUtils {
         }
         try {
             val iconRes = shortcutIntent.getParcelableExtra<Intent.ShortcutIconResource>(Intent.EXTRA_SHORTCUT_ICON_RESOURCE)
-            val appRes = context.packageManager.getResourcesForApplication(iconRes.packageName)
+            val appRes = context.packageManager.getResourcesForApplication(iconRes!!.packageName)
             val resId = appRes.getIdentifier(iconRes.resourceName, null, null)
             return ContextCompat.getDrawable(context, resId)
         } catch (e: Exception) {

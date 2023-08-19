@@ -13,7 +13,7 @@ interface IContextAccess {
     /**
      * @brief   returns a drawable with the given id
      * @param id    the id of the drawable
-     * @param themed    when set to [true] the current theme gets applied, otherwise the default
+     * @param themed    when set to true the current theme gets applied, otherwise the default
      *                  "getDrawable" is called
      */
     fun getDrawable(id: Int, themed : Boolean) : Drawable

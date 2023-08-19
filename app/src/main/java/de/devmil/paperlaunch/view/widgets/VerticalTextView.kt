@@ -17,49 +17,44 @@ package de.devmil.paperlaunch.view.widgets
 
 import android.content.Context
 import android.graphics.Canvas
+import android.support.v7.widget.AppCompatTextView
+import android.text.TextPaint
 import android.util.AttributeSet
-import android.view.Gravity
-import android.widget.TextView
 
-class VerticalTextView : TextView {
-    private var topDown: Boolean = false
 
-    constructor(context: Context) : super(context) {
-        construct()
-    }
-
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        construct()
-    }
-
-    private fun construct() {
-        val gravity = gravity
-        topDown = if (Gravity.isVertical(gravity) && gravity and Gravity.VERTICAL_GRAVITY_MASK == Gravity.BOTTOM) {
-            setGravity(gravity and Gravity.HORIZONTAL_GRAVITY_MASK or Gravity.TOP)
-            false
-        } else
-            true
-    }
-
+class VerticalTextView(context: Context, attrs: AttributeSet? = null) :
+    AppCompatTextView(context, attrs) {
+    private var vTopToDown = true
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(heightMeasureSpec, widthMeasureSpec)
         setMeasuredDimension(measuredHeight, measuredWidth)
     }
 
-    override fun setFrame(l: Int, t: Int, r: Int, b: Int): Boolean {
-        return super.setFrame(l, t, l + (b - t), t + (r - l))
+    override fun onDraw(canvas: Canvas) {
+        val textPaint: TextPaint = paint
+        textPaint.color = currentTextColor
+        //Typeface typeface = ResourcesCompat.getFont(getContext(), R.font.ti_ti_lli_um_web_regular);
+        //textPaint.setTypeface(typeface);
+        textPaint.drawableState = drawableState
+        canvas.save()
+        if (vTopToDown) {
+            canvas.translate(0f, height.toFloat())
+            canvas.rotate(-90f)
+        } else {
+            canvas.translate(width.toFloat(), 0f)
+            canvas.rotate(90f)
+        }
+        canvas.translate(compoundPaddingLeft.toFloat(), extendedPaddingTop.toFloat())
+        layout.draw(canvas)
+        canvas.restore()
     }
 
-    override fun draw(canvas: Canvas) {
-        if (topDown) {
-            canvas.translate(height.toFloat(), 0f)
-            canvas.rotate(90f)
-        } else {
-            canvas.translate(0f, width.toFloat())
-            canvas.rotate(-90f)
-        }
-        @Suppress("DEPRECATION")
-        canvas.clipRect(0f, 0f, width.toFloat(), height.toFloat(), android.graphics.Region.Op.REPLACE)
-        super.draw(canvas)
+    init {
+        init(context, attrs)
+    }
+
+    private fun init(context: Context, attrs: AttributeSet?) {
+        if (isInEditMode) return
+        vTopToDown = false //typedArray.getBoolean(R.styleable.VerticalTextView_vt_align_top_to_btm, true)
     }
 }
