@@ -11,7 +11,7 @@ class AndroidContextAccess(private val context: Context) : IContextAccess {
         if(themed) {
             return context.resources.getDrawable(id, context.theme)
         }
-        return context.getDrawable(id)
+        return context.getDrawable(id)!!
     }
 
     override fun getAppName(intent: Intent): String? {
