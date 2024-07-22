@@ -5,10 +5,10 @@ android {
     defaultConfig {
         applicationId "de.devmil.paperlaunch"
         minSdkVersion 21
-        compileSdkVersion 33
-        targetSdkVersion 33
-        versionCode 16
-        versionName "1.1.0"
+        compileSdkVersion 34
+        targetSdkVersion 34
+        versionCode 17
+        versionName "1.2.0"
         archivesBaseName = "paperlaunch-v${defaultConfig.versionName}-${buildTime()}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

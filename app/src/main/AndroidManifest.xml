@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission tools:ignore="QueryAllPackagesPermission" android:name="android.permission.QUERY_ALL_PACKAGES" />
 
     <application
@@ -37,8 +38,12 @@
 
         <service
             android:name=".service.LauncherOverlayService"
+            android:foregroundServiceType="specialUse"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Render System overlay (as this is a Launcher that needs to be available all the time)"/>
+        </service>
 
         <receiver
             android:name=".service.LaunchServiceReceiver"
