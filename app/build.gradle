@@ -7,8 +7,8 @@ android {
         minSdkVersion 21
         compileSdkVersion 34
         targetSdkVersion 34
-        versionCode 17
-        versionName "1.2.0"
+        versionCode 18
+        versionName "1.3.0"
         archivesBaseName = "paperlaunch-v${defaultConfig.versionName}-${buildTime()}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
