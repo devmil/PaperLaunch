@@ -103,6 +103,7 @@ class LauncherOverlayService : Service() {
                     finishLauncher()
                     resetData()
                     ensureData()
+                    reloadTouchReceiver()
                 }
             }
         }
