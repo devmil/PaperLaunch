@@ -24,6 +24,6 @@ class LaunchServiceReceiver : BroadcastReceiver() {
 
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent?) {
-        LauncherOverlayService.launch(context)
+        LauncherOverlayService.launch(context, intent)
     }
 }

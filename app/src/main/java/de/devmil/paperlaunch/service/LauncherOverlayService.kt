@@ -67,6 +67,7 @@ class LauncherOverlayService : Service() {
     //receivers
     private var screenOnOffReceiver: ScreenOnOffReceiver? = null
     private var orientationChangeReceiver: OrientationChangeReceiver? = null
+    private var packageWatchReceiver: PackageWatchReceiver? = null
 
     private val state: ServiceState by lazy {
         ServiceState(this)
@@ -109,6 +110,13 @@ class LauncherOverlayService : Service() {
         }
     }
 
+    internal inner class PackageWatchReceiver(context: Context) : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            //TODO: currently we don't do anything based on changed packages as the service is read-only
+            Log.d(TAG, "received Action '${intent?.action}' (${intent?.data})")
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
 
@@ -118,6 +126,7 @@ class LauncherOverlayService : Service() {
 
         registerScreenOnReceiver()
         registerOrientationChangeReceiver()
+        registerPackageWatchReceiver()
     }
 
     override fun onDestroy() {
@@ -131,26 +140,29 @@ class LauncherOverlayService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent != null && ACTION_LAUNCH == intent.action) {
+        val action = intent?.action
+        val triggerAction = intent?.getStringExtra(EXTRA_TRIGGER_ACTION)
+        Log.d(TAG, "received start command: $action, trigger: $triggerAction")
+        if (ACTION_LAUNCH == action) {
             adaptState(false)
-        } else if (intent != null && ACTION_NOTIFYDATACHANGED == intent.action) {
+        } else if (ACTION_NOTIFYDATACHANGED == action) {
             adaptState(true)
-        } else if (intent != null && ACTION_NOTIFYCONFIGCHANGED == intent.action) {
+        } else if (ACTION_NOTIFYCONFIGCHANGED == action) {
             reloadConfigMetadata()
             reloadTouchReceiver()
-        } else if (intent != null && ACTION_NOTIFYDATACONFIGCHANGED == intent.action) {
+        } else if (ACTION_NOTIFYDATACONFIGCHANGED == action) {
             adaptState(true)
-        } else if (intent != null && ACTION_PAUSE == intent.action) {
+        } else if (ACTION_PAUSE == action) {
             state.isActive = false
             state.save(this)
             adaptState(false)
-        } else if (intent != null && ACTION_PLAY == intent.action) {
+        } else if (ACTION_PLAY == action) {
             state.isActive = true
             state.save(this)
             adaptState(false)
-        } else if (intent != null && ACTION_ENSUREACTIVATIONTAPPABLE == intent.action) {
+        } else if (ACTION_ENSUREACTIVATIONTAPPABLE == action) {
             reloadTouchReceiver()
-        } else if(intent != null && ACTION_NOTIFYPERMISSIONCHANGED == intent.action) {
+        } else if(ACTION_NOTIFYPERMISSIONCHANGED == action) {
             reloadTouchReceiver()
         }
         return super.onStartCommand(intent, flags, startId)
@@ -185,12 +197,36 @@ class LauncherOverlayService : Service() {
 
         orientationChangeReceiver = OrientationChangeReceiver(this)
         registerReceiver(orientationChangeReceiver, filter)
+        Log.d(TAG, "Registered OrientationChangeReceiver")
     }
 
     private fun unregisterOrientationChangeReceiver() {
         if (orientationChangeReceiver != null) {
             unregisterReceiver(orientationChangeReceiver)
+            Log.d(TAG, "Unregistered OrientationChangeReceiver")
             orientationChangeReceiver = null
+        }
+    }
+
+    private fun registerPackageWatchReceiver() {
+        unregisterPackageWatchReceiver()
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(Intent.ACTION_PACKAGE_REPLACED)
+        intentFilter.addAction(Intent.ACTION_PACKAGE_FULLY_REMOVED)
+        intentFilter.addAction(Intent.ACTION_PACKAGE_CHANGED)
+        intentFilter.addDataScheme("package")
+
+        packageWatchReceiver = PackageWatchReceiver(this)
+        registerReceiver(packageWatchReceiver, intentFilter)
+
+        Log.d(TAG, "Registered PackageWatchReceiver")
+    }
+
+    private fun unregisterPackageWatchReceiver() {
+        if(packageWatchReceiver != null) {
+            unregisterReceiver(packageWatchReceiver)
+            Log.d(TAG, "Unregistered PackageWatchReceiver")
+            packageWatchReceiver = null
         }
     }
 
@@ -200,12 +236,14 @@ class LauncherOverlayService : Service() {
         filter.addAction(Intent.ACTION_SCREEN_OFF)
         screenOnOffReceiver = ScreenOnOffReceiver()
         registerReceiver(screenOnOffReceiver, filter)
+        Log.d(TAG, "Registered ScreenOffReceiver")
     }
 
     private fun unregisterScreenOnOffReceiver() {
         if (screenOnOffReceiver != null) {
             unregisterReceiver(screenOnOffReceiver)
             screenOnOffReceiver = null
+            Log.d(TAG, "Unregistered ScreenOffReceiver")
         }
     }
 
@@ -514,13 +552,15 @@ class LauncherOverlayService : Service() {
         private val ACTION_ENSUREACTIVATIONTAPPABLE = "ACTION_ENSUREACTIVATIONTAPPABLE"
         private val ACTION_PAUSE = "ACTION_PAUSE"
         private val ACTION_PLAY = "ACTION_PLAY"
+        private val EXTRA_TRIGGER_ACTION = "EXTRA_TRIGGER_ACTION"
         private val NOTIFICATION_ID = 2000
         private val NOTIFICATION_CHANNEL_ID = "paperlaunch_main"
         private val NOTIFICATION_CHANNEL_NAME = "Paperlaunch Main"
 
-        fun launch(context: Context) {
+        fun launch(context: Context, triggerIntent: Intent? = null) {
             val launchServiceIntent = Intent(context, LauncherOverlayService::class.java)
             launchServiceIntent.action = ACTION_LAUNCH
+            launchServiceIntent.putExtra(EXTRA_TRIGGER_ACTION, triggerIntent?.action)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(launchServiceIntent)
             } else {

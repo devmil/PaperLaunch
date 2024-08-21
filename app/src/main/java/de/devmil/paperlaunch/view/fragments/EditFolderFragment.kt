@@ -27,13 +27,18 @@ import android.support.design.widget.FloatingActionButton
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import com.makeramen.dragsortadapter.DragSortAdapter
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.TextView
 import de.devmil.paperlaunch.EditFolderActivity
 import de.devmil.paperlaunch.R
 import de.devmil.paperlaunch.config.LaunchConfig
@@ -48,6 +53,7 @@ import de.devmil.paperlaunch.storage.ITransactionContext
 import de.devmil.paperlaunch.utils.FolderImageHelper
 import de.devmil.paperlaunch.view.utils.IntentSelector
 import de.devmil.paperlaunch.view.utils.UrlSelector
+import java.util.Collections
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
@@ -129,6 +135,27 @@ class EditFolderFragment : Fragment() {
                 }
             })
         }
+
+        val simpleCallback = object: ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
+
+                adapter!!.swap(fromPosition, toPosition)
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                // NOOP
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(simpleCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
@@ -417,7 +444,7 @@ class EditFolderFragment : Fragment() {
         }
     }
 
-    private inner class EntriesAdapter(recyclerView: RecyclerView, private val mEntries: MutableList<IEntry>) : DragSortAdapter<EntriesAdapter.ViewHolder>(recyclerView) {
+    private inner class EntriesAdapter(recyclerView: RecyclerView, private val mEntries: MutableList<IEntry>) : RecyclerView.Adapter<EntriesAdapter.ViewHolder>() {
 
         val entries: List<IEntry>
             get() = mEntries
@@ -428,7 +455,7 @@ class EditFolderFragment : Fragment() {
             notifyDataSetChanged()
         }
 
-        override fun getPositionForId(id: Long): Int {
+        private fun getPositionForId(id: Long): Int {
             return mEntries.indices.firstOrNull { mEntries[it].entryId == id }  ?: -1
         }
 
@@ -440,29 +467,15 @@ class EditFolderFragment : Fragment() {
             return mEntries[position].entryId
         }
 
-        override fun move(fromPosition: Int, toPosition: Int): Boolean {
-            if (fromPosition < 0 || toPosition >= mEntries.size) {
-                return false
-            }
-            mEntries.add(toPosition, mEntries.removeAt(fromPosition))
-
-            saveOrder()
-            folder?.let { itFolder ->
-                updateFolderImage(itFolder.dto, mEntries)
-            }
-            notifyDataChanged()
-            return true
-        }
-
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(activity).inflate(R.layout.fragment_edit_folder_entries, parent, false)
-            return ViewHolder(this, view)
+            return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val entry = mEntries[position]
 
-            holder.container.visibility = if (draggingId == entry.entryId) View.INVISIBLE else View.VISIBLE
+            holder.container.visibility = View.VISIBLE
             holder.detailsImg.visibility = if (entry.isFolder) View.VISIBLE else View.GONE
             holder.imageView.setImageDrawable(entry.icon)
             holder.textView.text = entry.name
@@ -480,7 +493,17 @@ class EditFolderFragment : Fragment() {
             })
         }
 
-        internal inner class ViewHolder(dragSortAdapter: DragSortAdapter<*>, itemView: View) : DragSortAdapter.ViewHolder(dragSortAdapter, itemView), View.OnLongClickListener, View.OnClickListener {
+        fun swap(fromPosition: Int, toPosition: Int) {
+            Collections.swap(mEntries, fromPosition, toPosition)
+            saveOrder()
+            folder?.let { itFolder ->
+                updateFolderImage(itFolder.dto, mEntries)
+            }
+            notifyItemMoved(fromPosition, toPosition)
+            notifyDataChanged()
+        }
+
+        internal inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnLongClickListener, View.OnClickListener {
             val container: LinearLayout = itemView.findViewById(R.id.fragment_edit_folder_entries_container)
             val imageView: ImageView = itemView.findViewById(R.id.fragment_edit_folder_entries_image)
             val textView: TextView = itemView.findViewById(R.id.fragment_edit_folder_entries_text)
@@ -498,8 +521,7 @@ class EditFolderFragment : Fragment() {
             }
 
             override fun onLongClick(view: View): Boolean {
-                startDrag()
-                return true
+                return false
             }
 
             override fun onClick(v: View) {
