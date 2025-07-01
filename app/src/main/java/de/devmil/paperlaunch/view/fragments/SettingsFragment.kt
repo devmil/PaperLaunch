@@ -38,6 +38,7 @@ class SettingsFragment : PreferenceFragment() {
     private var userSettings: UserSettings? = null
     private var activationParametersChangedListener: (() -> Unit)? = null
 
+    @Deprecated("Deprecated in Java")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

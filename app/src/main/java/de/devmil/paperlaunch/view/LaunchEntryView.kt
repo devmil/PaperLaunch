@@ -27,6 +27,7 @@ internal class LoadParams(var target: ImageView, var entry: LaunchEntryViewModel
 
 internal class LoadIconTask : AsyncTask<LoadParams, Void, Void>() {
 
+    @Deprecated("Deprecated in Java")
     override fun doInBackground(vararg params: LoadParams): Void? {
         for (p in params) {
             val icon = p.entry.appIcon

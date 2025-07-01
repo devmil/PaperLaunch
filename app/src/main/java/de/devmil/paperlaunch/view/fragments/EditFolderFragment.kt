@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION")
+
 package de.devmil.paperlaunch.view.fragments
 
 
@@ -88,6 +90,7 @@ class EditFolderFragment : Fragment() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         config = LaunchConfig(UserSettings(activity))
@@ -96,11 +99,13 @@ class EditFolderFragment : Fragment() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onResume() {
         super.onResume()
         bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val result = inflater.inflate(R.layout.fragment_edit_folder, container, false)
@@ -316,6 +321,7 @@ class EditFolderFragment : Fragment() {
         startActivityForResult(intent, REQUEST_ADD_URL)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when(requestCode) {

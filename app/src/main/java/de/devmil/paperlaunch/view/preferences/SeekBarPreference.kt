@@ -41,6 +41,7 @@ class SeekBarPreference(context: Context, min: Int, max: Int) : Preference(conte
         layoutResource = R.layout.preference_seekbar
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBindView(view: View) {
         super.onBindView(view)
 
@@ -73,6 +74,7 @@ class SeekBarPreference(context: Context, min: Int, max: Int) : Preference(conte
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onSetInitialValue(restorePersistedValue: Boolean, defaultValue: Any) {
         setValue(if (restorePersistedValue) getPersistedInt(currentValue) else defaultValue as Int)
     }

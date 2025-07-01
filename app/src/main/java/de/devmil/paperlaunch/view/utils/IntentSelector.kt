@@ -50,6 +50,7 @@ class IntentSelector : Activity() {
         var isAnotherSearchRunning: Boolean = false
         var isObsolete: Boolean = false
 
+        @Deprecated("Deprecated in Java")
         override fun doInBackground(vararg params: Unit?) {
             //this approach can kill the PackageManager if there are too many apps installed
             //				List<ResolveInfo> shortcutResolved = getPackageManager().queryIntentActivities(shortcutIntent, PackageManager.GET_ACTIVITIES | PackageManager.GET_INTENT_FILTERS);
@@ -82,12 +83,14 @@ class IntentSelector : Activity() {
                     if (showAll) {
                         try {
                             val pi = pm.getPackageInfo(appInfo.packageName, PackageManager.GET_ACTIVITIES or PackageManager.GET_INTENT_FILTERS)
+                            pi.activities?.let { it ->
+                                for (ai in it) {
+                                    val ri = ResolveInfo()
+                                    ri.activityInfo = ai
 
-                            for (ai in pi.activities) {
-                                val ri = ResolveInfo()
-                                ri.activityInfo = ai
+                                    mainResolved.add(ri)
+                                }
 
-                                mainResolved.add(ri)
                             }
 
                             addMainActivities = false
@@ -137,12 +140,14 @@ class IntentSelector : Activity() {
             }
         }
 
+        @Deprecated("Deprecated in Java")
         override fun onPreExecute() {
             super.onPreExecute()
             val localIntentSelector = intentSelectorRef.get()
             localIntentSelector?.runOnUiThread { localIntentSelector.llWait!!.visibility = View.VISIBLE }
         }
 
+        @Deprecated("Deprecated in Java")
         override fun onPostExecute(result: Unit?) {
             super.onPostExecute(result)
             val localIntentSelector = intentSelectorRef.get()
@@ -160,6 +165,7 @@ class IntentSelector : Activity() {
             }
         }
 
+        @Deprecated("Deprecated in Java")
         override fun onCancelled() {
             super.onCancelled()
             val localIntentSelector = intentSelectorRef.get()
