@@ -17,8 +17,6 @@ package de.devmil.paperlaunch.config
 
 interface IUserSettings {
 
-    val activationOffsetHeightDip: Int
-    val activationOffsetPositionDip: Int
     val sensitivityDip: Int
     val isOnRightSide: Boolean
     val isShowBackground: Boolean
@@ -26,4 +24,8 @@ interface IUserSettings {
     val launcherGravity: LauncherGravity?
     val showLogo: Boolean
     val itemScalePercent: Int
+    val activationHeightPercent: Int
+    val activationOffsetPosition: Int
+    val isShowHint : Boolean
+
 }

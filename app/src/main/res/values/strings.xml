@@ -90,4 +90,7 @@
     <string name="activity_edit_setting_description_enable">Activate</string>
     <string name="activity_edit_setting_description_disable">Pause</string>
     <string name="activity_edit_setting_new_paperlaunch_state">New PaperLaunch state:</string>
+    <string name="fragment_settings_activation_show_hint_title">Show activation hint</string>
+    <string name="fragment_settings_activation_show_hint_summary_on">Activation hint is shown</string>
+    <string name="fragment_settings_activation_show_hint_summary_off">Activation hint is not shown</string>
 </resources>

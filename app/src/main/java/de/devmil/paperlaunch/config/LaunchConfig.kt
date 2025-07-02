@@ -46,15 +46,17 @@ class LaunchConfig(userSettings: IUserSettings) : ILaunchEntryConfig, ILaunchLan
     val launcherBackgroundAlpha = 0.3f
     val launcherBackgroundAnimationDurationMS = 250
     val maxFolderDepth = 9
+    val launcherHintAlpha = 0.28f
 
     //UserSettings
     @Suppress("JoinDeclarationAndAssignment")
     val launcherSensitivityDip: Int
     override val isOnRightSide: Boolean
-    val launcherOffsetPositionDip: Int
-    val launcherOffsetHeightDip: Int
     val showLauncherBackground: Boolean
     val isVibrateOnActivation: Boolean
+    val launcherOffsetPosition: Int
+    val launcherHeightPercent: Int
+    val showLauncherHint : Boolean
     override val launcherGravity: LauncherGravity?
     override val imageWidthDip: Float
     override val showLogo: Boolean
@@ -68,12 +70,13 @@ class LaunchConfig(userSettings: IUserSettings) : ILaunchEntryConfig, ILaunchLan
     init {
         launcherSensitivityDip = userSettings.sensitivityDip
         isOnRightSide = userSettings.isOnRightSide
-        launcherOffsetPositionDip = userSettings.activationOffsetPositionDip
-        launcherOffsetHeightDip = userSettings.activationOffsetHeightDip
         showLauncherBackground = userSettings.isShowBackground
         isVibrateOnActivation = userSettings.isVibrateOnActivation
         launcherGravity = userSettings.launcherGravity
         imageWidthDip = (BASE_IMAGE_WIDTH_DIP * userSettings.itemScalePercent) / 100f
         showLogo = userSettings.showLogo
+        showLauncherHint = userSettings.isShowHint
+        launcherOffsetPosition = userSettings.activationOffsetPosition
+        launcherHeightPercent = userSettings.activationHeightPercent
     }
 }
