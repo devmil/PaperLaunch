@@ -64,8 +64,8 @@ class SettingsActivity : Activity() {
                 activationIndicatorView,
                 this,
                 ViewUtils.getPxFromDip(this, us.sensitivityDip.toFloat()).toInt(),
-                ViewUtils.getPxFromDip(this, us.activationOffsetPositionDip.toFloat()).toInt(),
-                ViewUtils.getPxFromDip(this, us.activationOffsetHeightDip.toFloat()).toInt(),
+                us.activationOffsetPosition,
+                us.activationHeightPercent,
                 us.isOnRightSide,
                 ContextCompat.getColor(this, R.color.theme_accent)
         )

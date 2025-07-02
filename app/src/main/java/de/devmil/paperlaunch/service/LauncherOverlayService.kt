@@ -23,12 +23,15 @@ import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Rect
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RoundRectShape
 import android.os.Build
 import android.os.IBinder
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
+import android.support.v4.content.ContextCompat
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
@@ -376,14 +379,25 @@ class LauncherOverlayService : Service() {
 
     @Synchronized private fun reloadTouchReceiver() {
 
+        val showLauncherHint = currentConfig!!.showLauncherHint
+        val colorAccent = ContextCompat.getColor(this, R.color.theme_accent)
+        val backgroundColor =   if(showLauncherHint)
+                                    Color.argb(
+                                        (currentConfig!!.launcherHintAlpha * 0xff).toInt(),
+                                        Color.red(colorAccent),
+                                        Color.green(colorAccent),
+                                        Color.blue(colorAccent) )
+                                else Color.TRANSPARENT
+
         val avr = addActivationViewToWindow(
                 touchReceiverView,
                 this,
                 ViewUtils.getPxFromDip(this, currentConfig!!.launcherSensitivityDip.toFloat()).toInt(),
-                ViewUtils.getPxFromDip(this, currentConfig!!.launcherOffsetPositionDip.toFloat()).toInt(),
-                ViewUtils.getPxFromDip(this, currentConfig!!.launcherOffsetHeightDip.toFloat()).toInt(),
+                currentConfig!!.launcherOffsetPosition,
+                currentConfig!!.launcherHeightPercent,
                 currentConfig!!.isOnRightSide,
-                Color.TRANSPARENT)
+                backgroundColor
+        )
 
         if(!avr.success) {
             return
@@ -630,13 +644,34 @@ class LauncherOverlayService : Service() {
             @Suppress("RtlHardcoded")
             params.gravity = Gravity.LEFT or Gravity.TOP
 
+            val cornerRadius = 20.0f
+            val radiusRect = if(isOnRightSide)
+                                RoundRectShape(
+                                floatArrayOf(cornerRadius,cornerRadius,.0f,.0f,.0f,.0f,cornerRadius,cornerRadius), null, null)
+                            else
+                                RoundRectShape(
+                                floatArrayOf(.0f,.0f,cornerRadius,cornerRadius,cornerRadius,cornerRadius,.0f,.0f), null, null)
+
+            val activationBg = ShapeDrawable().apply {
+                shape = radiusRect
+                paint.color = backgroundColor
+            }
+
             result.activationView = LinearLayout(context)
-            result.activationView!!.setBackgroundColor(backgroundColor)
+            result.activationView!!.background = activationBg
 
             val touchReceiverParams = LinearLayout.LayoutParams(
                     activationRect.width(),
                     activationRect.height())
             touchReceiverParams.setMargins(0, activationRect.top, 0, windowRect.height() - activationRect.bottom)
+
+            // Prevent conflicting with system's back gesture starting Android 10
+            val exclusionRects = mutableListOf<Rect>()
+            val exclusionRect = Rect(0, 0,activationRect.width(), activationRect.height())
+            exclusionRects.add(exclusionRect)
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){ // Android 10 and up
+                result.activationView!!.systemGestureExclusionRects = exclusionRects
+            }
 
             wm.addView(result.activationView, params)
 
