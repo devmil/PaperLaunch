@@ -37,15 +37,14 @@ object ActivationIndicatorHelper {
             right = left + sensitivity
         }
 
-        val height = availableRect.height() - offsetSize
-        top += offsetPosition + offsetSize / 2
+        val height = (availableRect.height() * (offsetSize/100.0f)).toInt()
+
+        // top += (center Y of the window) - (half the view height) + ( (position range) * position percentage)
+        top += ((availableRect.height()/2) - (height / 2) + ( (availableRect.height()-height) * offsetPosition/100.0f) ).toInt()
+
         bottom = top + height
 
         val result = Rect(left, top, right, bottom)
-
-        if (!result.intersect(availableRect)) {
-            return availableRect
-        }
 
         return result
     }

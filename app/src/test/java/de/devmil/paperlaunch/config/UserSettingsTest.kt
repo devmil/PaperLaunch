@@ -22,8 +22,8 @@ class UserSettingsTest {
 
     private fun createUUT(
             sensitivityDip: Int,
-            activationOffsetPositionDip: Int,
-            activationOffsetHeightDip: Int,
+            activationOffsetPosition: Int,
+            activationOffsetHeightPercent: Int,
             isShowBackground: Boolean,
             isVibrateOnActivation: Boolean,
             isOnRightSide: Boolean,
@@ -37,10 +37,10 @@ class UserSettingsTest {
 
         `when`(mockSharedPreferences.getInt(eq(UserSettings.KEY_SENSITIVITY_DIP), anyInt()))
                 .thenReturn(sensitivityDip)
-        `when`(mockSharedPreferences.getInt(eq(UserSettings.KEY_ACTIVATION_OFFSET_POSITION_DIP), anyInt()))
-                .thenReturn(activationOffsetPositionDip)
-        `when`(mockSharedPreferences.getInt(eq(UserSettings.KEY_ACTIVATION_OFFSET_HEIGHT_DIP), anyInt()))
-                .thenReturn(activationOffsetHeightDip)
+        `when`(mockSharedPreferences.getInt(eq(UserSettings.KEY_ACTIVATION_OFFSET_POSITION), anyInt()))
+                .thenReturn(activationOffsetPosition)
+        `when`(mockSharedPreferences.getInt(eq(UserSettings.KEY_ACTIVATION_HEIGHT_PERCENT), anyInt()))
+                .thenReturn(activationOffsetHeightPercent)
         `when`(mockSharedPreferences.getBoolean(eq(UserSettings.KEY_SHOW_BACKGROUND), anyBoolean()))
                 .thenReturn(isShowBackground)
         `when`(mockSharedPreferences.getBoolean(eq(UserSettings.KEY_VIBRATE_ON_ACTIVATION), anyBoolean()))

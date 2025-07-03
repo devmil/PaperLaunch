@@ -89,34 +89,29 @@ class SettingsFragment : PreferenceFragment() {
         val metrics = DisplayMetrics()
         activity.windowManager.defaultDisplay.getMetrics(metrics)
 
-        val heightDpi = metrics.heightPixels / metrics.density
-
-        val offsetHeightPreference = SeekBarPreference(context, 0, heightDpi.toInt())
+        val offsetHeightPreference = SeekBarPreference(context, 0, 100)
         activationCategory.addPreference(offsetHeightPreference)
 
-        offsetHeightPreference.setValue(heightDpi.toInt() - userSettings!!.activationOffsetHeightDip)
+        offsetHeightPreference.setValue(userSettings!!.activationHeightPercent)
         offsetHeightPreference.setTitle(R.string.fragment_settings_activation_offset_height_title)
         offsetHeightPreference.isPersistent = false
         offsetHeightPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
             userSettings!!.load(activity)
-            userSettings!!.activationOffsetHeightDip = heightDpi.toInt() - newValue as Int
+            userSettings!!.activationHeightPercent = newValue as Int
             userSettings!!.save(activity)
             fireActivationParametersChanged()
             true
         }
 
-        val offsetMin = -(heightDpi / 2).toInt()
-        val offsetMax = (heightDpi / 2).toInt()
-
-        val offsetPositionPreference = SeekBarPreference(context, offsetMin, offsetMax)
+        val offsetPositionPreference = SeekBarPreference(context, -50,50) // 0 is center of the window's height
         activationCategory.addPreference(offsetPositionPreference)
 
-        offsetPositionPreference.setValue(userSettings!!.activationOffsetPositionDip)
+        offsetPositionPreference.setValue(userSettings!!.activationOffsetPosition)
         offsetPositionPreference.setTitle(R.string.fragment_settings_activation_offset_position_title)
         offsetPositionPreference.isPersistent = false
         offsetPositionPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
             userSettings!!.load(activity)
-            userSettings!!.activationOffsetPositionDip = newValue as Int
+            userSettings!!.activationOffsetPosition = newValue as Int
             userSettings!!.save(activity)
             fireActivationParametersChanged()
             true
@@ -137,6 +132,26 @@ class SettingsFragment : PreferenceFragment() {
             LauncherOverlayService.notifyConfigChanged(activity)
             true
         }
+
+        val showActivationHintPreference = CheckBoxPreference(context)
+        activationCategory.addPreference(showActivationHintPreference)
+
+        val isShowHint = userSettings!!.isShowHint
+        showActivationHintPreference.isChecked = isShowHint
+
+        showActivationHintPreference.setTitle(R.string.fragment_settings_activation_show_hint_title)
+        showActivationHintPreference.setSummaryOn(R.string.fragment_settings_activation_show_hint_summary_on)
+        showActivationHintPreference.setSummaryOff(R.string.fragment_settings_activation_show_hint_summary_off)
+        showActivationHintPreference.isPersistent = false
+        showActivationHintPreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener{ _, newValue ->
+            userSettings!!.load(activity)
+            userSettings!!.isShowHint = newValue as Boolean
+            userSettings!!.save(activity)
+            LauncherOverlayService.notifyConfigChanged(activity)
+
+            true
+        }
+
     }
 
     private fun addAppearanceSettings(context: Context, screen: PreferenceScreen) {
