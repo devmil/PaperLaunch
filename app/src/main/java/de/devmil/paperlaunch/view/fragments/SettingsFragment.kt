@@ -43,6 +43,8 @@ class SettingsFragment : PreferenceFragment() {
     private var userSettings: UserSettings? = null
     private var activationParametersChangedListener: (() -> Unit)? = null
 
+    private val executor = java.util.concurrent.Executors.newSingleThreadExecutor()
+    
     @Deprecated("Deprecated in Java")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,48 +61,61 @@ class SettingsFragment : PreferenceFragment() {
         addBackupSettings(context, screen)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        executor.shutdown()
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && data != null && data.data != null) {
             val uri = data.data!!
             if (requestCode == REQUEST_CODE_EXPORT) {
-                Thread {
+                executor.execute {
+                    val context = activity
+                    if (context == null || context.isFinishing) {
+                        return@execute
+                    }
                     try {
-                        val json = DataExporter(activity).exportToJson()
-                        activity.contentResolver.openOutputStream(uri)?.use { output ->
+                        val json = DataExporter(context).exportToJson()
+                        context.contentResolver.openOutputStream(uri)?.use { output ->
                             output.write(json.toByteArray())
                         }
-                        activity.runOnUiThread {
-                            Toast.makeText(activity, R.string.fragment_settings_backup_export_success, Toast.LENGTH_SHORT).show()
+                        context.runOnUiThread {
+                            Toast.makeText(context, R.string.fragment_settings_backup_export_success, Toast.LENGTH_SHORT).show()
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        activity.runOnUiThread {
-                            Toast.makeText(activity, R.string.fragment_settings_backup_export_error, Toast.LENGTH_SHORT).show()
+                        context.runOnUiThread {
+                            Toast.makeText(context, R.string.fragment_settings_backup_export_error, Toast.LENGTH_SHORT).show()
                         }
                     }
-                }.start()
+                }
             } else if (requestCode == REQUEST_CODE_IMPORT) {
-                Thread {
+                executor.execute {
+                    val context = activity
+                    if (context == null || context.isFinishing) {
+                        return@execute
+                    }
                     try {
-                        val json = activity.contentResolver.openInputStream(uri)?.use { input ->
+                        val json = context.contentResolver.openInputStream(uri)?.use { input ->
                             input.bufferedReader().use { it.readText() }
                         }
                         if (json != null) {
-                            DataImporter(activity).importFromJson(json)
-                            activity.runOnUiThread {
-                                Toast.makeText(activity, R.string.fragment_settings_backup_import_success, Toast.LENGTH_SHORT).show()
-                                LauncherOverlayService.notifyDataChanged(activity)
+                            DataImporter(context).importFromJson(json)
+                            context.runOnUiThread {
+                                Toast.makeText(context, R.string.fragment_settings_backup_import_success, Toast.LENGTH_SHORT).show()
+                                LauncherOverlayService.notifyDataChanged(context)
                             }
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        activity.runOnUiThread {
-                            Toast.makeText(activity, R.string.fragment_settings_backup_import_error, Toast.LENGTH_SHORT).show()
+                        context.runOnUiThread {
+                            Toast.makeText(context, R.string.fragment_settings_backup_import_error, Toast.LENGTH_SHORT).show()
                         }
                     }
-                }.start()
+                }
             }
         }
     }
