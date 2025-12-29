@@ -93,4 +93,14 @@
     <string name="fragment_settings_activation_show_hint_title">Show activation hint</string>
     <string name="fragment_settings_activation_show_hint_summary_on">Activation hint is shown</string>
     <string name="fragment_settings_activation_show_hint_summary_off">Activation hint is not shown</string>
+    <string name="fragment_settings_category_backup_title">Backup &amp; Restore</string>
+    <string name="fragment_settings_backup_export_title">Export Configuration</string>
+    <string name="fragment_settings_backup_import_title">Import Configuration</string>
+    <string name="fragment_settings_backup_export_success">Export successful</string>
+    <string name="fragment_settings_backup_export_error">Export failed</string>
+    <string name="fragment_settings_backup_import_success">Import successful</string>
+    <string name="fragment_settings_backup_import_error">Import failed</string>
+    <string name="fragment_settings_backup_import_warning_title">Overwrite Data?</string>
+    <string name="fragment_settings_backup_import_warning_message">This will overwrite your current configuration. Are you sure?</string>
+    <string name="activity_intentselector_title_count">Select App (%d)</string>
 </resources>

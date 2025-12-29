@@ -22,7 +22,10 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 import java.lang.ref.WeakReference
-import java.util.*
+import java.util.ArrayList
+import java.util.Collections
+import java.util.Comparator
+import java.util.Locale
 
 class IntentApplicationEntry @Throws(NameNotFoundException::class)
 constructor(context: Context, packageName: String) : Comparable<IntentApplicationEntry> {
@@ -35,6 +38,7 @@ constructor(context: Context, packageName: String) : Comparable<IntentApplicatio
 
     private val appInfo: ApplicationInfo = context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
     val name: CharSequence
+    val nameLowercase: String
     private var appIcon: Drawable? = null
 
     private val intentItems = ArrayList<IntentItem>()
@@ -43,8 +47,8 @@ constructor(context: Context, packageName: String) : Comparable<IntentApplicatio
     private var shortcutIntentItems: MutableList<IntentItem>? = null
 
     init {
-
         name = context.packageManager.getApplicationLabel(appInfo)
+        nameLowercase = name.toString().lowercase(Locale.getDefault())
     }
 
     fun addResolveInfo(info: ResolveInfo, intentType: IntentType) {
@@ -164,6 +168,9 @@ constructor(context: Context, packageName: String) : Comparable<IntentApplicatio
 
         val displayName: String
             get() = name.toString() + if (isLauncherActivity) " (Launcher)" else ""
+        
+        val displayNameLowercase: String
+            get() = displayName.lowercase(Locale.getDefault())
     }
 
     private val context : WeakReference<Context> = WeakReference(context)

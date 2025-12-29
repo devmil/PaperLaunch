@@ -103,6 +103,7 @@ class EditFolderFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        loadData()
     }
 
     @Deprecated("Deprecated in Java")
@@ -310,6 +311,7 @@ class EditFolderFragment : Fragment() {
         intent.setClass(activity, IntentSelector::class.java)
         intent.putExtra(IntentSelector.EXTRA_STRING_ACTIVITIES, resources.getString(R.string.folder_settings_add_app_activities))
         intent.putExtra(IntentSelector.EXTRA_STRING_SHORTCUTS, resources.getString(R.string.folder_settings_add_app_shortcuts))
+        intent.putExtra(IntentSelector.EXTRA_ALLOW_MULTI_SELECT, true)
 
         startActivityForResult(intent, REQUEST_ADD_APP)
     }
@@ -331,7 +333,12 @@ class EditFolderFragment : Fragment() {
                     return
                 }
                 if(data != null) {
-                    addLaunch(data)
+                    if (data.hasExtra(IntentSelector.EXTRA_RESULT_INTENTS)) {
+                        val list = data.getParcelableArrayListExtra<Intent>(IntentSelector.EXTRA_RESULT_INTENTS)
+                        list?.let { addLaunches(it) }
+                    } else {
+                        addLaunch(data)
+                    }
                 }
             }
             REQUEST_EDIT_FOLDER -> {
@@ -349,6 +356,27 @@ class EditFolderFragment : Fragment() {
 
                 adapter?.let { itAdapter ->
                     itAdapter.addEntry(l)
+                    folder?.let { itFolder ->
+                        updateFolderImage(itFolder.dto, itAdapter.entries)
+                    }
+                }
+            }
+        })
+        notifyDataChanged()
+    }
+
+    private fun addLaunches(launchIntents: List<Intent>) {
+        EntriesDataSource.instance.accessData(activity, object: ITransactionAction {
+            override fun execute(transactionContext: ITransactionContext) {
+                adapter?.let { itAdapter ->
+                    val newEntries = ArrayList<IEntry>()
+                    for (launchIntent in launchIntents) {
+                        val l = transactionContext.createLaunch(folderId)
+                        l.dto.launchIntent = launchIntent
+                        transactionContext.updateLaunchData(l)
+                        newEntries.add(l)
+                    }
+                    itAdapter.addEntries(newEntries)
                     folder?.let { itFolder ->
                         updateFolderImage(itFolder.dto, itAdapter.entries)
                     }
@@ -430,6 +458,12 @@ class EditFolderFragment : Fragment() {
 
         fun addEntry(entry: IEntry) {
             mEntries.add(entry)
+            saveOrder()
+            notifyDataSetChanged()
+        }
+
+        fun addEntries(entries: List<IEntry>) {
+            mEntries.addAll(entries)
             saveOrder()
             notifyDataSetChanged()
         }

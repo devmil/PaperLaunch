@@ -7,8 +7,8 @@ android {
         minSdkVersion 21
         compileSdkVersion 35
         targetSdkVersion 35
-        versionCode 19
-        versionName "2.0.0"
+        versionCode 20
+        versionName "2.1.0"
         archivesBaseName = "paperlaunch-v${defaultConfig.versionName}-${buildTime()}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -60,6 +60,7 @@ dependencies {
     implementation 'io.reactivex:rxandroid:1.1.0'
     implementation 'io.reactivex:rxjava:1.1.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
 
     testImplementation 'junit:junit:4.13.2'
