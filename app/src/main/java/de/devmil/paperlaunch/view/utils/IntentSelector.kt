@@ -385,11 +385,11 @@ class IntentSelector : AppCompatActivity(), SearchView.OnQueryTextListener {
                 val q = query.lowercase(Locale.getDefault())
                 for (entry in originalEntries) {
                     var matches = false
-                    if (entry.name.toString().lowercase(Locale.getDefault()).contains(q)) {
+                    if (entry.nameLowercase.contains(q)) {
                         matches = true
                     } else {
                         val subList = getSubList(entry)
-                        if (subList.any { it.displayName.lowercase(Locale.getDefault()).contains(q) }) {
+                        if (subList.any { it.displayNameLowercase.contains(q) }) {
                             matches = true
                         }
                     }
