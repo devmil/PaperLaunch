@@ -28,7 +28,8 @@
         </activity>
         <activity
             android:name=".view.utils.IntentSelector"
-            android:label="@string/activity_intentselector_label" />
+            android:label="@string/activity_intentselector_label"
+            android:theme="@style/Theme.PaperLaunch.NoActionBar"/>
         <activity
             android:name=".view.utils.UrlSelector"
             android:label="@string/activity_urlselector_label" />

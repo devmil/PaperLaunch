@@ -8,4 +8,14 @@
         <!-- Status bar configuration for API 35+ -->
         <item name="android:statusBarColor">@color/theme_primary_light</item>
     </style>
+
+    <style name="Theme.PaperLaunch.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorAccent">@color/theme_accent</item>
+        <item name="colorPrimary">@color/theme_primary</item>
+        <item name="colorPrimaryDark">@color/theme_primary_dark</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!-- Status bar configuration for API 35+ -->
+        <item name="android:statusBarColor">@color/theme_primary_light</item>
+    </style>
 </resources>

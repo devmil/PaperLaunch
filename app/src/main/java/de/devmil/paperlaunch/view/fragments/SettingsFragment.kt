@@ -31,7 +31,12 @@ import de.devmil.paperlaunch.R
 import de.devmil.paperlaunch.config.LauncherGravity
 import de.devmil.paperlaunch.config.UserSettings
 import de.devmil.paperlaunch.service.LauncherOverlayService
+import de.devmil.paperlaunch.storage.DataExporter
+import de.devmil.paperlaunch.storage.DataImporter
 import de.devmil.paperlaunch.view.preferences.SeekBarPreference
+import android.content.Intent
+import android.app.Activity
+import android.widget.Toast
 
 class SettingsFragment : PreferenceFragment() {
 
@@ -51,6 +56,53 @@ class SettingsFragment : PreferenceFragment() {
 
         addActivationSettings(context, screen)
         addAppearanceSettings(context, screen)
+        addBackupSettings(context, screen)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && data != null && data.data != null) {
+            val uri = data.data!!
+            if (requestCode == REQUEST_CODE_EXPORT) {
+                Thread {
+                    try {
+                        val json = DataExporter(activity).exportToJson()
+                        activity.contentResolver.openOutputStream(uri)?.use { output ->
+                            output.write(json.toByteArray())
+                        }
+                        activity.runOnUiThread {
+                            Toast.makeText(activity, R.string.fragment_settings_backup_export_success, Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        activity.runOnUiThread {
+                            Toast.makeText(activity, R.string.fragment_settings_backup_export_error, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }.start()
+            } else if (requestCode == REQUEST_CODE_IMPORT) {
+                Thread {
+                    try {
+                        val json = activity.contentResolver.openInputStream(uri)?.use { input ->
+                            input.bufferedReader().use { it.readText() }
+                        }
+                        if (json != null) {
+                            DataImporter(activity).importFromJson(json)
+                            activity.runOnUiThread {
+                                Toast.makeText(activity, R.string.fragment_settings_backup_import_success, Toast.LENGTH_SHORT).show()
+                                LauncherOverlayService.notifyDataChanged(activity)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        activity.runOnUiThread {
+                            Toast.makeText(activity, R.string.fragment_settings_backup_import_error, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }.start()
+            }
+        }
     }
 
     fun setOnActivationParametersChangedListener(listener: () -> Unit) {
@@ -303,5 +355,50 @@ class SettingsFragment : PreferenceFragment() {
                 return R.string.fragment_settings_appearance_gravity_optionbottom_summary
             }
         }
+    }
+
+    private fun addBackupSettings(context: Context, screen: PreferenceScreen) {
+        val backupCategory = PreferenceCategory(context)
+        screen.addPreference(backupCategory)
+
+        backupCategory.isPersistent = false
+        backupCategory.setTitle(R.string.fragment_settings_category_backup_title)
+
+        val exportPreference = Preference(context)
+        backupCategory.addPreference(exportPreference)
+        exportPreference.setTitle(R.string.fragment_settings_backup_export_title)
+        exportPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+                putExtra(Intent.EXTRA_TITLE, "paperlaunch_backup.json")
+            }
+            startActivityForResult(intent, REQUEST_CODE_EXPORT)
+            true
+        }
+
+        val importPreference = Preference(context)
+        backupCategory.addPreference(importPreference)
+        importPreference.setTitle(R.string.fragment_settings_backup_import_title)
+        importPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            android.app.AlertDialog.Builder(activity)
+                .setTitle(R.string.fragment_settings_backup_import_warning_title)
+                .setMessage(R.string.fragment_settings_backup_import_warning_message)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "application/json"
+                    }
+                    startActivityForResult(intent, REQUEST_CODE_IMPORT)
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+            true
+        }
+    }
+
+    companion object {
+        private const val REQUEST_CODE_EXPORT = 101
+        private const val REQUEST_CODE_IMPORT = 102
     }
 }

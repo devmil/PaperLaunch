@@ -174,8 +174,12 @@ class LauncherOverlayService : Service() {
     }
 
     private fun adaptState(forceReload: Boolean) {
+        if (forceReload) {
+            resetConfig()
+            resetData()
+        }
         if (state.isActive) {
-            ensureOverlayActive(forceReload)
+            ensureOverlayActive(false)
         } else {
             ensureOverlayInActive()
         }

@@ -16,6 +16,11 @@
 package de.devmil.paperlaunch.view.utils
 
 import android.app.Activity
+import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
+import android.support.v7.widget.SearchView
+import android.view.Menu
+import android.view.MenuItem
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -32,7 +37,7 @@ import de.devmil.paperlaunch.R
 import java.lang.ref.WeakReference
 import java.util.*
 
-class IntentSelector : Activity() {
+class IntentSelector : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     private var llWait: LinearLayout? = null
     private var lvActivities: ExpandableListView? = null
@@ -52,11 +57,6 @@ class IntentSelector : Activity() {
 
         @Deprecated("Deprecated in Java")
         override fun doInBackground(vararg params: Unit?) {
-            //this approach can kill the PackageManager if there are too many apps installed
-            //				List<ResolveInfo> shortcutResolved = getPackageManager().queryIntentActivities(shortcutIntent, PackageManager.GET_ACTIVITIES | PackageManager.GET_INTENT_FILTERS);
-            //				List<ResolveInfo> mainResolved = getPackageManager().queryIntentActivities(mainIntent, PackageManager.GET_ACTIVITIES | PackageManager.GET_INTENT_FILTERS);
-            //				List<ResolveInfo> launcherResolved = getPackageManager().queryIntentActivities(launcherIntent, PackageManager.GET_ACTIVITIES | PackageManager.GET_INTENT_FILTERS);
-
             intentSelectorRef.get()?.let {
                 val pm = it.packageManager
 
@@ -64,75 +64,64 @@ class IntentSelector : Activity() {
                 val mainResolved = ArrayList<ResolveInfo>()
                 val launcherResolved = ArrayList<ResolveInfo>()
 
-                val appInfos = pm.getInstalledApplications(PackageManager.GET_META_DATA)
-
                 val showAll = it.chkShowAllActivities!!.isChecked
 
-                for (appInfo in appInfos) {
-                    if(isCancelled || isObsolete) {
-                        return
-                    }
-                    val shortcutIntent = Intent(Intent.ACTION_CREATE_SHORTCUT)
-                    shortcutIntent.`package` = appInfo.packageName
+                // Instead of getInstalledApplications, we query intents directly for better performance
 
-                    val appShortcutResolved = pm.queryIntentActivities(shortcutIntent, PackageManager.GET_META_DATA)
-                    shortcutResolved.addAll(appShortcutResolved)
-
-                    var addMainActivities = true
-
-                    if (showAll) {
-                        try {
-                            val pi = pm.getPackageInfo(appInfo.packageName, PackageManager.GET_ACTIVITIES or PackageManager.GET_INTENT_FILTERS)
-                            pi.activities?.let { it ->
-                                for (ai in it) {
-                                    val ri = ResolveInfo()
-                                    ri.activityInfo = ai
-
-                                    mainResolved.add(ri)
-                                }
-
-                            }
-
-                            addMainActivities = false
-                        } catch (e: Exception) {
-                        }
-
-                    }
-
-                    if (addMainActivities) {
-                        val mainIntent = Intent(Intent.ACTION_MAIN)
-                        mainIntent.`package` = appInfo.packageName
-
-                        val appMainResolved = pm.queryIntentActivities(mainIntent, PackageManager.GET_META_DATA)
-                        mainResolved.addAll(appMainResolved)
-                    }
-
-                    val launcherIntent = Intent(Intent.ACTION_MAIN)
-                    launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER)
-                    launcherIntent.`package` = appInfo.packageName
-
-                    val appLauncherResolved = pm.queryIntentActivities(launcherIntent, PackageManager.GET_META_DATA)
-                    launcherResolved.addAll(appLauncherResolved)
+                // 1. Launcher Activities (Always needed)
+                val launcherIntent = Intent(Intent.ACTION_MAIN)
+                launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+                try {
+                    launcherResolved.addAll(pm.queryIntentActivities(launcherIntent, 0))
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error querying launcher activities", e)
                 }
 
-                for (ri in shortcutResolved) {
-                    if(isCancelled || isObsolete) {
-                        return
-                    }
-                    addResolveInfo(ri, IntentApplicationEntry.IntentType.Shortcut, false, entries)
+                if (isCancelled || isObsolete) return
+
+                // 2. Shortcuts (Always needed)
+                val shortcutIntent = Intent(Intent.ACTION_CREATE_SHORTCUT)
+                try {
+                    shortcutResolved.addAll(pm.queryIntentActivities(shortcutIntent, 0))
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error querying shortcut activities", e)
                 }
-                for (ri in mainResolved) {
-                    if(isCancelled || isObsolete) {
-                        return
+
+                if (isCancelled || isObsolete) return
+
+                // 3. Main Activities (Only if showAll is true)
+                // Note: Querying ACTION_MAIN without category can be huge, but if user requests it...
+                // We can optimize by iterating launcherResolved/shortcutResolved to find packages?
+                // Or just query only if checked.
+                if (showAll) {
+                    val mainIntent = Intent(Intent.ACTION_MAIN)
+                    try {
+                        mainResolved.addAll(pm.queryIntentActivities(mainIntent, 0))
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error querying main activities", e)
                     }
-                    addResolveInfo(ri, IntentApplicationEntry.IntentType.Main, showAll, entries)
                 }
+
+                // Process Launcher Activities
                 for (ri in launcherResolved) {
-                    if(isCancelled || isObsolete) {
-                        return
-                    }
+                    if (isCancelled || isObsolete) return
                     addResolveInfo(ri, IntentApplicationEntry.IntentType.Launcher, false, entries)
                 }
+
+                // Process Shortcut Activities
+                for (ri in shortcutResolved) {
+                     if (isCancelled || isObsolete) return
+                     addResolveInfo(ri, IntentApplicationEntry.IntentType.Shortcut, false, entries)
+                }
+
+                // Process Main Activities
+                if (showAll) {
+                    for (ri in mainResolved) {
+                        if (isCancelled || isObsolete) return
+                        addResolveInfo(ri, IntentApplicationEntry.IntentType.Main, true, entries)
+                    }
+                }
+
                 //sort
                 val comparator = Comparator<IntentApplicationEntry> { object1, object2 -> object1.compareTo(object2) }
                 entries.sortWith(comparator)
@@ -158,6 +147,9 @@ class IntentSelector : Activity() {
 
                     localIntentSelector.lvActivities!!.setAdapter(localIntentSelector.adapterActivities)
                     localIntentSelector.lvShortcuts!!.setAdapter(localIntentSelector.adapterShortcuts)
+
+                    localIntentSelector.adapterActivities?.filter(localIntentSelector.mCurrentQuery)
+                    localIntentSelector.adapterShortcuts?.filter(localIntentSelector.mCurrentQuery)
                 }
                 if(!isAnotherSearchRunning) {
                     localIntentSelector.llWait!!.visibility = View.GONE
@@ -196,14 +188,18 @@ class IntentSelector : Activity() {
 
         private var intentSelectorRef: WeakReference<IntentSelector> = WeakReference(intentSelector)
     }
-
     private var mSearchTask : SearchTask? = null
+    private var adapterActivities: IntentSelectorAdapter? = null
+    private var adapterShortcuts: IntentSelectorAdapter? = null
 
-    internal var adapterActivities: IntentSelectorAdapter? = null
-    internal var adapterShortcuts: IntentSelectorAdapter? = null
+    private var fabDone: android.support.design.widget.FloatingActionButton? = null
+    private var allowMultiSelect: Boolean = false
+    private val selectedIntents = ArrayList<Intent>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        allowMultiSelect = intent.getBooleanExtra(EXTRA_ALLOW_MULTI_SELECT, false)
 
         if(mSearchTask != null) {
             mSearchTask!!.cancel(true)
@@ -231,24 +227,48 @@ class IntentSelector : Activity() {
         txtShortcuts = findViewById(R.id.common__intentSelector_txtShortcuts)
         toolbar = findViewById(R.id.common__intentSelector_toolbar)
 
-        setActionBar(toolbar)
+        setSupportActionBar(toolbar)
 
         txtShortcuts!!.text = shortcutText
 
         lvActivities!!.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
-            val resultIntent = Intent(Intent.ACTION_MAIN)
             val entry = adapterActivities!!.getChild(groupPosition, childPosition) as IntentApplicationEntry.IntentItem
+            val resultIntent = Intent(Intent.ACTION_MAIN)
             resultIntent.setClassName(entry.packageName, entry.activityName)
-            setResultIntent(resultIntent)
-            true
+
+            if (allowMultiSelect) {
+                toggleSelection(resultIntent)
+                adapterActivities!!.notifyDataSetChanged()
+                true
+            } else {
+                setResultIntent(resultIntent)
+                true
+            }
         }
         chkShowAllActivities!!.setOnCheckedChangeListener { _, _ -> startSearch() }
         lvShortcuts!!.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
-            val shortcutIntent = Intent(Intent.ACTION_CREATE_SHORTCUT)
             val entry = adapterShortcuts!!.getChild(groupPosition, childPosition) as IntentApplicationEntry.IntentItem
+            val shortcutIntent = Intent(Intent.ACTION_CREATE_SHORTCUT)
             shortcutIntent.setClassName(entry.packageName, entry.activityName)
             startActivityForResult(shortcutIntent, CREATE_SHORTCUT_REQUEST)
             false
+        }
+
+        fabDone = findViewById(R.id.common__intentSelector_fab)
+        if (allowMultiSelect) {
+            fabDone!!.show()
+            fabDone!!.setOnClickListener {
+                val resultIntent = Intent()
+                resultIntent.putParcelableArrayListExtra(EXTRA_RESULT_INTENTS, selectedIntents)
+                setResult(Activity.RESULT_OK, resultIntent)
+                finish()
+            }
+            // Keep tabs but maybe hide shortcuts for multiselect if not supported?
+            // Assuming shortcuts are not supported in multi-select for now or handled same way?
+            // Existing logic launches helper activity for shortcuts. This breaks multi-select flow unless handled.
+            // For now, let's just make Multi-Select work for Apps which is the performance killer.
+        } else {
+            fabDone!!.hide()
         }
 
         val tabs = this.findViewById<TabHost>(android.R.id.tabhost)
@@ -271,6 +291,27 @@ class IntentSelector : Activity() {
         llWait!!.visibility = View.VISIBLE
 
         startSearch()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_intent_selector, menu)
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as SearchView
+        searchView.setOnQueryTextListener(this)
+        return true
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
+
+    private var mCurrentQuery: String? = null
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        mCurrentQuery = newText
+        adapterActivities?.filter(newText)
+        adapterShortcuts?.filter(newText)
+        return true
     }
 
     private fun startSearch() {
@@ -300,13 +341,65 @@ class IntentSelector : Activity() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
+    private fun toggleSelection(intent: Intent) {
+        // Simple check based on component name
+        val component = intent.component ?: return
+        val existing = selectedIntents.find { it.component == component }
+        if (existing != null) {
+            selectedIntents.remove(existing)
+        } else {
+            selectedIntents.add(intent)
+        }
+        updateTitleInternal()
+    }
+
+    private fun updateTitleInternal() {
+        if (!allowMultiSelect) return
+        if (selectedIntents.size > 0) {
+            title = getString(R.string.activity_intentselector_title_count, selectedIntents.size)
+        } else {
+            title = getString(R.string.activity_intentselector_label)
+        }
+    }
+
+    private fun isSelected(intent: Intent): Boolean {
+        val component = intent.component ?: return false
+        return selectedIntents.any { it.component == component }
+    }
+
     internal class IntentSelectorAdapter(private val context: Context, entriesList: List<IntentApplicationEntry>, private val intentType: IntentApplicationEntry.IntentType) : BaseExpandableListAdapter() {
-        private val entries: MutableList<IntentApplicationEntry>
+        private var entries: MutableList<IntentApplicationEntry>
+        private val originalEntries: List<IntentApplicationEntry>
 
         init {
-            this.entries = entriesList
+            this.originalEntries = entriesList
                     .filter { getSubList(it).isNotEmpty() }
-                    .toMutableList()
+            this.entries = this.originalEntries.toMutableList()
+        }
+
+        fun filter(query: String?) {
+            entries.clear()
+            if (query.isNullOrEmpty()) {
+                entries.addAll(originalEntries)
+            } else {
+                val q = query.lowercase(Locale.getDefault())
+                for (entry in originalEntries) {
+                    var matches = false
+                    if (entry.name.toString().lowercase(Locale.getDefault()).contains(q)) {
+                        matches = true
+                    } else {
+                        val subList = getSubList(entry)
+                        if (subList.any { it.displayName.lowercase(Locale.getDefault()).contains(q) }) {
+                            matches = true
+                        }
+                    }
+
+                    if (matches) {
+                        entries.add(entry)
+                    }
+                }
+            }
+            notifyDataSetChanged()
         }
 
         fun getSubList(entry: IntentApplicationEntry): List<IntentApplicationEntry.IntentItem> {
@@ -329,9 +422,21 @@ class IntentSelector : Activity() {
             }
             val txt = effectiveConvertView!!.findViewById<TextView>(R.id.common__intentselectoritem_text)
             val txtActivityName = effectiveConvertView.findViewById<TextView>(R.id.common__intentselectoritem_activityName)
+            val checkbox = effectiveConvertView.findViewById<CheckBox>(R.id.common__intentselectoritem_checkbox)
 
-            txt.text = getSubList(entries[groupPosition])[childPosition].displayName
-            txtActivityName.text = getSubList(entries[groupPosition])[childPosition].activityName
+            val item = getSubList(entries[groupPosition])[childPosition]
+            txt.text = item.displayName
+            txtActivityName.text = item.activityName
+
+            if ((context as IntentSelector).allowMultiSelect && intentType == IntentApplicationEntry.IntentType.Main) {
+                checkbox.visibility = View.VISIBLE
+                val testIntent = Intent(Intent.ACTION_MAIN)
+                testIntent.setClassName(item.packageName, item.activityName)
+                checkbox.isChecked = context.isSelected(testIntent)
+            } else {
+                checkbox.visibility = View.GONE
+            }
+
             return effectiveConvertView
         }
 
@@ -387,6 +492,8 @@ class IntentSelector : Activity() {
         var EXTRA_SHORTCUT_TEXT = "de.devmil.common.extras.SHORTCUT_TEXT"
         var EXTRA_STRING_SHORTCUTS = "de.devmil.common.extras.STRING_SHORTCUTS"
         var EXTRA_STRING_ACTIVITIES = "de.devmil.common.extras.STRING_ACTIVITIES"
+        var EXTRA_ALLOW_MULTI_SELECT = "de.devmil.common.extras.ALLOW_MULTI_SELECT"
+        var EXTRA_RESULT_INTENTS = "de.devmil.common.extras.RESULT_INTENTS"
 
         private fun getSubList(entry: IntentApplicationEntry, intentType: IntentApplicationEntry.IntentType): List<IntentApplicationEntry.IntentItem> {
             when (intentType) {
