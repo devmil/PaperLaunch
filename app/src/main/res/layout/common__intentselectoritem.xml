@@ -15,7 +15,8 @@
         android:focusable="false"
         android:clickable="false"
         android:layout_marginEnd="12dp"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:contentDescription="Select this item"/>
 
     <LinearLayout
         android:layout_width="0dp"

@@ -107,6 +107,6 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_check"
         android:visibility="gone"
-        />
+        android:contentDescription="Confirm selection" />
 
 </RelativeLayout>

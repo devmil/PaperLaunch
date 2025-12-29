@@ -60,7 +60,7 @@ class DataImporter(private val context: Context) {
         } else if (entry.type == "launch") {
             val launch = transactionContext.createLaunch(parentFolderId, orderIndex)
             launch.dto.name = entry.name
-            launch.dto.launchIntent = IntentSerializer.deserialize(entry.intentUri)
+            launch.dto.launchIntent = entry.intentUri?.let { IntentSerializer.deserialize(it) }
             if (entry.icon != null) {
                 launch.dto.icon = decodeIcon(entry.icon)
             }
